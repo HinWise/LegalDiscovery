@@ -920,6 +920,9 @@ def dataentryui_spider(request):
     the_user = request.user
     user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     
+    if(the_user.username=="dimaelkezee"):
+        document_type = 'Arabic'
+    
     sourcepdfs_list = SourcePdf.objects.all()
     count_assigned = 0
     count_done = 0
@@ -927,15 +930,12 @@ def dataentryui_spider(request):
     if(the_user.is_superuser == True):
     
         sourcepdfs_handles_list = SourcePdfToHandle.objects.filter(assignedcompany=user_group).exclude(checked="checked")[:1]
-        print sourcepdfs_handles_list
-        print "FIRST"
+        
         if sourcepdfs_handles_list:
-            print sourcepdfs_handles_list
-            print "SECOND"
+            
             sourcepdfs_handle_item = sourcepdfs_handles_list[0]
-            print sourcepdfs_handle_item
             sourcepdfs_list = SourcePdf.objects.filter(assigndata=sourcepdfs_handle_item)[0]
-            print sourcepdfs_list
+            
         else:
             print "NO SOURCEPDF HANDLE MATCHING THE QUERY SUPERUSER!"+the_user.username
             
