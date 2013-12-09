@@ -1178,7 +1178,7 @@
                                     
                     });
                             
-                      $('#purchasenumberlink').text("Purchase Order / Contract Number: " + new_text);
+                      $('#purchasenumberlink').text("Purchase Order/Bon de Commande / Contract Number: " + new_text);
                       $('#purchasenumber').attr("value",new_text);
                       $('#purchasenumber').val(new_text);
                       
@@ -1204,7 +1204,7 @@
                                               
                     
                     var new_value = event.currentTarget.value;
-                    $('#purchasenumberlink').text("Purchase Order / Contract Number: " + new_value);
+                    $('#purchasenumberlink').text("Purchase Order/Bon de Commande / Contract Number: " + new_value);
                     $(this).attr("value",new_value);
                                                     
                     
@@ -1807,7 +1807,7 @@
                             if(purchasenumber.length)
                             {
                                 bValid = bValid && checkLength( purchasenumber, "Purchase Number", 1, 255  );
-                                //bValid = bValid && checkRegexp( purchasenumber, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Purchase Order Number may consist of a-z, 0-9, underscores, spaces, points and commas." );
+                                //bValid = bValid && checkRegexp( purchasenumber, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Purchase Order/Bon de Commande Number may consist of a-z, 0-9, underscores, spaces, points and commas." );
                             }
                             if(arabic.length)
                             {
@@ -2107,15 +2107,23 @@
     {% if sourcepdfs_list %}
     <div id="companyform_container">
             
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 <div id="company-dialog" >
-
                     <form id="company-form" title="Company Details">
                         <h4 id="fromTemplate_dialog"></h4>
                         <p class="validateTips_Company">Ensure that all fields are correct for the actual document.</p>
                         <fieldset id="company_fieldset">
-                            <label for="companyform_name">Company Name</label>
-                            <input type="text" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
+                                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
+                                    <label for="companyform_name">Company Name</label>
+                                {% endif %}
+                                {% if document_type = "Bulletin de Paie" or document_type = "Expense Claim" %}
+                                    <label for="companyform_name">Employee Name</label>
+                                {% endif %}
+                                    <input type="text" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                                
+                            {% endif %}
+                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" %}
                             <ul class="menuclass" id="companyaddress_menu">
                                 <li>
                                     <a id="companyaddress_link" href="#">Address</a>
@@ -2128,6 +2136,8 @@
                                     </ul>
                                 </li>  
                             </ul>
+                            {% endif %}
+                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" %}
                             <ul class="menuclass" id="companytelephone_menu">
                                 <li>
                                     <a id="companytelephone_link" href="#">Telephone</a>
@@ -2140,9 +2150,16 @@
                                     </ul>
                                 </li>  
                             </ul>
+                            {% endif %}
+                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Expense Claim" %}
                             <ul class="menuclass" id="companycity_menu">
                                 <li>
+                                    {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" %}
                                     <a id="companycity_link" href="#">City</a>
+                                    {% endif %}
+                                    {% if document_type = "Expense Claim" %}
+                                    <a id="companycity_link" href="#">Base</a>
+                                    {% endif %}
                                     <ul>
                                       <li><a href="#"><input type="text" value="" placeholder="Try to Search the City first." name="companyform_city" id="companyform_city" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
                                       <li>--</li>
@@ -2152,6 +2169,8 @@
                                     </ul>
                                 </li>  
                             </ul>
+                            {% endif %}
+                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Expense Claim" %}
                             <ul class="menuclass" id="companycountry_menu">
                                 <li>
                                     <a id="companycountry_link" href="#">Country</a>
@@ -2164,6 +2183,7 @@
                                     </ul>
                                 </li>  
                             </ul>
+                            {% endif %}
                         </fieldset>
                     </form>
                 </div>
@@ -2211,7 +2231,7 @@
                           <li><a href="#">Receipt/Recu</a></li>
                           {% endif %}
                           {% if user_group = "INVENSIS" or user_group = "NathanTeam" %}
-                          <li><a href="#">Purchase Order</a></li>
+                          <li><a href="#">Purchase Order/Bon de Commande</a></li>
                           {% endif %}
                           {% if user_group = "INVENSIS" or user_group = "NathanTeam" %}
                           <li><a href="#">Contract Page 1</a></li>
@@ -2221,6 +2241,18 @@
                           {% endif %}
                           {% if user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
                           <li><a href="#">Arabic</a></li>
+                          {% endif %}
+                          {% if user_group = "NathanTeam" %}
+                          <li><a href="#">Avis de Credit</a></li>
+                          {% endif %}
+                          {% if user_group = "NathanTeam" %}
+                          <li><a href="#">Avis de Debit</a></li>
+                          {% endif %}
+                          {% if user_group = "NathanTeam" %}
+                          <li><a href="#">Expense Claim</a></li>
+                          {% endif %}
+                          {% if user_group = "NathanTeam" %}
+                          <li><a href="#">Bulletin de Paie</a></li>
                           {% endif %}
                           
                           <li><a href="#">Other</a></li>
@@ -2233,7 +2265,7 @@
                 
                 <!-- AMOUNT -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 
                 <ul class="menuclass" id="amountmenu">
                     <li>
@@ -2253,7 +2285,7 @@
                 
                 <!-- CURRENCY -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 <!--<label for="currency">Currency</label>-->
                 
                 <ul class="menuclass" id="currencymenu">
@@ -2274,7 +2306,7 @@
                 
                 <!-- COMPANY -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 
                 <ul class="menuclass" id="companymenu">
                     <li>
@@ -2308,7 +2340,7 @@
                 {% if document_type = "Nothing" %}
                 <!-- SOURCE DOCUMENT -->
                 
-                <!--{% if document_type = "Cheque" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                <!--{% if document_type = "Cheque" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" %}
                 <ul class="menuclass" id="sourcedocmenu">
                     <li>
                         <a id="sourcedoclink" href="#">Source of Document</a>
@@ -2325,7 +2357,7 @@
                 
                 <!-- ISSUE DATE -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 <label for="issuedate-day">Issue Date:</label>
                 <input type="text" name="issuedate" id="issuedate" class="invisible"/>
                 <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="" class="date_text text ui-widget-content ui-corner-all" />
@@ -2336,7 +2368,7 @@
                 
                 <!-- DOCUMENT NUMBER -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" or document_type = "Contract Page X" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 
                 <ul class="menuclass" id="docnumbermenu">
                     <li>
@@ -2355,7 +2387,7 @@
                 
                 <!-- ACCOUNT NUMBER -->
                 
-                {% if document_type = "Cheque" %}
+                {% if document_type = "Cheque" or document_type = "Avis de Credit" or document_type = "Avis de Debit"%}
                 
                 <ul class="menuclass" id="accountnummenu">
                     <li>
@@ -2379,9 +2411,9 @@
                 
                 <ul class="menuclass" id="purchasenumbermenu">
                     <li>
-                        <a id="purchasenumberlink" href="#">Purchase Order / Contract Number:</a>
+                        <a id="purchasenumberlink" href="#">Purchase Order/Bon de Commande / Contract Number:</a>
                         <ul>
-                          <li><a href="#"><input type="text" value="" placeholder="Write the Purchase Order Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Purchase Order/Bon de Commande Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
                           <li>--</li>
                           <li><a class="purchasenumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2395,7 +2427,7 @@
                 
                 <!-- ARABIC -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Cheque Stub" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Cheque Stub" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 <ul class="menuclass" id="arabicmenu">
                     <li>
                         <a id="arabiclink" href="#">Contains Arabic:</a>
@@ -2411,7 +2443,7 @@
                 
                 <!-- PIECE NUMBER -->
                 
-                {% if document_type = "Cheque" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                {% if document_type = "Cheque" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 
                 <ul class="menuclass" id="piecenumbermenu">
                     <li>
@@ -2454,7 +2486,7 @@
          
                 {% endif %}
                 <!-- MEMO -->
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" or document_type = "Contract Page X" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
                 <label for="memo">Memo</label>
                 <input type="text" name="memo" id="memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
                 {% endif %}
