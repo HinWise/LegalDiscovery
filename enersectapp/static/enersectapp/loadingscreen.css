@@ -1,0 +1,50 @@
+@charset "UTF-8";
+
+#LoadingScreen {
+
+    position:absolute;
+
+    top:0;
+    left:0;
+    
+    width:100%;
+    height:100%;
+    
+    opacity:0.65;
+    
+    z-index:1000;
+    
+    background-color: white;
+
+}
+
+#LoadingSpinner {
+
+    position:fixed;
+
+    top:50%;
+    left:50%;
+    
+    
+    opacity:1;
+
+}
+
+#LoadingDescription {
+
+    position:fixed;
+
+    color:black;
+    
+    top:50%;
+    left:50%;
+    
+    opacity:1;
+    
+    text-align:center;
+    
+    margin-top:2%;
+
+   
+
+}

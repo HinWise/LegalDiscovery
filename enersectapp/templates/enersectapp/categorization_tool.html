@@ -1,0 +1,599 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/categorization_tool.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+{% endblock special_libs %}
+
+{% block config_libs %} 
+
+
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+<script>
+    
+    $(document).ready(function () {
+           
+                
+        $('.ui-widget').css("font-size","80%");
+        var tips = $( ".validateTips" );
+        tips.css("display","none");
+        createPdf_View();
+        createUserPanel();
+        createFieldsForm();
+        createFilters();
+        classLocator();
+        configLoadingScreen();
+        
+        function createFilters(){
+
+            
+            $( "#filter_container_mode" ).buttonset();
+        
+            
+            $('.choice').click(function(){
+            
+               mode = $(this).attr("choice_value");
+            
+               $('#mode').attr("value",mode);
+               $('#save_id').attr("value","NoId");
+               
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+            });
+            
+            
+        }
+        
+        function createPdf_View(){
+                var $pdf = $('#pdf_view');
+            
+                var w=$pdf.width();
+                var h=$pdf.height();
+                       
+                var link = $pdf.attr("value");
+         
+                var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+        }
+        
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+                
+                
+                
+        }
+            
+        function createFieldsForm(){
+        
+        
+            var companyValid = false;
+            var allFields = $( [] );
+
+            //DOCUMENT TYPE Menu Config
+                        
+            var doctype = $( "#doctype" );
+            
+    
+            if(doctype.length)
+            {
+            
+            allFields.add(doctype);
+            
+            var doc_value = doctype.attr("value");
+            
+            if(doc_value != "Document Type")
+            {
+                if(doc_value == "other" || doc_value == "uncategorized" || doc_value == "Other")
+                {
+                    
+                    $("#doctypemenu").addClass("ui-state-custom-error");
+                }
+                else
+                {
+                    $("#doctypemenu").addClass("ui-state-custom-filled");
+                }
+                
+                $('#doctypelink').text("Document Type: " + doc_value);
+            }
+
+            ////////////
+            $( "#doctypemenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#doctypemenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".doctypeoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.doctypeoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#doctype').unbind('copy paste', function (e) {
+                                    
+                    });
+                      
+                      $('#doctypelink').text("Document Type: " + new_text);
+                      $('#doctype').attr("value",new_text);
+                      $('#doctype').val(new_text);
+                      
+                      $("#doctypemenu").addClass("ui-state-custom-error");
+                        
+                    $('#doctype').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                    
+                        $('#doctype').click();
+                });
+                
+                $('#doctypemenu').removeClass('ui-menu-divider');
+                
+                $('#doctype').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#doctypemenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        
+                        $('#doctypelink').text("Document Type: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#doctypemenu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#doctypemenu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#doctypemenu").addClass("ui-state-custom-filled");
+                                                       
+                            
+                            if ($("#doctypemenu").hasClass("ui-state-custom-error") && new_value != "Other" && new_value != "other" && new_value != "uncategorized" )
+                            {
+                               
+                                $("#doctypemenu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+            ////
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:false,
+                resizable: false,
+                closeOnEscape: false,
+                buttons: {
+                    "Save in Database": function() {
+                        
+                        var bValid = true;
+
+                        //allFields.removeClass( "ui-state-error" );
+                        $(".ui-state-error").removeClass( "ui-state-error" );
+                        
+                            if(doctype.attr("value") == "uncategorized")
+                            {
+                                //bValid = false;
+                            }
+                            if(doctype.length)
+                            {
+                                if (doctype.val() == "uncategorized" || doctype.val() == "other" || doctype.val() == "Other") { bValid = false;}
+                                bValid = bValid && checkLength( doctype, "doctype", 1, 255  );
+                                bValid = bValid && checkRegexp( doctype, /^([0-9a-z_ '.,º\/])+$/i, "Document Type must be selected." );
+                            }
+                             
+                        if ( bValid ) {
+                            
+                            toggleLoadingScreen();
+                            
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            $('#fields_form').submit();
+                            
+                        }
+                    },
+                    
+                },
+                close: function() {
+                    allFields.val( "" ).removeClass( "ui-state-error" );
+                    
+                                        
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+
+        }
+        }
+        
+       
+        function checkLength( o, n, min, max ) {
+            if ( o.val().length > max || o.val().length < min ) {
+                o.addClass( "ui-state-error" );
+                updateTips(" Document Type must be selected or added! If you really don't know what type it is, choose 'Unsure'");
+                /*updateTips( "Length of " + n + " must be between " +
+                min + " and " + max + "." );*/
+                return false;
+            } 
+            else {
+                return true;
+            }
+        }
+        
+        function updateTips( t ) {
+                  tips
+                    .text( t )
+                    .addClass( "ui-state-error" );
+                    tips.css("display","block");
+                  setTimeout(function() {
+                    tips.removeClass( "ui-state-error", 1500 );
+                    tips.css("display","none");
+                  }, 5000 );
+        }
+             
+        function checkRegexp( o, regexp, n ) {
+        
+            if((o.val()!="Other") && (o.val()!="other") && (o.val()!="uncategorized") )
+            {
+        
+                if ( !( regexp.test( o.val() ) ) ) {
+                    o.addClass( "ui-state-error" );
+                    updateTips( n );
+                    return false;
+                } 
+                else {
+                    return true;
+                }
+            }
+            else return true;
+        }
+        
+        function populateFields() {
+            
+            var new_text = $('#doctypelink').text(new_text);
+            $('#doctype').attr("value",new_text);
+            $('#doctype').val(new_text);
+            
+        }
+        
+
+        function classLocator(){
+        
+            $actual_mode = $('#mode').attr("value");
+
+            if ($actual_mode == "uncategorized_mode"){
+                
+                $('#filter_pdf_uncategorized').attr("checked","checked").button("refresh");
+          
+            }           
+            
+            if ($actual_mode == "other_mode"){
+
+                $('#filter_pdf_other').attr("checked","checked").button("refresh");
+            }      
+
+        }
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+    });
+        
+</script>
+{% endblock config_libs %}
+
+<title>Categorization Tool Interface</title>
+
+</head>
+{% endblock page_title %}
+
+
+
+
+
+{% block jqueryui_setups %}
+
+
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    
+    {% if chosen_item %}
+    
+    
+    <div id="left_container">
+    
+        <div id="fields_container">
+        
+            <div id="dialog-form" title="Assign New Document Type">
+                            
+                <p class="validateTips">Selecting or Adding a Document Type is Required.</p>
+             
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:categorization_tool' %}" method="post">
+                {% csrf_token %}
+               
+                <fieldset id="fieldset_fields">
+               
+                <input class="invisible" type="text" name="save_id" id="save_id" value="{{chosen_item.id}}" />
+                <input class="invisible" type="text" name="mode" id="mode" value="{{mode}}" />
+                
+                
+                <ul class="menuclass" id="doctypemenu">
+                    <li>
+                        {% if mode = "uncategorized_mode" %} 
+                        <a id="doctypelink" href="#">Document Type:{{chosen_item.modified_document_type__name}}</a>
+                        {% endif %}
+                        {% if mode = "other_mode" %} 
+                        <a id="doctypelink" href="#">Document Type:{{chosen_item.modified_document_type__name}}</a>
+                        {% endif %}
+                        <ul>
+                          {% if mode = "uncategorized_mode" %} 
+                          <li><a href="#"><input value="{{chosen_item.modified_document_type__name}}" placeholder="Write the New Document Type here" type="text" name="doctype" id="doctype" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
+                          {% if mode = "other_mode" %} 
+                          <li><a href="#"><input value="{{chosen_item.modified_document_type__name}}" placeholder="Write the New Document Type here" type="text" name="doctype" id="doctype" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
+                          {% for type in types_list %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li>--</li>
+                          <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                          {% endif %}
+                          {% endfor %}
+                          <!--{% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li>--</li>
+                          <li><a class="doctypeoption" href="#" value='Cheque'>Cheque</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Cheque Stub'>Cheque Stub</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Invoice/Facture'>Invoice/Facture</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Receipt/Recu'>Receipt/Recu</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Purchase Order'>Purchase Order</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Blank'>Blank</a></li>
+                          <li>--</li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a class="doctypeoption" href="#" value='Unsure'>Unsure</a></li>
+                          {% endif %}-->
+                        </ul>
+                    </li>
+                </ul>
+
+              </fieldset>
+                
+                
+              </form>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div id="right_container">
+        
+        {% if mode = "uncategorized_mode" %}        
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{chosen_item.job_directory}}\{{chosen_item.filename}}">
+        {% endif %}
+        {% if mode = "other_mode" %}        
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{chosen_item.sourcedoc_link__job_directory}}\{{chosen_item.sourcedoc_link__filename}}">
+        {% endif %}
+        </div>
+        
+        <div id="filters_panel">
+                
+                <div class="show-option" id="filter_container_mode" title="Filter the Search Results by one Category">
+                    
+                    <input type="radio" class="filter_choice choice" id="filter_pdf_uncategorized" choice_value="uncategorized_mode" name="radio2" /><label class="filter_choice_label" for="filter_pdf_uncategorized">Source Docs</label>
+                    <input type="radio" class="filter_choice choice" id="filter_pdf_other" choice_value="other_mode" name="radio2" /><label class="filter_choice_label" for="filter_pdf_other">Pdf Records</label>
+                            
+                </div>                        
+        </div>
+        
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                
+                {% if mode = "uncategorized_mode" %}        
+                <p class="validateTips_Countdown">{{show_progress_user}} <br><br> Documents Uncategorized left in this Mode: {{count_uncategorized}}</p>
+                {% endif %}
+                {% if mode = "other_mode" %}        
+                <p class="validateTips_Countdown">{{show_progress_user}} <br><br> Documents Uncategorized left in this Mode: {{count_other}}</p>
+                {% endif %}
+                
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    {% else %}
+    
+    <div id="left_container">
+    
+        <div id="fields_container">
+        
+            <div id="dialog-form" title="Assign New Document Type">
+                            
+                <p class="validateTips">Selecting or Adding a Document Type is Required.</p>
+             
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:categorization_tool' %}" method="post">
+                {% csrf_token %}
+               
+                <fieldset id="fieldset_fields">
+               
+                <input class="invisible" type="text" name="save_id" id="save_id" value="{{chosen_item.id}}" />
+                <input class="invisible" type="text" name="mode" id="mode" value="{{mode}}" />
+                
+                </fieldset>
+                
+                
+              </form>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div id="right_container">
+        
+        {% if mode = "uncategorized_mode" %}        
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{chosen_item.job_directory}}\{{chosen_item.filename}}">
+        {% endif %}
+        {% if mode = "other_mode" %}        
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{chosen_item.sourcedoc_link__job_directory}}\{{chosen_item.sourcedoc_link__filename}}">
+        {% endif %}
+        </div>
+        
+        <div id="filters_panel">
+                
+                <div class="show-option" id="filter_container_mode" title="Filter the Search Results by one Category">
+                    
+                    <input type="radio" class="filter_choice choice" id="filter_pdf_uncategorized" choice_value="uncategorized_mode" name="radio2" /><label class="filter_choice_label" for="filter_pdf_uncategorized">Source Docs</label>
+                    <input type="radio" class="filter_choice choice" id="filter_pdf_other" choice_value="other_mode" name="radio2" /><label class="filter_choice_label" for="filter_pdf_other">Pdf Records</label>
+                            
+                </div>                        
+        </div>
+        
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">{{show_progress_user}} <br><br> All Documents in this Mode have valid Categories.</p>
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    
+    {% endif %}
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

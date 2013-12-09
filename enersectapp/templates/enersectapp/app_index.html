@@ -1,0 +1,100 @@
+
+{% load i18n %}
+
+{% block page_title %}
+<head>
+<title>Enersect Apps Main Menu</title>
+</head>
+{% endblock page_title %}
+
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_site_titles_etc.css' %}" />
+
+
+<script>
+    
+    $(document).ready(function(){
+        
+        createUserPanel();
+        
+        $( "#tools-panel" ).dialog({
+                  
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  
+                  
+        });
+                
+        $( "#toolspanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+        });    
+
+
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+        }
+    
+    });
+    
+
+</script>
+
+<body>
+
+    
+    <div id="toolspanel_container">
+            <div id="tools-panel" title="Tools Available">
+                <!--<p class="validateTips_ToolsAvailable">Comment paragraph</p>-->
+                <ul class="menuclass" id="toolspanelmenu">
+                    {% for userinterfacetype in uitype_list %}
+                        <li><a href="{{userinterfacetype.redirection_url}}">{{ userinterfacetype.name }}</a></li>
+                        <li>--</li>
+                    {% endfor %}
+                        <li><a href="{% url 'admin:index' %}">Admin App</a></li>
+                </ul>
+            </div>
+    </div>
+    
+    <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user.username}}">
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    
+                </ul>
+            </div>
+    </div>
+    
+</body>
+
+

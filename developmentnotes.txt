@@ -1,0 +1,124 @@
+Development notes:
+
+1. do you have the relational database structure file? NASP Discovery Project Database blabla
+to help guide which fields would be displayed there.
+
+on the left with the internal accounting fields I think we'll need date of transaction,
+ credit/debit amount, name of client,and of course the memo field +++
+ 
+ 
+all the major stuff from the grande livre pdf there,on the right hand side,
+where it says "PDF record 1",and you click on it and get more info.
+I want it to display 3 things.  amount, date, company,and you click on it and get more info.
+and the more info should have the other important info
+including memo field, account number... everything significant about the record in the database basically
+and of course we'll need the search buttons and stuff, but that goes without saying +++
+
+
+after that's done
+we'll have to figure out the scripts for getting the files from the databases and linking them together
+what sort of searches will be most effective
+and marios will need to be in on that bad boy because he's been coddling the data
+
+
+for the first demo
+we'll have a toggle button that says "include linked records in search" +++
+
+
+Xanto:and about that, can something be linked with two pdf records?
+
+Nath:let's think this through
+ we do have a few multi-page documents
+ hmmm
+ 
+
+but this will be for the next iteration, it's not a right now priority
+for the first demo
+we'll have a toggle button that says "include linked records in search"
+and potential matches that are already linked will come up in red
+if someone thinks the link was made in error they can flag it +++
+
+
+
+
+-Search bar above PDF Records.+++
+
+-Different data options / Combo Search +- Extra field +++
+
+-Pdf_Records with Author = Automatic 
+
+-SKip button in lower right hand corner+++
+
+-Instead of "Fixed", "Undo Error"++
+
+-Instead of "Undo", say "Unlink"+++
+
+-Skip Button Tooltip to say: "Only Skip if there is no obvious match."+++
+
+-Skip confirmation. Are you sure? (If it is Skipped, it goes out of the records pool)+++
+
+-Low priority : Error Panel to Select typical types of Records or Comment if you dont find them. (If I can do that in a sort amount of time)+++
+ 
+-Low priority : Background to a solid one, instead of patterned+++
+
+-Remember to fix the Date Search, which right now isn't working properly 
+
+-Remember the Auth, and to change the "Modification Author" each time someone Links, Flags or Skips a Record
+ 
+
+
+Command to Load Data to Database: python manage.py loaddata "D:\01_Projects\Important Shit Projects\On the Go\EVS Nathan Project\MariosDjango\Fixtures\AmalgamatedOutput.csv.json"
+
+
+Data entry tooL:
+
+-remember to make KeyDown Enter for the input text areas, if possible! Right now it is TAB!
+-yeah.  a checkbox or button or something so that if the first search doesn't work out, it will move to other categories, "Extra results", or "Extend Search"
+
+Type of output:
+
+-Document Discovery Report: Exhibit Number, Document Title (Either Automatic or Manual), Description of some sort, Page Number. Able to Turn Off any of those fields
+
+
+
+
+class InternalRecord(models.Model):
+        
+    AccountNum = models.CharField('Account Number',max_length=255)
+    Company = models.CharField('Company',max_length=255)
+    Nomvt = models.CharField('Number Movement',max_length=255)
+    Journal = models.CharField('Journal',max_length=255)
+    Date = models.CharField('Date',max_length=255)
+    Nopiece = models.CharField('Nopiece',max_length=255)
+    Memo = models.CharField('Memo',max_length=255)
+    S = models.CharField('S',max_length=255)
+    Debit = models.CharField('Debit',max_length=255)
+    Lett = models.CharField('Lett',max_length=255)    
+    Credit = models.CharField('Credit',max_length=255)
+    def __unicode__(self):
+        return self.Memo  
+        
+        
+        
+Feedback on Entry Tool on 10_10_2013:
+
+-It didn't add the New Company to the Company List when saved
+-Work on the speed of the fade-outs when you click outside. +++
+-"Done" button to enter fields or some more definitive way of how to enter data. --- Not doing that because the interaction is already messy enough.
+-Team Leader in admin can undo the superuser priviledges by using his action, and modify the superuser.
+     He should only see people with his group assigned.
+     Try to make the Grouping automatic for each Leader.
+     Also, the Grouping is not working. The marked users are not staff, or even active.
+
+-Should tell what Company Fields are incorrect when closing the Company window, instead of the other one. +++
+-Country should autofill when choosing the City. +++
+-No Autofills in Input Text Areas (HTML Defaults that remember what you wrote before)++?
+-Focus all the menus out when you focus in on something +++
+-"Cheque number" should appear insted of Document Number, once that is filled. --
+-Extra case for when all the records are completed. +++
+-Currency from an Array and also Autocomplete like COmpany Name, City, etc. +++
+-Make the Company Form bigger so City and Country are later, and so it can fit without scrolling.+++
+-Change MouseOver for MouseClick, in the Menus.
+
+
+

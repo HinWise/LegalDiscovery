@@ -1,0 +1,222 @@
+
+{% load i18n admin_static %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/sudo_assign_by_doctype_and_number.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+{% endblock special_libs %}
+
+{% block javascript %} 
+
+<script>
+
+    $(document).ready(function () {
+    
+        createPanels();
+        setFields();
+        configLoadingScreen();
+        
+        function createSlider(){
+        
+            /*$('#slider').slider({
+                value: $('#num_toassign').attr("value"),
+                min: 0,
+                max: $('#max_assign').attr("value"),
+                range: "max",
+                step: 1,
+                animate: 100,
+                
+            });*/
+        
+        
+        }
+        
+        function createPanels(){
+        
+            $( "#companychoose" ).dialog({
+              autoOpen: true,
+              height: 450,
+              width: 400,
+              modal: true,
+              closeOnEscape: false,
+              resizable: false,
+              buttons: {
+                "Assign Selected Documents": function() {
+                
+                    $('#save_data').attr("value","save_data");
+                    saveFieldsAndSubmit();
+                    
+                    
+                }
+              }
+          
+            });
+            
+            
+            $( "#companiesmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#companiesmenu" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $('#companieslink').text("Company: " +new_text);
+                                $('#company_name').attr("value",new_text);
+                                
+                                $("#companiesmenu").addClass("ui-state-custom-filled");
+                            }
+                            saveFieldsAndSubmit();
+                            
+                        } 
+            });
+            
+            $( "#doctypesmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#companiesmenu" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $('#doctypeslink').text("Document Type: " +new_text);
+                                $('#doctype_name').attr("value",new_text);
+                                
+                                $("#doctypesmenu").addClass("ui-state-custom-filled");
+                            } 
+                            saveFieldsAndSubmit();
+                        } 
+            });
+        
+        }
+    
+        function setFields(){
+        
+            var new_text = $('#company_name').attr("value");
+            if (new_text != "NoCompanyName") {
+                $('#companieslink').text("Company: " +new_text);
+                $("#companiesmenu").addClass("ui-state-custom-filled");
+                
+            }
+            else
+            {
+                $("#doctypesmenu").menu({ disabled: true }).addClass("invisible");
+                $('button').attr("disabled", true).addClass("ui-state-disabled").addClass("invisible");
+                $("#num_toassign").addClass("invisible");
+            }
+            var new_text = $('#doctype_name').attr("value");
+            if (new_text != "NoDocType") {
+                $('#doctypeslink').text("Document Type: " +new_text);
+                $("#doctypesmenu").addClass("ui-state-custom-filled");
+                createSlider();
+            }
+            else
+            {
+                $('button').attr("disabled", true).addClass("ui-state-disabled").addClass("invisible");
+                $("#num_toassign").addClass("invisible");
+            }
+            
+
+        }
+    
+        function saveFieldsAndSubmit(){
+        
+            toggleLoadingScreen();
+            $('#ChooseForm').submit();
+            
+        }
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+                  
+    });
+
+</script>
+
+{% endblock javascript %}
+
+<body>
+{% block content %}
+    
+    <div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+    <div id="companychoose" title="Choose Company, Document Type and Number of Documents to Assign:">
+        <form id="ChooseForm" name="ChooseForm" action="{% url 'enersectapp:sudo_assignsourcepdfsui_by_doctype_and_number' %}" method="post">
+        {% csrf_token %}
+                      
+          <fieldset>
+            <ul class="menuclass" id="companiesmenu">
+                <li>
+                    <a id="companieslink" href="#">Company:</a>
+                    <ul>
+                        {% for company in company_names_list %}
+                        <li><a href="#">{{company}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <ul class="menuclass" id="doctypesmenu">
+                <li>
+                    <a id="doctypeslink" href="#">Document Type:</a>
+                    <ul>
+                        {% for doctype in doctype_names_list %}
+                        <li><a href="#">{{doctype}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <h5>There are <span style="color:wheat;">{{number_docs_not_in_company}}</span> Documents not assigned to this Company yet. From the Selection made, there are <span style="color:limegreen"> {{number_follow_assign_criteria}} </span> that can be Assigned. </h5>
+            <h4><span style="color:limegreen"> {{success_message}} </span></h4>
+            <input id="num_toassign" type="text" class="value" name="num_toassign" value="0" min="0" max="{{number_follow_assign_criteria}}" />
+            
+            <input type="text" name="company_name" id="company_name" value="{{company_name}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="doctype_name" id="doctype_name" value="{{doctype_name}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="max_assign" id="max_assign" value="{{number_follow_assign_criteria}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="save_data" id="save_data" value="" class="invisible text ui-widget-content ui-corner-all" />
+            <!--<input type="text" name="user_group" id="user_group" value="{{user_group.name}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="sourcepdfs_list" id="sourcepdfs_list" value="{{sourcepdfs_list}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="the_user" id="the_user" value="{{the_user}}" class="invisible text ui-widget-content ui-corner-all" />-->
+            
+            
+          </fieldset>
+            
+        </form>
+    </div>
+    
+{% endblock %}
+</body>

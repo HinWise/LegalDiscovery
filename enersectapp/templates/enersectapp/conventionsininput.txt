@@ -1,0 +1,29 @@
+
+Amount -> Either 2 or 3 decimal places . No letters. No commas. 1000000.00 <-Example format
+Currency -> Letters, points and spaces.
+Company Name -> Allow anything (for now)
+COmpany Address -> Allow anything
+Company Telephone -> No letters. No spaces. No punctuation, just numbers.
+City -> Letters, spaces and characters like . and -
+Country -> Selection (Autocomplete) List from the Internet. Letter, spaces, parenthesis, commas.
+AccountNum -> Only numbers.
+Issuedate -> dd/mm/yy
+Docnumber -> Allow anything
+purchasenumber -> Allow anything
+memo -> Allow anything
+
+piece number -> Allow anything (until confirmation of only being numbers and letters)
+
+Piece Number: In everything, and optional
+
+
+1. the fields for the data entry to be on the right hand side of the screen instead of the left
+[14:39:34] nathan.williams.mba: (easier on the eyes).
+[14:39:58] nathan.williams.mba: 2. he asked about the team lead functionality
+[14:40:24] nathan.williams.mba: I told him that we are developing that, it might be that we just start by assigning small lots to agents ourselves until it's ready to go
+[14:40:44] nathan.williams.mba: but ultimately it would be best for him to have team lead functionality - assigning agents, assigning job lots
+[14:40:49] nathan.williams.mba: being able to check them
+[14:41:24] nathan.williams.mba: 3. the telephone field.  it might be good to do minimal formatting on it, but it could work either way
+[14:41:32] nathan.williams.mba: but he suggested a separated country code
+[14:42:09] nathan.williams.mba: I'm not sure if that's the best thing given the different formats of numbers we're working with
+

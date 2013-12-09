@@ -1,0 +1,270 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+<title>Spider- Data Entry App</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/progress_report.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_site_titles_etc.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+
+    $(document).ready(function () {
+
+        createFieldsForm();
+        createUserPanel();
+        configLoadingScreen();
+
+        function createFieldsForm(){
+          
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:true,
+                resizable: true,
+                closeOnEscape: false,
+                buttons: {
+                    "Export Report as CSV": function() {
+                        
+                        toggleLoadingScreen();
+                        $('button').attr("disabled", true).addClass("ui-state-disabled");
+                        $('#export_mark').attr("value","export_csv");
+                        $('#fields_form').submit();
+                        
+                    },
+                    
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+            
+
+        }
+       
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+            });
+        }
+
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+    });
+        
+</script>
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    <div id="left_container">
+    
+        <div id="fields_container">  
+        
+            <div id="dialog-form" title="Progress Report on Data Entry, Linking and Categorization">
+                 
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:progress_report' %}" method="post">
+                {% csrf_token %}
+
+                
+                <fieldset id="fieldset_fields">
+
+                <input class="invisible" type="text" name="export_mark" id="export_mark" value="None" />
+
+                {% if total_source_documents != 0 %}
+        
+                    <div class="table_div">
+                   
+                        <div>
+                            
+                            <table class="pdf_zebra zebra">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <th>Total Number of:</th>
+                                </tr>
+                                <tr>
+                                    <th>Source Documents</th>
+                                    <td>{{total_source_documents}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Documents With an Identified Document Type</th>
+                                    <td>{{total_with_doctype}}</td>
+                                </tr>
+                                <tr>
+                                    <th>-----------</th>
+                                    <td>-----------</td>
+                                </tr>
+                                <tr>
+                                    <th>Document Entries Made</th>
+                                    <td>{{total_pdf_entered}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Document Entries Linked to a Record</th>
+                                    <td>{{total_linked_documents}}</td>
+                                </tr>
+                                <tr>
+                                    <th>-----------</th>
+                                    <td>-----------</td>
+                                </tr>
+                                {% for company in company_names_and_values_list %}
+                                <tr>
+                                    <th>Entries made by {{company.name}}</th>
+                                    <td>{{company.count}}</td>
+                                </tr>
+                                {% empty %}
+                                {% endfor %}
+                                <tr>
+                                    <th>-----------</th>
+                                    <td>-----------</td>
+                                </tr>
+                                {% for doctype in document_types_names_and_values_list %}
+                                <tr>
+                                    <th>Entries with Document Type {{doctype.name}}</th>
+                                    <td>{{doctype.count}}</td>
+                                </tr>
+                                {% empty %}
+                                {% endfor %}
+                                
+                            </thead>
+                            <tbody>
+                                    
+                            </tbody>
+           
+                            </table>
+                            
+                        </div>
+                        
+                    </div>
+                    {% else %}
+                    <div id="pdf_table_title">No Source Documents Found.</div>
+                    {% endif %}
+     
+                </fieldset>
+                
+                </form>
+                
+            </div>
+            
+        </div>
+    </div> 
+    <div id="right_container">
+      
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

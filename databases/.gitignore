@@ -1,0 +1,7 @@
+*.
+*.zip
+*.xz
+*.rar
+*.json
+*.pyc
+nathansqlite3db

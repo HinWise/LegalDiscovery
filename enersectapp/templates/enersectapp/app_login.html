@@ -1,0 +1,64 @@
+
+{% load i18n admin_static %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/app_login.css' %}" />
+
+{% endblock special_libs %}
+
+{% block javascript %} 
+
+<script>
+
+    $(document).ready(function () {
+    
+        $( "#login" ).dialog({
+          autoOpen: true,
+          height: 300,
+          width: 350,
+          modal: true,
+          closeOnEscape: false,
+          resizable: false,
+          buttons: {
+            "Login": function() {
+                $('#LoginForm').submit();
+            }
+          }
+          
+        });
+    
+    
+    });
+
+</script>
+
+{% endblock javascript %}
+
+{% block content %}
+    <div id="login" title="Log In">
+        <form id="LoginForm" name="LoginForm" action="{% url 'enersectapp:app_login' %}" method="post">
+        {% csrf_token %}
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}" />
+        {% endif %}
+              
+          <fieldset>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username"  class="text ui-widget-content ui-corner-all" />
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+          </fieldset>
+
+        </form>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,296 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+<title>Category Changer Interface</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/category_changer.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_site_titles_etc.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+
+    $(document).ready(function () {
+
+        createFieldsForm();
+        createUserPanel();
+        configLoadingScreen();
+
+        function createFieldsForm(){
+          
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:true,
+                resizable: true,
+                closeOnEscape: false,
+                buttons: {
+                    "Confirm Change and Save": function() {
+                        
+                        type1 = $('#type1').val();
+                        type2 = $('#type2').val();
+                        input1 = $('#input_type1').val();
+                        input2 = $('#input_type2').val();
+                        
+                        if(type1==input1&&type2==input2)
+                        {
+                            toggleLoadingScreen();
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            $('#save_mark').attr("value","save_mark");
+                            $('#fields_form').submit();
+                        }
+ 
+                    },
+                    "Delete Type": function() {
+                        
+                        type3 = $('#type3').val();
+                                                
+                        if(type3)
+                        {
+                            toggleLoadingScreen();
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            $('#save_mark').attr("value","delete_mark");
+                            
+                            $('#fields_form').submit();
+                        }
+ 
+                    },
+                    
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+            
+            $( "#doctypemenu1" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#companiesmenu" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $('#doctype1link').text("Document Type 1: " +new_text);
+                                $('#type1').attr("value",new_text);
+                                
+                                $("#doctypemenu1").addClass("ui-state-custom-filled");
+                            }
+                            
+                            
+                        } 
+            });
+            
+            $( "#doctypemenu2" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#companiesmenu" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $('#doctype2link').text("Document Type 2: " +new_text);
+                                $('#type2').attr("value",new_text);
+                                
+                                $("#doctypemenu2").addClass("ui-state-custom-filled");
+                            }
+                            
+                            
+                        } 
+            });
+            
+
+        }
+       
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+            });
+        }
+
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+    });
+        
+</script>
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    <div id="left_container">
+    
+        <div id="fields_container">  
+        
+            <div id="dialog-form" title="Category Changer Tool">
+                                
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:category_changer' %}" method="post">
+                {% csrf_token %}
+
+                
+                <fieldset id="fieldset_fields">
+
+                <input class="invisible" type="text" name="save_mark" id="save_mark" value="none" />
+                <input class="invisible" type="text" name="type1" id="type1" value="none" />
+                <input class="invisible" type="text" name="type2" id="type2" value="none" />
+
+                    <h3><br>From Category: </h3>
+					<ul class="menuclass" id="doctypemenu1">
+						<li>
+                            <a id="doctype1link" href="#">Document Type 1:</a>
+							<ul>
+								{% for type in types_list %}
+								
+										<li>--</li>
+										<li><a class="doctype1option" href="#" title="{{type.pretty_name}}|{{type.id}}" value='{{type.name}}'>{{type.name}}</a></li>
+								
+                                {% endfor %}
+							</ul>
+						</li>
+					</ul>
+                    <input type="text" name="input_type1" id="input_type1" value="" />
+                    <h3><br>To Category: </h3>
+                    <ul class="menuclass" id="doctypemenu2">
+						<li>
+                            <a id="doctype2link" href="#">Document Type 2:</a>
+							<ul>
+								{% for type in types_list %}
+								
+										<li>--</li>
+										<li><a class="doctype2option" href="#" title="{{type.pretty_name}}|{{type.id}}" value='{{type.name}}'>{{type.name}}</a></li>
+								
+                                {% endfor %}
+							</ul>
+						</li>
+					</ul>
+                    <input type="text" name="input_type2" id="input_type2" value="" />
+                    <h3><br>{{success_message}}</h3>
+                    <h3><br>To Delete (if empty): </h3>
+                    <input type="text" name="type3" id="type3" value="" />
+                </fieldset>
+                
+                </form>
+                
+            </div>
+            
+        </div>
+    </div> 
+    <div id="right_container">
+      
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

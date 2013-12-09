@@ -1,0 +1,369 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/arabic_memo_edit.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+{% endblock special_libs %}
+
+{% block config_libs %} 
+
+
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+<script>
+   
+    $(document).ready(function () {
+    
+        
+         
+        $('input.disablecopypaste').bind('copy paste', function (e) {
+                e.preventDefault();
+        });
+               
+        
+        $('.ui-widget').css("font-size","80%");
+        var tips = $( ".validateTips" );
+        tips.css("display","none");
+        createPdf_View();
+        createUserPanel();
+        createFieldsForm();
+        configLoadingScreen();
+                
+        function createPdf_View(){
+                var $pdf = $('#pdf_view');
+            
+                var w=$pdf.width();
+                var h=$pdf.height();
+                       
+                var link = $pdf.attr("value");
+         
+                var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+        }
+        
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+            }
+            
+        function createFieldsForm(){
+        
+            var allFields = $( [] );
+            //TRANSLATION MEMO Menu Config
+            
+            var translation_memo = $( "#translation_memo" );
+            if(translation_memo.length)
+            {
+                allFields.add(translation_memo);
+                
+            }    
+            
+
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:false,
+                resizable: false,
+                closeOnEscape: false,
+                buttons: {
+                    "Save Edit in Database": function() {
+                        
+                        var bValid = true;
+                        
+                        //allFields.removeClass( "ui-state-error" );
+                        $(".ui-state-error").removeClass( "ui-state-error" );
+                        
+                            /*if(translation_memo.length)
+                            {
+                                bValid = bValid && checkLength( translation_memo, "Translation Memo", 1, 255  );
+                                bValid = bValid && checkRegexp( translation_memo, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Translation Memo may consist of any character." );
+                            }*/
+                            
+                        if ( bValid ) {
+                            
+                            toggleLoadingScreen();
+                            $('#save_mark').attr("value","save_mark");
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            //$( this ).dialog( "close" );
+                            $('#fields_form').submit();
+                            
+                        }
+                    },
+                    
+                },
+                close: function() {
+                    allFields.val( "" ).removeClass( "ui-state-error" );
+                    
+                                        
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+
+        }
+        
+        function updateTips( t ) {
+                  tips
+                    .text( t )
+                    .addClass( "ui-state-error" );
+                    tips.css("display","block");
+                  setTimeout(function() {
+                    tips.removeClass( "ui-state-error", 1500 );
+                    tips.css("display","none");
+                  }, 5000 );
+        }
+        
+        function checkLength( o, n, min, max ) {
+            if ( o.val().length > max || o.val().length < min ) {
+                o.addClass( "ui-state-error" );
+                updateTips(n+" field must be filled and have less than "+max+" characters.");
+                /*updateTips( "Length of " + n + " must be between " +
+                min + " and " + max + "." );*/
+                return false;
+            } 
+            else {
+                return true;
+            }
+        }
+             
+        function checkRegexp( o, regexp, n ) {
+        
+            if((o.val()!="MISSING") && (o.val()!="UNREADABLE"))
+            {
+        
+                if ( !( regexp.test( o.val() ) ) ) {
+                    o.addClass( "ui-state-error" );
+                    updateTips( n );
+                    return false;
+                } 
+                else {
+                    return true;
+                }
+            }
+            else return true;
+        }
+        
+        function checkRange( o, array, n ) {
+        
+            if((o.val()!="MISSING") && (o.val()!="UNREADABLE"))
+            {
+               
+                if ( o.val()<array[0] || o.val()>array[1] ) 
+                {
+                    
+                    o.addClass( "ui-state-error" );
+                    updateTips( n );
+                    return false;
+                } 
+                else {
+                    return true;
+                }
+            }
+            else return true;
+        }
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+        
+    });
+        
+</script>
+{% endblock config_libs %}
+
+<title>Arabic Memo Edit</title>
+
+</head>
+{% endblock page_title %}
+
+
+
+
+
+{% block jqueryui_setups %}
+
+
+
+{% endblock jqueryui_setups %}  
+
+
+<body>
+{% if not is_popup %}
+
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+</div>
+    
+
+{% block container_all %}
+    
+<div id="container_all">
+
+
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+
+
+{% block content%}
+    
+    {% if chosen_item %}
+ 
+    <div id="left_container">
+
+        <div id="fields_container">
+
+            <div id="dialog-form" title="Create new Data Entry">
+                            
+                <p class="validateTips">All form fields are required.</p>
+             
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:arabic_memo_edit' %}" method="post">
+                {% csrf_token %}
+               
+                <fieldset id="fieldset_fields">
+               
+                    <input class="invisible" type="text" name="save_id" id="save_id" value="{{chosen_item.id}}" />
+                    <input class="invisible" type="text" name="save_mark" id="save_mark" value="NoSaveMark" />
+
+                                    
+                    <div class="divisor-line"></div>
+                    
+                    <!-- TRANSLATION MEMO -->
+                    
+                    <label for="translation_memo">Translation Memo</label>
+                    <input type="text" name="translation_memo" id="translation_memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                    
+                
+                
+                </fieldset>
+                
+                
+              </form>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div id="right_container">
+        
+                
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{chosen_item.sourcedoc_link.job_directory}}\{{chosen_item.sourcedoc_link.filename}}">
+            
+        </div>
+        
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">{{show_progress_user}} <br><br> Arabic Documents to Edit left: {{count_arabic}}</p>
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    {% else %}
+
+    <div id="right_container">
+              
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">{{show_progress_user}} <br><br> All Assigned Documents have been Completed.</p>
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    
+    {% endif %}
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

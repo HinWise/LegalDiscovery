@@ -1,0 +1,125 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+<title>Spider- Data Entry App</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'docreader/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'docreader/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'docreader/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'docreader/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'docreader/dataentryui_site_titles_etc.css' %}" />
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+    xanto="";
+    petra="";
+    dateturn="";
+    timer=0;
+    
+    $(document).ready(function () {
+    
+        createPdf_View();
+        
+                
+        function createPdf_View(){
+                var $pdf = $('#pdf_view');
+            
+                var w=$pdf.width();
+                var h=$pdf.height();
+                       
+                var link = $pdf.attr("value");
+                var directory = $pdf.attr("directory");
+                var filename = $pdf.attr("filename");
+         
+                var s ='<object id="pdf_view_object" data='+link+"/"+filename+"/"+directory+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+        }
+        
+    });
+        
+</script>
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    
+        
+    <div id="left_container">
+    
+        <div id="fields_container">
+        
+        
+        </div>
+        
+    </div>
+    
+    <div id="right_container">
+        
+        <div id="pdf_view" filename="{{file.filename}}" directory="{{file.job_directory}}" value="http://54.213.170.244">
+            
+        </div>
+        
+    </div>
+ 
+
+{% endblock content%}
+
+{% block breadcrumbs %}
+
+</div>
+
+{% endblock breadcrumbs%}
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

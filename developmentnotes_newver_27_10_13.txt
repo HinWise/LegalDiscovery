@@ -1,0 +1,47 @@
+
+
+-Time zones warning migration: https://docs.djangoproject.com/en/dev/topics/i18n/timezones/#time-zones-migration-guide
+#Happens when using datetime.now() or similar thing +++
+
+-Multiple Table Audit Comparison Tool
+    #For Superuser, makes all the entered entries tables related to the document appear. (Ex: FlatWorld and Enersect Tables with Amount, Company Name, etc)
+       -Make coincident fields of the tables appear Green, and different fields appear in Red.
+       -Number of marked as Incorrect in total +++
+       -Number of marked as Correct in total +++
+   
+        -Filters: 
+                For User (From List of Users), +++
+                For Entered Date (Default: Any Date), +++
+                For Lot (From List of Lots), +++
+                For Evaluation (Correct/Incorrect)
+                For Main Company (The one that is selected for "Random Item", the one on the left
+        
+        -Options:
+        
+                Mark as "Revise Document Type" (revisemarked_doctype)
+   
+    #For TeamLead, makes entries from his Company appear.
+
+        -Number of marked as Incorrect In this lot +++
+        -Number of marked as Correct In this lot +++
+        -Number of marked as Reentry In this lot +++
+        -Number of total files in this lot +++
+       
+        -Options: 
+
+            -Filters: 
+                For User (From List of Users), +++
+                For Entered Date (Default: Any Date), +++
+                For Lot (From List of Lots), +++
+                
+            -Evaluate Buttons: 
+                -Correct (Marks the PDFRecord related to that Company as "auditmarked_as_correct") +++
+                -Incorrect (Marks the PDFRecord related to that Company as "auditmarked_as_incorrect") +++
+                -Send all Incorrects to Re-Entry; Are you sure? ; (Marks the PDFRecord related to the ones +++
+                    that have "auditmarked_as_incorrect" as "auditmarked_as_incorrect_resent_for_entry", accesses
+                    the SourcePdfToHandle from the related SourcePdf (sourcedoc_link__assigndata) that has
+                    the same assignedcompany and assigneduser; changes the User to "None", and the "check" (status)
+                    to "error".
+                -Send entire Lot to Re-Entry; Are you sure? ; (Same as previous option, but this one sends the entire lot that this
+                result form parts of to re-entry) +++
+                

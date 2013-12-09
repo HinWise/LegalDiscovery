@@ -1,0 +1,684 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+<title>Spider- Data Entry App</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/randomqa_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_site_titles_etc.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+    xanto="";
+    
+
+    $(document).ready(function () {
+    
+
+        createPdf_View();
+        //createUserPanel();
+        createFilters();
+        classLocator();
+        createFieldsForm();
+        configLoadingScreen();
+                
+        function createPdf_View(){
+                var $pdf = $('#pdf_view');
+            
+                var w=$pdf.width();
+                var h=$pdf.height();
+                       
+                var link = $pdf.attr("value");
+         
+                var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+        }
+        
+        /*function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+            }*/
+
+        function createFieldsForm(){
+          
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:true,
+                resizable: true,
+                closeOnEscape: false,
+                buttons: {
+                    "Mark Entry as Correct": function() {
+                        
+                        toggleLoadingScreen();
+                        $('button').attr("disabled", true).addClass("ui-state-disabled");
+                        disableButtonsets();
+                        savePanelSizes();
+                        $('#save_mark').attr("value","auditmarked_as_correct");
+                        $('#fields_form').submit();
+                        
+                        
+                    },
+                    "Mark Entry as Incorrect": function() {
+                        
+                        toggleLoadingScreen();
+                        $('button').attr("disabled", true).addClass("ui-state-disabled");
+                        disableButtonsets();
+                        savePanelSizes();
+                        $('#save_mark').attr("value","auditmarked_as_incorrect");
+                        $('#fields_form').submit();
+                        
+                        
+                    },
+                    "Send Incorrect Entries from Selection to Re-Entry": function() {
+                        
+                        toggleLoadingScreen();
+                        $('button').attr("disabled", true).addClass("ui-state-disabled");
+                        disableButtonsets();
+                        savePanelSizes();
+                        $('#save_mark').attr("value","auditmarked_as_incorrect_reentry");
+                        $('#fields_form').submit();
+                        
+                        
+                    },
+                    "Send Entire Lot/User Selection to Re-Entry": function() {
+                        
+                        toggleLoadingScreen();
+                        $('button').attr("disabled", true).addClass("ui-state-disabled");
+                        disableButtonsets();
+                        savePanelSizes();
+                        $('#save_mark').attr("value","auditmarked_as_selection_reentry");
+                        $('#fields_form').submit();
+                        
+                        
+                    },
+                    
+                    
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+            
+            //Save Error Prevention; If there are no Candidates for Auditing, deactivate the Buttons
+            if(($('#pdf_record_id').attr("value").length) == 0)
+            {
+                $('button').attr("disabled", true).addClass("ui-state-disabled");
+            }
+            
+
+        }
+        
+        function createFilters(){
+
+            //stablishPanelSizes();
+        
+            $( "#filters_dialog" ).dialog({
+                
+                width: $('#filters_panel').width(),
+                height: $('#filters_panel').height(),
+                
+                modal: false,
+                draggable:true,
+                resizable: true,
+                closeOnEscape: false,
+                position: {
+                    my: "left top", at: "left top", of: $('#filters_panel')
+                }
+            });
+            
+            $( "#filter_container_lot" ).buttonset();
+            $( "#filter_container_author" ).buttonset();
+            $( "#filter_container_doctype" ).buttonset();
+            $( "#filter_container_date" ).buttonset();
+            $( "#filter_container_modification_author" ).buttonset();
+            $( "#filter_container_company" ).buttonset();
+        
+        
+            $('.choice_lot').click(function(){
+            
+               lot_value = $(this).attr("choice_value");
+            
+               $('#selected_lot').attr("value",lot_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+                
+               $("#fields_form").submit();
+             
+            });
+            
+            $('.choice_author').click(function(){
+            
+               author_value = $(this).attr("choice_value");
+            
+               $('#selected_user').attr("value",author_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+            });
+            
+            $('.choice_doctype').click(function(){
+            
+               doctype_value = $(this).attr("choice_value");
+            
+               $('#selected_doctype').attr("value",doctype_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+            });
+            
+            $('.choice_date').click(function(){
+            
+               date_value = $(this).attr("choice_value");
+            
+               $('#selected_date').attr("value",date_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+             
+            });
+            
+            $('.choice_modification_author').click(function(){
+            
+               modification_author_value = $(this).attr("choice_value");
+            
+               $('#selected_modification_author').attr("value",modification_author_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+             
+            });
+            
+            $('.choice_company').click(function(){
+            
+               modification_company_value = $(this).attr("choice_value");
+            
+               $('#selected_company').attr("value",modification_company_value);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+             
+            });
+            
+        }
+                
+        function disableButtonsets(){
+            
+            $( "#filter_container_lot" ).buttonset("disable");
+            $( "#filter_container_author" ).buttonset("disable");
+            $( "#filter_container_doctype" ).buttonset("disable");
+            $( "#filter_container_date" ).buttonset("disable");
+            $( "#filter_container_modification_author" ).buttonset("disable");
+            $( "#filter_container_company" ).buttonset("disable");
+        }
+        
+        function savePanelSizes(){
+        
+            filters_panel_width = $("#filters_dialog").width();
+            filters_panel_height = $("#filters_dialog").height();
+            $("#filters_panel_width").attr("value",filters_panel_width);
+            $("#filters_panel_height").attr("value",filters_panel_height);
+            
+            
+        }
+        
+        function stablishPanelSizes(){
+        
+            filters_panel_width = $("#filters_panel_width").attr("value"); 
+            filters_panel_height = $("#filters_panel_height").attr("value");
+            if (filters_panel_width) $("#filters_panel").width(filters_panel_width);
+            if (filters_panel_width) $("#filters_panel").height(filters_panel_height);
+            
+            
+        }
+        
+        function classLocator()
+        {
+            
+            //For the Lot Choice
+            
+            var lot_choice = $('#selected_lot').attr("value");
+        
+            $('#filter_pdf_lot'+lot_choice).attr("checked","checked").button("refresh");
+            
+            //For the User Choice
+            
+            var user_choice = $('#selected_user').attr("value");
+        
+            $('#filter_pdf_author'+user_choice).attr("checked","checked").button("refresh");
+            
+            //For the Doctype Choice
+            
+            var doctype_choice = $('#selected_doctype').attr("value");
+        
+            $('#filter_pdf_doctype'+doctype_choice).attr("checked","checked").button("refresh");
+            
+            //For the Date Choice
+            
+            var date_choice = $('#selected_date').attr("value");
+        
+            $('#filter_pdf_date'+date_choice).attr("checked","checked").button("refresh");
+            
+            //For the Editor/Modification Author Choice
+            
+            var modification_author = $('#selected_modification_author').attr("value");
+        
+            $('#filter_pdf_modification_author'+modification_author).attr("checked","checked").button("refresh");
+            
+            //For the Company Choice
+            
+            var company = $('#selected_company').attr("value");
+        
+            $('#filter_pdf_company'+company).attr("checked","checked").button("refresh");
+            
+        }    
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+    });
+        
+</script>
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    <div id="left_container">
+    
+        <div id="filters_panel">
+            <div id="filters_dialog"  title="Filters Panel (Drag and Stretch)">
+                    
+                    <div class="show-option" id="filter_container_lot" title="Filter the Search Results by Lot">
+                            {% for item in pdf_lot_number_distinct %}
+                            <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lot{{item.lot_number}}" choice_value="{{item.lot_number}}" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lot{{item.lot_number}}">Lot {{item.lot_number}}</label>
+                            {% endfor %}
+                            <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lotall" choice_value="all" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lotall">All Lots</label>
+                            
+                    </div>
+                    <div class="show-option" id="filter_container_author" title="Filter the Search Results by Author">
+                            {% for item in pdf_author_distinct %}
+                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item.assigneduser__username}}" choice_value="{{item.assigneduser__username}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item.assigneduser__username}}">{{item.assigneduser__username}}</label>
+                            {% endfor %}
+                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
+                    </div>
+                    <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
+                            {% for item in pdf_doctype_distinct %}
+                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item.modified_document_type__name}}" choice_value="{{item.modified_document_type__name}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item.modified_document_type__name}}">{{item.modified_document_type__name}}</label>
+                            {% endfor %}
+                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctypeall" choice_value="all" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctypeall">All Document Types</label>
+                    </div>
+                    <div class="show-option" id="filter_container_date" title="Filter the Search Results by Date of Creation">
+                            
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datetoday" choice_value="today" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datetoday">Today</label>
+                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastdays" choice_value="lastdays" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastdays">Last Days</label> -->
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastweek" choice_value="lastweek" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datelastweek">Last Week</label>
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastmonth" choice_value="lastmonth" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datelastmonth">Last Month</label>
+                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastmonths" choice_value="lastmonths" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastmonths">Last Months</label> -->
+                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastyear" choice_value="lastyear" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastyear">Last Year</label> -->
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_dateall" choice_value="all" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_dateall">All Dates</label>  
+                    </div>
+                    
+                    <div class="show-option" id="filter_container_company" title="Filter the Search Results by Company">
+                            {% if company_names_list %}
+                            {% for item in company_names_list %}
+                            <input type="radio" class="filter_choice choice_company" id="filter_pdf_company{{item}}" choice_value="{{item}}" name="radio5" /><label class="filter_choice_label" for="filter_pdf_company{{item}}">{{item}}</label>
+                            {% endfor %}
+                            <input type="radio" class="filter_choice choice_company" id="filter_pdf_companyall" choice_value="all" name="radio5" /><label class="filter_choice_label" for="filter_pdf_companyall">All Companies</label>
+                            {% endif %}
+                    </div>
+
+                    <div class="show-option" id="filter_container_modification_author" title="Filter the Search Results by Editor">
+                            {% for item in modification_authors_list %}
+                            <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_author{{item}}" choice_value="{{item}}" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_author{{item}}">{{item}}</label>
+                            {% endfor %}
+                            <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_authorall" choice_value="all" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_authorall">All Editors</label>
+                    </div>
+            </div>        
+        </div>
+        
+        <div id="fields_container">  
+        
+            <div id="dialog-form" title="Random Audit of Data Entries from Lot {{lot_number}}">
+                 
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:randomqa_spider' %}" method="post">
+                {% csrf_token %}
+
+                
+                <div id="statistics_panel">
+                    <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
+                    <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
+                </div>
+                
+                <fieldset id="fieldset_fields">
+               
+               
+                <input class="invisible" type="text" name="filters_panel_width" id="filters_panel_width" value="{{filters_panel_width}}" />
+                <input class="invisible" type="text" name="filters_panel_height" id="filters_panel_height" value="{{filters_panel_height}}" />
+                
+                <input class="invisible" type="text" name="save_mark" id="save_mark" value="None" />
+                <input class="invisible" type="text" name="selected_modification_author" id="selected_modification_author" value="{{selected_modification_author}}" />
+                <input class="invisible" type="text" name="selected_lot" id="selected_lot" value="{{lot_number}}" />
+                <input class="invisible" type="text" name="selected_user" id="selected_user" value="{{selected_user}}" />
+                <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" />
+                {% if company_names_list %}
+                <input class="invisible" type="text" name="selected_company" id="selected_company" value="{{selected_company}}" />
+                {% endif %}
+                <input class="invisible" type="text" name="selected_date" id="selected_date" value="{{selected_date}}" />
+                <input class="invisible" type="text" name="pdf_record_id" id="pdf_record_id" value="{{pdf_random_item.id}}" />
+     
+                {% if pdf_item_list %}
+        
+                    <div id="table_div">
+                   
+                    
+                        <div>
+                            
+                            <table class="pdf_zebra zebra">
+                            <caption><h4 id="table_caption">Document Name: <br>{{pdf_random_item.sourcedoc_link.filename}}<br></h4></caption>
+                            <thead>
+                                <tr>
+                                    <th>Data Entered By Company</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.OcrByCompany.name}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Reports</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.commentary}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Document Type</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Document_Type}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Amount</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Amount}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Currency</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Currency}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Company Name</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Company}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Issue Date</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.IssueDate}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Address}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Telephone</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Telephone}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>City</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.City}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Country</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Country}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Source Bank Account</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Source_Bank_Account}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Document Number</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Document_Number}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Purchase Order Number</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Piece Number</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Piece_Number}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Contains Arabic</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.ContainsArabic}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Source Bank Account</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Source_Bank_Account}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Blank</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Blank}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Unreadable</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Unreadable}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Memo</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.Notes}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Data Entered by User</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.ocrrecord_link.OcrAuthor}}</td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <th>Data Entered on Date</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td>{{pdf_item.modification_date}}</td>
+                                    {% endfor %}
+                                </tr>
+                                
+                                
+                            </thead>
+                            <tbody>
+                                    
+                            </tbody>
+           
+                            </table>
+                            
+                        </div>
+                        
+                    </div>
+                    {% else %}
+                    <div id="pdf_table_title">No Candidates for Auditing found.</div>
+                    {% endif %}
+     
+                </fieldset>
+                
+                </form>
+                
+            </div>
+            
+        </div>
+    </div> 
+    <div id="right_container">
+        
+                
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{pdf_random_item.sourcedoc_link.job_directory}}\{{pdf_random_item.sourcedoc_link.filename}}">
+            
+        </div>
+        
+        <!--<div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">{{count_done}} Documents Completed from a total of {{count_assigned}} Documents Assigned.</p>
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>-->
+                
+    </div>
+    
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

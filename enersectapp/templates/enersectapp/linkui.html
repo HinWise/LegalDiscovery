@@ -1,0 +1,27 @@
+{% extends "enersectapp/app_index.html" %}
+{% load i18n %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+
+<div class="breadcrumbs">
+<a href="{% url 'enersectapp:main' %}">{% trans 'Applications Menu' %}</a>
+&rsaquo;
+
+
+</div>
+
+{% endblock %}
+
+{% block content%}
+
+        <p>Future intro / transition</p>
+        <a href="{% url 'enersectapp:linkui_spiderweb' %}">{% trans 'Click to continue to the Linking App' %}</a>
+    
+    
+{% endblock %}
+{% endif %}
+
+
+
+{% block sidebar %}{% endblock %}

@@ -1,0 +1,894 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block page_title %}
+<head>
+<title>SpiderWeb - Linking App</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/linkui_spiderweb.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/linkui_site_titles_etc.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+    $(document).ready(function () {
+    
+      $( "#pdf_view" ).toggle( "drop", 1000 );
+    
+      $('#accordion').accordion({header: "h3",collapsible: true,active:false,heightStyle: "content" })/*.sortable({
+        axis: "y",
+        handle: "h3",
+        stop: function( event, ui ) {
+          // IE doesn't register the blur when sorting
+          // so trigger focusout handlers to remove .ui-state-focus
+          ui.item.children( "h3" ).triggerHandler( "focusout" );
+        }
+      })*/;
+  
+  
+  
+  
+        classLocator();
+        configLoadingScreen();
+    
+        $(".toggle_pdf_button")
+        .button({
+            icons: {primary: "ui-icon-document"}
+        })
+        .click(function () {
+            
+            var $element_id = $(this).attr("value2");
+            
+            if (this.checked) {
+                
+                
+                $('.toggle_pdf_button').each(function(){
+                
+                    if(this.checked == true) this.checked=false;
+                    $(this).button("option", "icons", {primary: "ui-icon-document"});
+                    $(this).removeClass("ui-state-active");
+                })
+                
+                $('.toggle_pdf_label').each(function(){
+                  
+                    $(this).removeClass("ui-state-active");
+                })
+                
+                
+                $("#toggle_pdf_label"+$element_id).addClass("ui-state-active");
+                
+                
+                this.checked = true;
+                
+                $(this).button("option", "icons", {primary: "ui-icon-close"});
+                
+                
+                if($('#pdf_view_object').length !=0) $('#pdf_view_object').remove();
+              
+                
+                var link = $(this).attr("value");
+                
+                var w=window.innerWidth*0.486;
+                var h=window.innerHeight*0.74;
+               
+                         
+                var $pdf = $('#pdf_view');
+                
+                $pdf.append(s); 
+               
+                
+                var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+
+                if($('#pdf_view').hasClass("opened-pdf")==false)
+                {            
+                    $('#pdf_view').addClass("opened-pdf",1000);
+                    $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
+                   
+                }
+                            
+                
+            }
+            else {
+                $(this).button("option", "icons", {primary: "ui-icon-document"});
+                
+                if($('#pdf_view').hasClass("opened-pdf")==true)
+                {            
+                    $('#pdf_view').removeClass("opened-pdf",1000);
+                    $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
+                }
+                
+            }
+           
+            
+            
+        })
+        .filter(":checked").button({icons: {primary: "ui-icon-close"}});
+        
+        //ui-state-custom-linked
+        
+        $(".linking_button")
+        .button({
+            icons: {primary: "ui-icon-link"}
+        })
+        .click(function () {
+        
+            var $element_id = $(this).attr("value");
+            toggleLoadingScreen();       
+            $("#linking_form"+$element_id).submit();
+                             
+        });
+        
+        $(".unlinking_button")
+        .button({
+            icons: {primary: "ui-icon-cancel"}
+        })
+        .click(function () {
+        
+            var $element_id = $(this).attr("value");
+            toggleLoadingScreen();
+            $("#unlinking_form"+$element_id).submit();
+              
+        });
+        
+        //ui-state-custom-error
+        
+        $(".flag_button")
+        .button({
+            icons: {primary: "ui-icon-flag"}
+        })
+        .click(function () {
+        
+            var $element_id = $(this).attr("value");
+                           
+            var isChecked = $(this).hasClass("clicked");
+            
+            if(isChecked)
+            {
+                $(this).removeClass("clicked");
+                $("#flag_form").css("display","none"); 
+                  
+            }
+            else
+            {
+                $(this).addClass("clicked");
+                $("#flag_form").css("display","block"); 
+                $("#flag_record_id").attr("value",$element_id);
+             
+            }
+                             
+        });
+        
+        
+        $( "#flag_option_typo" ).button().click(function(){
+        
+            $("#flag_record_category").attr("value","Typo");
+        
+        });
+        
+        $( "#flag_option_category" ).button().click(function(){
+        
+            $("#flag_record_category").attr("value","Wrong Category");
+        
+        });
+        
+        $( "#flag_option_duplicate" ).button().click(function(){
+        
+            $("#flag_record_category").attr("value","Duplicate");
+        
+        });
+        
+        $( "#flag_option_mislinked" ).button().click(function(){
+        
+            $("#flag_record_category").attr("value","Mislinked");
+        
+        });
+        
+        
+        $( "#submit_now" ).button().click(function(){
+            toggleLoadingScreen();                 
+            $("#flag_form").submit();
+
+        });
+        
+        /*$('.flag_form_report').button().click(function(){
+          
+           var $element_id = $(this).attr("value");
+           
+         
+        });*/
+        
+        
+        $(".unflag_button")
+        .button({
+            icons: {primary: "ui-icon-check"}
+        })
+        .click(function () {
+        
+            var $element_id = $(this).attr("value");
+        
+            toggleLoadingScreen();
+            $("#unflag_form"+$element_id).submit();
+            
+           
+        });
+        
+               
+        
+        
+        $("#search_button")
+        .button({
+            icons: {primary: "ui-icon-search"}
+        })
+        .click(function () {
+        
+               $("#paginator_text").attr("value","");
+               toggleLoadingScreen();
+               $("#search_form").submit();
+        });    
+       
+        $( "#paginator_prev" ).click(function(){
+        
+            $("#paginator_text").attr("value","Prev");
+            toggleLoadingScreen();
+            $("#search_form").submit();
+        
+        });
+        
+        $( "#paginator_next" ).click(function(){
+        
+            $("#paginator_text").attr("value","Next");
+            toggleLoadingScreen();
+            $("#search_form").submit();
+        
+        });
+        
+        
+        
+        
+        $( "#filter_container" ).buttonset();
+        
+        
+               
+        
+        $('#filter_pdf_all').click(function(){
+        
+           $('#filter_text').attr("value","pdf_all");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+           
+        
+        });
+        
+        /*$('#filter_pdf_xanto').click(function(){
+        
+           $('#filter_text').attr("value","pdf_xanto");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });*/
+        
+        $('#filter_pdf_linked').click(function(){
+        
+           $('#filter_text').attr("value","pdf_linked");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+        $('#filter_pdf_unlinked').click(function(){
+        
+           $('#filter_text').attr("value","pdf_unlinked");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+        $('#filter_pdf_error').click(function(){
+        
+           $('#filter_text').attr("value","pdf_error");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+
+        $('#skip_button').button().click(function(){
+          
+           $("#skip_confirmation_panel").css("display","block");
+         
+        });
+        
+        
+        $('#skip_yes').button().click(function(){
+           toggleLoadingScreen();
+           $("#skip_form").submit();
+         
+        });
+        
+        $('#skip_no').button().click(function(){
+          
+           $("#skip_confirmation_panel").css("display","none");
+         
+        });
+        
+        //When click in one field of a table, it copies the contents in the Search button
+        // and updates the search with that in mind
+        
+        /*$('td').dblclick(function(){
+        
+           $('#search_text').attr("value",$(this).text());
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });*/
+        
+        
+        $( "#search_options_container" ).buttonset();
+        
+        /*$('#option_name').click(function(){
+        
+           var str= $('#options_text').attr("value");
+           var new_str = "";
+           
+           if(str.match('option_name'))
+           {     
+                new_str = str.replace('option_name',"");
+                $('#options_text').attr("value",new_str);
+           }    
+           else
+           { 
+                new_str = 'option_name'+str;
+                $('#options_text').attr("value",new_str);   
+            } 
+        });
+        
+        $('#option_document_name').click(function(){
+        
+           var str= $('#options_text').attr("value");
+           var new_str = "";
+           
+           if(str.match('option_docname'))
+            {   
+                new_str = str.replace('option_docname',"");
+                $('#options_text').attr("value",new_str);
+            }   
+           else
+            {
+                new_str = 'option_docname'+str;
+                $('#options_text').attr("value",new_str);   
+            }
+        });
+        
+        $('#option_issue_date').click(function(){
+        
+           var str= $('#options_text').attr("value");
+           var new_str = "";
+           
+           if(str.match('option_date'))
+            {   
+                new_str = str.replace('option_date',"");
+                $('#options_text').attr("value",new_str);
+            }   
+           else
+            {
+                new_str = 'option_date'+str;
+                $('#options_text').attr("value",new_str);   
+            }
+        });
+        
+        $('#option_amount').click(function(){
+        
+           var str= $('#options_text').attr("value");
+           var new_str = "";
+           
+           if(str.match('option_amount'))
+            {   
+                new_str = str.replace('option_amount',"");
+                $('#options_text').attr("value",new_str);
+            }   
+           else
+            {
+                new_str = 'option_amount'+str;
+                $('#options_text').attr("value",new_str);   
+            }
+        });*/
+        
+        
+        
+        //Cute tooltips
+        
+        $(function() {
+            $( ".show-option" ).tooltip({
+              
+              show: {
+                effect: "slideDown",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+            $( ".hide-option" ).tooltip({
+              hide: {
+                effect: "slideUp",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+        });
+    
+    
+        function classLocator()
+        {
+            //Mark the correct initial filter, from the filter_container
+        
+            var filter_choice = $('#filter_text').attr("value");
+        
+            switch(filter_choice)
+            {
+                case "pdf_all":
+                    $('#filter_pdf_all').attr("checked","checked");
+                break;
+                               
+                case "pdf_linked":
+                    $('#filter_pdf_linked').attr("checked","checked");
+                break;
+                
+                case "pdf_unlinked":
+                    $('#filter_pdf_unlinked').attr("checked","checked");
+                break;
+                
+                case "pdf_error":
+                    $('#filter_pdf_error').attr("checked","checked");
+                break;
+                
+                default:
+                    $('#filter_pdf_all').attr("checked","checked");
+                break;
+            }
+            
+            /*var search_options = $('#options_text').attr("value");
+            
+            
+            if(search_options.match('option_name')) {
+                $('#option_name').attr("checked","checked");
+            }
+            
+            if(search_options.match('option_docname')) {
+                $('#option_document_name').attr("checked","checked");
+            }
+            
+            if(search_options.match('option_date')) {
+                $('#option_issue_date').attr("checked","checked");
+            }
+            
+            if(search_options.match('option_amount')) {
+                $('#option_amount').attr("checked","checked");
+            } */
+            
+            
+        }
+    
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+    
+    });
+    
+    
+    
+    
+</script>
+
+{% endblock jqueryui_setups %}  
+ <body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+{% block branding %}
+<div id="site-header"><div id="site-name">SpiderWeb - Linking App</div></div>
+
+{% endblock branding%}
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+
+    <div id="left_container">
+    
+    <div id="unlinked_records_container">   
+        {% for record in next_unlinked_record %}
+        <table id="unlinked_records_table" class="zebra">
+        <caption>Next Unlinked Record from the Accounting Ledgers:</caption>
+            <thead>     
+                <tr>
+                    <th>Amount Credit</th>
+                    <td>{{record.internalrecord_link.Credit}}</td> 
+                </tr>
+                <tr>
+                    <th>Amount Debit</th>
+                    <td>{{record.internalrecord_link.Debit}}</td> 
+                </tr>
+                <tr>
+                    <th>Name of Client</th>
+                    <td>{{record.internalrecord_link.Company}}</td>
+                </tr>
+                <tr>
+                    <th>Transaction Date</th>
+                    <td>{{record.internalrecord_link.Day}}/{{record.internalrecord_link.Month}}/{{record.internalrecord_link.Year}}</td>
+                </tr>
+                <tr>
+                    <th>Number of Movement</th>
+                    <td>{{record.internalrecord_link.NoMvt}}</td>
+                </tr>
+                <tr>
+                    <th>Journal</th>
+                    <td>{{record.internalrecord_link.Journal}}</td>
+                </tr>
+                <tr>
+                    <th>Ledger Year</th>
+                    <td>{{record.internalrecord_link.LedgerYear}}</td>
+                </tr>
+                <tr>
+                    <th>Piece Number</th>
+                    <td>{{record.internalrecord_link.NoPiece}}</td>
+                </tr>
+                <tr>
+                    <th>Lett</th>
+                    <td>{{record.internalrecord_link.Lett}}</td>
+                </tr>
+                <tr>
+                    <th>S</th>
+                    <td>{{record.internalrecord_link.S}}</td>
+                </tr>
+                <tr>
+                    <th>Memo Field</th>
+                    <td>{{record.internalrecord_link.Memo}}</td>
+                </tr>
+            </thead>
+            <tbody>
+      
+            </tbody>
+        </table>
+        
+        <form id="skip_form" action="{% url 'enersectapp:linkui_skip' record.id %}" method="post">
+        {% csrf_token %}
+            <button class="show-option" id="skip_button" type="button" title="Only Skip a Record if there is no obvious match."><label id="skip_label" for="#skip_button">Skip</label></button>              
+            <div class="ui-widget ui-tooltip ui-corner-all ui-widget-content custom-tooltip" id="skip_confirmation_panel">
+                <h3> Are you sure you want to Skip the Record? </h3>
+                <h4> (You should only Skip the Record if there is no obvious match) </h4>
+                <div id="skip_confirmation_buttonset">
+                    <button id="skip_yes" type="button"><label id="skip_yes_label" for="#skip_yes">Yes, skip</label></button>   
+                    <button id="skip_no" type="button"><label id="skip_no_label" for="#skip_no">No, keep searching</label></button>  
+                </div>
+            </div>
+        </form>
+        
+        {% empty %}
+                
+           <div id="all_records_linked"> All Records from the Accounting Ledger are Linked. </div>
+                
+        {% endfor%}
+        
+    </div>
+    
+    </div>
+    
+    <div id="right_container">
+        
+        <div id="pdf_records_container">   
+    
+            <div id="accordion_table">
+        
+                <div id="accordion">
+                {% for pdfrecord in pdf_records_list %}
+        
+                    <div id="group{{pdfrecord.id}}" class="group">
+                    <h3 id="pdf_table_name{{pdfrecord.id}}" class="pdf_table_name {{pdfrecord.linked_style_class}} {{pdfrecord.error_style_class}}">Amount:     <span class ="title_text"> {{pdfrecord.ocrrecord_link.Amount}}  {{pdfrecord.ocrrecord_link.Currency}}</span><br>Company Name:     <span class ="title_text">{{pdfrecord.ocrrecord_link.Company}}</span><br>Issue Date:     <span class ="title_text">{{pdfrecord.ocrrecord_link.IssueDate}}</span></h3>
+                        <div>
+                            <table class="pdf_zebra zebra">
+                            <thead>
+                                <tr>
+                                    <th>Document Type</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Document_Type}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Document Name</th>
+                                    
+                                    <td>{{pdfrecord.sourcedoc_link.filename}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Address}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Telephone</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Telephone}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>City</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.City}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Country</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Country}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Bank Account Number</th>
+                                   
+                                    <td>{{pdfrecord.ocrrecord_link.Source_Bank_Account}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Document Number</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Document_Number}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Purchase Order Number</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Piece Number</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Piece_Number}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Contains Arabic</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.ContainsArabic}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Source Bank Account</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Source_Bank_Account}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Memo</th>
+                                    
+                                    <td>{{pdfrecord.ocrrecord_link.Notes}}</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <th>Error Reports</th>
+                                    
+                                    <td>{{pdfrecord.commentary}}</td>
+                                    
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                    
+                            </tbody>
+           
+                            </table>
+                            
+                            <div class= "pdf_tools_container">          
+                            <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{pdfrecord.id}}" value="http:\\54.200.180.182\sourcepdfs\{{pdfrecord.sourcedoc_link.job_directory}}\{{pdfrecord.sourcedoc_link.filename}}" value2="{{pdfrecord.id}}"><label id="toggle_pdf_label{{pdfrecord.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{pdfrecord.id}}">PDF</label>
+                            
+                            {% if pdfrecord.error_style_class = "noerror" %}
+                            <input class="flag_button" type="checkbox" id="flag_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="flag_button_label" for="flag_button{{pdfrecord.id}}">FLAG</label>
+                            
+                            {% else %}
+                            <form class="unflag_form" id="unflag_form{{pdfrecord.id}}" action="{% url 'enersectapp:linkui_unflag' pdfrecord.id %}" method="post">
+                            {% csrf_token %}    
+                                <input class="unflag_button" type="checkbox" id="unflag_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{pdfrecord.id}}">UNFLAG</label>
+                            </form>
+                            {% endif %}
+                            
+                            {% for record in next_unlinked_record %}
+                            <form class="unlinking_form" id="unlinking_form{{pdfrecord.id}}" action="{% url 'enersectapp:linkui_unlink' pdfrecord.id %}" method="post">
+                             
+                             {% csrf_token %}
+                             <input type="button" style="display:none">
+                            </form>
+                            <form id="linking_form{{pdfrecord.id}}" action="{% url 'enersectapp:linkui_link' pdfrecord.id record.id %}" method="post">
+                            {% csrf_token %}
+                                {% if pdfrecord.linked_style_class = "nolink" %}
+                                <input class="linking_button" type="checkbox" id="linking_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="linking_button_label" for="linking_button{{pdfrecord.id}}">LINK</label>
+                                {% else %}
+                                <input class="unlinking_button" type="checkbox" id="unlinking_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="unlinking_button_label ui-state-active" for="unlinking_button{{pdfrecord.id}}">UNLINK</label>
+                                {% endif %}
+                                <!--<input class="search_text_copy" type="text" name='search_word_copy' value="{{searchword_filterword.pdf_searchword}}">-->
+                                <input class="filter_text_copy" type="text" name='filter_word_copy' value="{{searchword_filterword.pdf_filterword}}"> 
+                            </form>
+                            {% empty %}
+                                {% if pdfrecord.linked_style_class != "nolink" %}
+                                <form class="unlinking_form" id="unlinking_form{{pdfrecord.id}}" action="{% url 'enersectapp:linkui_unlink' pdfrecord.id %}" method="post">
+                             
+                                 {% csrf_token %}
+                                 <input class="unlinking_button" type="checkbox" id="unlinking_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="unlinking_button_label ui-state-active" for="unlinking_button{{pdfrecord.id}}">UNDO</label> 
+                                 
+                                 </form>
+                                
+                                {% endif %}
+                            {% endfor %} 
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div id="pdf_table_title">No Candidates for Linking found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
+                    {% endfor %}
+                    
+                </div>
+        
+       
+            </div>
+                <form class="flag_form" id="flag_form" action="{% url 'enersectapp:linkui_flag'%}" method="post">
+                            {% csrf_token %}
+                                
+                                <div class="flag_form_report" id="flag_form_report">
+                                    <h3 id="flag_form_line1">Error Report</h3>
+                                    <h4 id="flag_form_line2">Step 1. Choose a Category for the Error.<br>If it isn't one of the main Categories, procede to Step 2.</h4>
+                                    <div class="flag_form_report_panel">
+                                        <input type="radio" class="flag_option" id="flag_option_typo" name="radio2" /><label id="flag_option_label_typo" class="flag_option_label" for="flag_option_typo">Typo</label>
+                                        <input type="radio" class="flag_option" id="flag_option_category" name="radio2" /><label id="flag_option_label_category" class="flag_option_label" for="flag_option_category">Wrong Doc.Type</label>
+                                        <input type="radio" class="flag_option" id="flag_option_duplicate" name="radio2" /><label id="flag_option_label_duplicate" class="flag_option_label" for="flag_option_duplicate">Duplicate</label>
+                                        <input type="radio" class="flag_option" id="flag_option_mislinked" name="radio2" /><label id="flag_option_label_custom" class="flag_option_label" for="flag_option_mislinked">Mislinked</label>
+                                    </div>
+                                    <h4 id="flag_form_line3">Step 2. Write additional details to identify and solve the Error.<br>Example: " In Field "Address" "</h4>
+                                    <input id="flag_form_text" type="text" name='flag_form_text' value=""> 
+                                    <button id="submit_now" type="button"><label id="submit_now_label" for="#submit_now">Submit Now</label></button> 
+                                    <input class="invisible" name='flag_form_record_id' id="flag_record_id" type="text" value="">
+                                    <input class="invisible" name='flag_form_category' id="flag_record_category" type="text" value="">                                     
+                                </div>
+                                 
+                </form>
+                <div id="pdf_view"></div>
+        </div>
+    </div>
+    
+    
+    <div id="search_container">
+        <form id="search_form" action="{% url 'enersectapp:linkui_spiderweb' %}" method="post">
+        {% csrf_token %}
+            <button id="search_button" type="button"><label id="search_label" for="#search_button">Search</label></button>
+         
+            <input class="show-option" id="search_text" type="text" name='search_word' title="Want to search faster? Double click on any table's element!" value="{{searchword_filterword.pdf_searchword}}" placeholder="Search candidates">
+            <input id="filter_text" type="text" name='filter_word' value="{{searchword_filterword.pdf_filterword}}"> 
+            <input id="options_text" type="text" name='option_array' value="{{search_options}}">
+            
+                       
+        
+        
+        <div class="search_options" id="search_options_container">
+                <input type="checkbox" class="option_checkbox" id="option_amount"  /><label class="option_checkbox_label" for="option_amount">Amount</label>
+                <input type="text" name='search_word_amount' value="{{word_amount}}" class="option_text_input" id="option_text_input_amount"/>
+                <input type="checkbox" class="option_checkbox" id="option_name" /><label id="option_name_label" class="option_checkbox_label" for="option_name">Company Name</label>
+                <input type="text" name='search_word_companyname' value="{{word_companyname}}" class="option_text_input" id="option_text_input_name"/>
+                <input type="checkbox" class="option_checkbox" id="option_issue_date"  /><label class="option_checkbox_label" for="option_issue_date">Issue Date</label>
+                <input type="text" name='search_word_date' value="{{word_date}}" class="option_text_input" id="option_text_input_date"/>
+                <input type="checkbox" class="option_checkbox" id="option_document_name" /><label id="option_document_name_label" class="option_checkbox_label" for="option_document_name">Doc. Name</label>
+                <input type="text" name='search_word_docname' value="{{word_docname}}" class="option_text_input" id="option_text_input_docname"/>
+                
+        </div>
+            
+        <div id="paginator">
+            <h6 id="paginator_informer"> You are seeing Candidates {{page_counter_beginning}} through {{page_counter_end}} from a Total of {{total_pdf_records}}.</h6>
+            {% if page_counter_beginning >= 10 %} 
+            <h5 id="paginator_prev"> Prev. </h5>
+            {% endif %}
+            
+            {% if plus_limit >= page_counter_beginning %} 
+            <h5 id="paginator_next"> .Next </h5>
+            {% endif %}
+            
+            <input class="invisible" type="text" name='prev_next_results' value="" id="paginator_text"/>
+            <input class="invisible" type="text" name='actual_min_num' value="{{page_counter_beginning}}" id="paginator_text"/>
+        </div>
+        
+        </form>
+        
+        <div class="show-option" id="filter_container" title="Filter the Search Results by one Category">
+                <input type="radio" class="filter_choice" id="filter_pdf_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_pdf_all">All</label>
+                <!--<input type="radio" class="filter_choice" id="filter_pdf_xanto" name="radio"  /><label class="filter_choice_label" for="filter_pdf_xanto">Xanto</label>-->
+                <input type="radio" class="filter_choice" id="filter_pdf_linked" name="radio" /><label class="filter_choice_label" for="filter_pdf_linked">Linked</label>
+                <input type="radio" class="filter_choice" id="filter_pdf_unlinked" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_pdf_unlinked">Unlinked</label>
+                <input type="radio" class="filter_choice" id="filter_pdf_error" name="radio" /><label class="filter_choice_label" for="filter_pdf_error">Error</label>
+            
+        </div>
+        
+    </div>
+    
+    <div id="down_container">
+        <div class="down_label">Number of unlinked Records remaining: </div>
+        <div class="down_number">{{unlinked_records_remaining}}</div>
+                
+    </div>
+
+{% endblock content%}
+
+{% block breadcrumbs %}
+
+<div class="breadcrumbs">
+<a href="{% url 'enersectapp:main' %}">{% trans 'Return to Tools Menu' %}</a>
+
+
+</div>
+
+{% endblock breadcrumbs%}
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

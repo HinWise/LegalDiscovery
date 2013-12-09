@@ -1,0 +1,2533 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+{% endblock special_libs %}
+
+{% block config_libs %} 
+
+
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+<script>
+    xanto="";
+    petra="";
+    dateturn="";
+    timer=0;
+    
+    //companyNameList for the Autocomplete of Company 
+    var companyNameList = "";
+    var countryList = "";
+    var currencies = "";
+
+    $(document).ready(function () {
+    
+        countryList = new Array("Afghanistan", "Albania", "Algeria", "American Samoa", "Angola", "Anguilla", "Antartica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Ashmore and Cartier Island", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burma", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Clipperton Island", "Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo, Democratic Republic of the", "Congo, Republic of the", "Cook Islands", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czeck Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Europa Island", "Falkland Islands (Islas Malvinas)", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern and Antarctic Lands", "Gabon", "Gambia, The", "Gaza Strip", "Georgia", "Germany", "Ghana", "Gibraltar", "Glorioso Islands", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See (Vatican City)", "Honduras", "Hong Kong", "Howland Island", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Ireland, Northern", "Israel", "Italy", "Jamaica", "Jan Mayen", "Japan", "Jarvis Island", "Jersey", "Johnston Atoll", "Jordan", "Juan de Nova Island", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia, Former Yugoslav Republic of", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Man, Isle of", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia, Federated States of", "Midway Islands", "Moldova", "Monaco", "Mongolia", "Montserrat", "Morocco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcaim Islands", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Scotland", "Senegal", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and South Sandwich Islands", "Spain", "Spratly Islands", "Sri Lanka", "Sudan", "Suriname", "Svalbard", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Tobago", "Toga", "Tokelau", "Tonga", "Trinidad", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "United States (USA)", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Virgin Islands", "Wales", "Wallis and Futuna", "West Bank", "Western Sahara", "Yemen", "Yugoslavia", "Zambia", "Zimbabwe");
+        currencies = new Array(
+        'Afghan afghani (AFN)',
+        'Albanian lek (ALL)' ,
+        'Algerian dinar (DZD)' ,
+        'European euro (EUR)' ,
+        'Angolan kwanza (AOA)' ,
+        'East Caribbean dollar (XCD)' ,
+        'Argentine peso (ARS)' ,
+        'Armenian dram (AMD)' ,
+        'Aruban florin (AWG)' ,
+        'Australian dollar (AUD)' ,
+        'Azerbaijani manat (AZN)' ,
+        'Bahamian dollar (BSD)' ,
+        'Bahraini dinar (BHD)' ,
+        'Bangladeshi taka (BDT)' ,
+        'Barbadian dollar (BBD)' ,
+        'Belarusian ruble (BYR)' ,
+        'Belize dollar (BZD)' ,
+        'West African CFA franc (XOF)' ,
+        'Bhutanese ngultrum (BTN)' ,
+        'Bolivian boliviano (BOB)' ,
+        'Bosnia-Herzegovina konvertibilna marka (BAM)' ,
+        'Botswana pula (BWP)' ,
+        'Brazilian real (BRL)' ,
+        'Brunei dollar (BND)' ,
+        'Bulgarian lev (BGN)' ,
+        'Burundi franc (BIF)' ,
+        'Cambodian riel (KHR)' ,
+        'Central African CFA franc (XAF)' ,
+        'Canadian dollar (CAD)' ,
+        'Cape Verdean escudo (CVE)' ,
+        'Cayman Islands dollar (KYD)' ,
+        'Chilean peso (CLP)' ,
+        'Chinese renminbi (CNY)' ,
+        'Colombian peso (COP)' ,
+        'Comorian franc (KMF)' ,
+        'Congolese franc (CDF)' ,
+        'Costa Rican colon (CRC)' ,
+        'Croatian kuna (HRK)' ,
+        'Cuban peso (CUC)' ,
+        'Czech koruna (CZK)' ,
+        'Danish krone (DKK)' ,
+        'Djiboutian franc (DJF)' ,
+        'Dominican peso (DOP)' ,
+        'Egyptian pound (EGP)' ,
+        'Central African CFA franc (GQE)' ,
+        'Eritrean nakfa (ERN)' ,
+        'Estonian kroon (EEK)' ,
+        'Ethiopian birr (ETB)' ,
+        'Falkland Islands pound (FKP)' ,
+        'Fijian dollar (FJD)' ,
+        'CFP franc (XPF)' ,
+        'Gambian dalasi (GMD)' ,
+        'Georgian lari (GEL)' ,
+        'Ghanaian cedi (GHS)' ,
+        'Gibraltar pound (GIP)' ,
+        'Guatemalan quetzal (GTQ)' ,
+        'Guinean franc (GNF)' ,
+        'Guyanese dollar (GYD)' ,
+        'Haitian gourde (HTG)' ,
+        'Honduran lempira (HNL)' ,
+        'Hong Kong dollar (HKD)' ,
+        'Hungarian forint (HUF)' ,
+        'Icelandic krona (ISK)' ,
+        'Indian rupee (INR)' ,
+        'Indonesian rupiah (IDR)' ,
+        'Iranian rial (IRR)' ,
+        'Iraqi dinar (IQD)' ,
+        'Israeli new sheqel (ILS)' ,
+        'Jamaican dollar (JMD)' ,
+        'Japanese yen (JPY)' ,
+        'Jordanian dinar (JOD)' ,
+        'Kazakhstani tenge (KZT)' ,
+        'Kenyan shilling (KES)' ,
+        'North Korean won (KPW)' ,
+        'South Korean won (KRW)' ,
+        'Kuwaiti dinar (KWD)' ,
+        'Kyrgyzstani som (KGS)' ,
+        'Lao kip (LAK)' ,
+        'Latvian lats (LVL)' ,
+        'Lebanese lira (LBP)' ,
+        'Lesotho loti (LSL)' ,
+        'Liberian dollar (LRD)' ,
+        'Libyan dinar (LYD)' ,
+        'Lithuanian litas (LTL)' ,
+        'Macanese pataca (MOP)' ,
+        'Macedonian denar (MKD)' ,
+        'Malagasy ariary (MGA)' ,
+        'Malawian kwacha (MWK)' ,
+        'Malaysian ringgit (MYR)' ,
+        'Maldivian rufiyaa (MVR)' ,
+        'Mauritanian ouguiya (MRO)' ,
+        'Mauritian rupee (MUR)' ,
+        'Mexican peso (MXN)' ,
+        'Moldovan leu (MDL)' ,
+        'Mongolian tugrik (MNT)' ,
+        'Moroccan dirham (MAD)' ,
+        'Mozambican metical (MZM)' ,
+        'Myanma kyat (MMK)' ,
+        'Namibian dollar (NAD)' ,
+        'Nepalese rupee (NPR)' ,
+        'Netherlands Antillean gulden (ANG)' ,
+        'New Zealand dollar (NZD)' ,
+        'Nicaraguan cordoba (NIO)' ,
+        'Nigerian naira (NGN)' ,
+        'Norwegian krone (NOK)' ,
+        'Omani rial (OMR)' ,
+        'Pakistani rupee (PKR)',
+        'Panamanian balboa (PAB)' ,
+        'Papua New Guinean kina (PGK)' ,
+        'Paraguayan guarani (PYG)' ,
+        'Peruvian nuevo sol (PEN)' ,
+        'Philippine peso (PHP)' ,
+        'Polish zloty (PLN)' ,
+        'Qatari riyal (QAR)' ,
+        'Romanian leu (RON)' ,
+        'Russian ruble (RUB)' ,
+        'Rwandan franc (RWF)' ,
+        'Saint Helena pound (SHP)' ,
+        'Samoan tala (WST)' ,
+        'Sao Tome and Principe dobra (STD)' ,
+        'Saudi riyal (SAR)' ,
+        'Serbian dinar (RSD)' ,
+        'Seychellois rupee (SCR)' ,
+        'Sierra Leonean leone (SLL)' ,
+        'Singapore dollar (SGD)' ,
+        'Slovak koruna (SKK)' ,
+        'Solomon Islands dollar (SBD)' ,
+        'Somali shilling (SOS)' ,
+        'South African rand (ZAR)' ,
+        'Sudanese pound (SDG)' ,
+        'Sri Lankan rupee (LKR)' ,
+        'Sudanese pound (SDG)' ,
+        'Surinamese dollar (SRD)' ,
+        'Swazi lilangeni (SZL)' ,
+        'Swedish krona (SEK)' ,
+        'Swiss franc (CHF)' ,
+        'Syrian pound (SYP)' ,
+        'New Taiwan dollar (TWD)' ,
+        'Tajikistani somoni (TJS)' ,
+        'Tanzanian shilling (TZS)' ,
+        'Thai baht (THB)' ,
+        'Paanga (TOP9' ,
+        'Trinidad and Tobago dollar (TTD)' ,
+        'Tunisian dinar (TND)' ,
+        'Turkish new lira (TRY)' ,
+        'Turkmen manat (TMM)' ,
+        'Ugandan shilling (UGX)' ,
+        'Ukrainian hryvnia (UAH)' ,
+        'United Arab Emirates dirham (AED)' ,
+        'British pound (GBP)' ,
+        'United States dollar (USD)' ,
+        'Uruguayan peso (UYU)' ,
+        'Uzbekistani som (UZS)' ,
+        'Vanuatu vatu (VUV)' ,
+        'Venezuelan bolivar (VEB)' ,
+        'Vietnamese dong (VND)' ,
+        'Yemeni rial (YER)' ,
+        'Zambian kwacha (ZMK)' ,
+        'Zimbabwean dollar (ZWD)'
+      );
+        
+        
+        //Control; When you focus on any menu element, the rest of elements get hidden.
+        //Algorithm must be updated for each extra Autocomplete field that is added
+        //This is because, if not done this way (detecting if the Autocomplete of the
+        //selected menu is disabled), it unfocus the input elements right away when
+        //you try to choose an element in the Autocomplete candidates.
+    
+        $('.menuclass').mouseover(function(event){
+        
+            $(this).siblings().blur();
+
+            if($(this).is('#currencymenu'))
+            {
+                if($( "#currency" ).autocomplete( "option", "disabled" ))
+                {
+                    
+                    $('input:not(#companyname_search)').blur();
+                    
+                }
+                
+            }
+            else if($(this).is('#companymenu'))
+            {
+                if($( "#companyname_search" ).autocomplete( "option", "disabled" ))
+                {
+                    
+                    $('input:not(#companyname_search)').blur();
+                    
+                }
+            }
+            else if($(this).is('#companycity_menu'))
+            {
+                if($( "#companyform_city" ).autocomplete( "option", "disabled" ))
+                {
+                    
+                    $('input:not(#companyname_search)').blur();
+                    
+                }
+            }
+            else if($(this).is('#companycountry_menu'))
+            {
+                if($( "#companyform_country" ).autocomplete( "option", "disabled" ))
+                {
+                    
+                    $('input:not(#companyname_search)').blur();
+                    
+                }
+            }          
+            else
+            {
+                
+                $('input:not(#companyname_search)').blur();
+                 
+            }
+            
+        });
+        
+        //$('.menuclass').mouseover(function(){});
+        
+    
+        /*$( "#pdf_view" ).toggle( "drop", 1000 );*/
+    
+        /*Cleaning the string with all the company names received from Django*/
+    
+        if($('#companiesarray').length)
+        {
+    
+            companyNameList = $('#companiesarray').attr("value");
+            companyNameList = companyNameList.replace(/'/g,"");
+            companyNameList = companyNameList.replace("]","");
+            companyNameList = companyNameList.replace("[","");
+            companyNameList = companyNameList.split(", ");
+            
+           
+
+            i = 0;
+            while(i < companyNameList.length){
+                companyNameList[i] = companyNameList[i].slice(1);
+                i++;
+            }
+        
+        }
+         
+        $('input.disablecopypaste').bind('copy paste', function (e) {
+                e.preventDefault();
+        });
+               
+        
+        $('.ui-widget').css("font-size","80%");
+        var tips = $( ".validateTips" );
+        tips.css("display","none");
+        createPdf_View();
+        createUserPanel();
+        createFieldsForm();
+        configLoadingScreen();
+        
+                
+        function createPdf_View(){
+                var $pdf = $('#pdf_view');
+            
+                var w=$pdf.width();
+                var h=$pdf.height();
+                       
+                var link = $pdf.attr("value");
+         
+                var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
+                s+= 'PDF View not Available in this Browser : ';
+                s+= '<a href='+link+'>Alternative Link</a>';
+                s+= '</object>'
+                
+                $pdf.append(s); 
+        }
+        
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+            }
+            
+        function createFieldsForm(){
+        
+            var companyValid = false;
+            var allFields = $( [] );
+            
+            
+            //AMOUNT Menu Config
+            
+            var amount = $( "#amount" );
+            
+            if(amount.length)
+            {
+                
+                allFields.add( amount )
+                           
+
+                
+                $( "#amountmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#amountmenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            xanto = ui;
+                            var new_text = ui.item.text();
+                            $(".amountoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                               
+                
+                $('.amountoption').click(function(e){
+                
+                
+                    var new_text = $(this).text();
+                
+                    $('#amount').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#amountlink').text("Amount: " + new_text);
+                      $('#amount').attr("value",new_text);
+                      $('#amount').val(new_text);
+                       
+                        $("#amountmenu").addClass("ui-state-custom-error");
+                        
+                    $('#amount').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#amount').removeClass('ui-menu-divider');
+                
+                $('#amount').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#amountmenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                var new_value = event.currentTarget.value;
+                $('#amountlink').text("Amount: " + new_value);
+                $(this).attr("value",new_value);
+                
+                if ($("#amountmenu").hasClass("ui-state-custom-filled"))
+                {
+                    $("#amountmenu").removeClass("ui-state-custom-filled");
+                }
+                
+                if(new_value.length > 0)
+                {
+                    $("#amountmenu").addClass("ui-state-custom-filled");
+                    
+                    if ($("#amountmenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                    {
+                        $("#amountmenu").removeClass("ui-state-custom-error");
+                    }
+                }
+                
+                }); 
+            });
+            
+            }
+            
+            //CURRENCY Menu Config
+
+            var currency = $( "#currency" );
+            
+            if(currency.length)
+            {
+            
+                allFields.add( currency );
+     
+
+                $( "#currencymenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#currencymenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".currencyoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.currencyoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#currency').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#currencylink').text("Currency: " + new_text);
+                      $('#currency').attr("value",new_text);
+                      $('#currency').val(new_text);
+                      
+                      $("#currencymenu").addClass("ui-state-custom-error");
+                        
+                      $("#currencymenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#currencymenu").hasClass("ui-state-custom-error") && new_text != "MISSING" && new_text != "UNREADABLE" )
+                        {
+                            $("#currencymenu").removeClass("ui-state-custom-error");
+                        }  
+                        
+                        
+                    $('#currency').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#currency').autocomplete({
+                  source: currencies,
+                  appendTo: "#currencymenu"
+                });
+            
+                }
+                
+                $('#currencymenu').removeClass('ui-menu-divider');
+                
+                $('#currency').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#currencymenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                var new_value = event.currentTarget.value;
+                $('#currencylink').text("Currency: " + new_value);
+                $(this).attr("value",new_value);
+                                                
+                
+                
+                if ($("#currencymenu").hasClass("ui-state-custom-filled"))
+                {
+                    $("#currencymenu").removeClass("ui-state-custom-filled");
+                }
+                
+                if(new_value.length > 0)
+                {
+                    $("#currencymenu").addClass("ui-state-custom-filled");
+                    
+                    
+                    if ($("#currencymenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                    {
+                        $("#currencymenu").removeClass("ui-state-custom-error");
+                    }
+                }
+                }); 
+            });
+            
+            
+            
+            //ARABIC Menu Config
+            
+            var arabic = $( "#arabic" );
+            
+            if(arabic.length)
+            {
+            
+                allFields.add(arabic);
+                
+                $( "#arabicmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                    
+                        var first_elem = ui.item.parent().is($( "#arabicmenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            var new_text = ui.item.text();
+                            $('#arabiclink').text("Contains Arabic: " +new_text);
+                            $('#arabic').attr("value",new_text);
+                            $('#arabic').val(new_text);
+                            
+                        
+                            $("#arabicmenu").addClass("ui-state-custom-filled");
+                        } 
+                    } 
+                });
+                /* $( "#sourcedocmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                    
+                        var first_elem = ui.item.parent().is($( "#sourcedocmenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            var new_text = ui.item.text();
+                            $('#sourcedoclink').text("Contains Arabic: " +new_text);
+                            $('#sourcedoc').attr("value",new_text);
+                            $('#sourcedoc').val(new_text);
+                        } 
+                    } 
+                }); */
+            }
+            
+            //COMPANY NAME Menu Config
+            
+            var company_name = $( "#companyform_name" );
+            var company_address = $( "#companyform_address" );
+            var company_telephone = $( "#companyform_telephone" );
+            var company_city = $( "#companyform_city" );
+            var company_country = $( "#companyform_country" );
+            var company_template = $( "#companyform_template" );
+            
+            
+            if(company_name.length)
+            {
+            
+                allFields.add( company_name );
+                allFields.add( company_address );
+                allFields.add( company_telephone );
+                allFields.add( company_city );
+                allFields.add( company_country );
+                
+                $( "#companymenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#companymenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".companyoption[value='"+new_text+"']").click();
+                            
+                        } 
+                    } 
+                });
+                
+                $('.companyoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#company').unbind('copy paste', function (e) {
+                                    
+                    });
+                    
+                    if(new_text!="Add a NEW COMPANY")
+                    {
+                        $('#companyform_name').attr("value",new_text);
+                        $('#companyform_name').val(new_text);
+                        $('#company_template').attr("value",new_text);
+                        $('#company_template').val(new_text);
+                        $('#companyname_search').attr("value",new_text);
+                        $('#companyname_search').val(new_text);
+                    }
+                    else
+                    {
+                        $('#company_template').attr("value","New Company");
+                        $('#company_template').val(new_text);
+                    }
+                    
+                    $( "#fromTemplate_dialog" ).text("From Template: '"+$('#company_template').attr("value")+"'");
+                                    
+                     if(new_text=="MISSING NAME" || new_text=="UNREADABLE NAME")
+                     {
+                        $("#companyform_name").attr("disabled","disabled");
+                        $("#companymenu").addClass("ui-state-custom-error");
+
+                     }
+                     else
+                     {
+                        $("#companyform_name").attr("disabled",false);
+                     }
+                     
+                     $('#company-form').dialog("open");    
+                     /*else
+                     {*/
+                        
+                     //}   
+                      
+                      /*$('#companylink').text("Company Beneficiary: " + new_text);
+                      $('#company').attr("value",new_text);
+                      $('#company').val(new_text);
+                      
+                      $("#companymenu").addClass("ui-state-custom-error");
+                        
+                      $("#companymenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#companymenu").hasClass("ui-state-custom-error") && new_text != "MISSING" && new_text != "UNREADABLE" )
+                        {
+                            $("#companymenu").removeClass("ui-state-custom-error");
+                        }  */
+
+                    $('#company').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#companymenu').removeClass('ui-menu-divider');
+                
+                $('#companyname_search').autocomplete({
+                  source: companyNameList,
+                  appendTo: "#companymenu"
+                });
+                                
+                
+                $('#companyname_search').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#companymenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                var new_value = event.currentTarget.value;
+                //$('#companylink').text("Company Name: " + new_value);
+                $(this).attr("value",new_value);
+                $('#companyform_name').attr("value",new_value);
+                $('#company_template').attr("value",new_value);
+                
+                $( "#fromTemplate_dialog" ).text("From Template: '"+$('#company_template').attr("value")+"'");
+                $('#company-form').dialog("open");  
+                
+                }); 
+                
+                /*if ($("#companymenu").hasClass("ui-state-custom-filled"))
+                {
+                    $("#companymenu").removeClass("ui-state-custom-filled");
+                }
+                
+                if(new_value.length > 0)
+                {
+                    $("#companymenu").addClass("ui-state-custom-filled");
+                    
+                    if ($("#companymenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                    {
+                        $("#companymenu").removeClass("ui-state-custom-error");
+                    }
+                }*/
+            });
+            
+            $('#companyform_city').autocomplete({
+                  source: function( request, response ) {
+                    $.ajax({
+                      url: "http://ws.geonames.org/searchJSON",
+                      dataType: "jsonp",
+                      data: {
+                        featureClass: "P",
+                        style: "full",
+                        maxRows: 6,
+                        name_startsWith: request.term
+                      },
+                      success: function( data ) {
+                        response( $.map( data.geonames, function( item ) {
+                          return {
+                            label: item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+                            value: item.name + (item.adminName1 ? ", " + item.adminName1 : ""),
+                            countryValue : item.countryName
+                          }
+                        }));
+                      }
+                    });
+                  },
+                  select: function( event, ui ) {
+                    var countryValue = ui.item.countryValue;
+                    
+                    if(countryValue) {$('#companyform_country').attr("value",countryValue); }
+                    //$('#companyform_country').focusout();
+                    //$('#companyform_city').focusout();
+                    
+                    //$('#companyform_country').focusout();
+                  },
+                  appendTo: "#company_fieldset"
+                });
+                
+                $('#companyform_country').autocomplete({
+                  source: countryList,
+                  appendTo: "#company_fieldset"
+                });
+            
+                //COMPANY ADDRESS Menu Config
+                
+                $( "#companyaddress_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#companyaddress_menu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".companyaddress_option[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.companyaddress_option').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#companyform_address').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#companyaddress_link').text("Address: " + new_text);
+                      $('#companyform_address').attr("value",new_text);
+                      $('#companyform_address').val(new_text);
+                      
+                      $("#companyaddress_menu").addClass("ui-state-custom-error");
+                        
+                    $('#companyform_address').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#companyaddress_menu').removeClass('ui-menu-divider');
+                
+                $('#companyform_address').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#companyaddress_menu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        $('#companyaddress_link').text("Address: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#companyaddress_menu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#companyaddress_menu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#companyaddress_menu").addClass("ui-state-custom-filled");
+                                                       
+                            
+                            if ($("#companyaddress_menu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                            {
+                                $("#companyaddress_menu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+                
+                //COMPANY TELEPHONE Menu Config
+                
+                $( "#companytelephone_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#companytelephone_menu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".companytelephone_option[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.companytelephone_option').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#companyform_telephone').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#companytelephone_link').text("Telephone: " + new_text);
+                      $('#companyform_telephone').attr("value",new_text);
+                      $('#companyform_telephone').val(new_text);
+                      
+                      $("#companytelephone_menu").addClass("ui-state-custom-error");
+                        
+                    $('#companyform_telephone').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#companytelephone_menu').removeClass('ui-menu-divider');
+                
+                $('#companyform_telephone').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#companytelephone_menu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        $('#companytelephone_link').text("Telephone: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#companytelephone_menu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#companytelephone_menu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#companytelephone_menu").addClass("ui-state-custom-filled");
+                                                       
+                            
+                            if ($("#companytelephone_menu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                            {
+                                $("#companytelephone_menu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+                
+                //COMPANY CITY Menu Config
+                
+                $( "#companycity_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#companycity_menu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".companycity_option[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.companycity_option').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#companyform_city').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#companycity_link').text("City: " + new_text);
+                      $('#companyform_city').attr("value",new_text);
+                      $('#companyform_city').val(new_text);
+                      
+                      
+                      $("#companycity_menu").addClass("ui-state-custom-error");
+                        
+                    $('#companyform_city').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#companycity_menu').removeClass('ui-menu-divider');
+                
+                $('#companyform_city').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#companycity_menu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        $('#companycity_link').text("City: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#companycity_menu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#companycity_menu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#companycity_menu").addClass("ui-state-custom-filled");
+                                                       
+                            
+                            if ($("#companycity_menu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                            {
+                                $("#companycity_menu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+                
+                //COMPANY COUNTRY Menu Config
+                
+                $( "#companycountry_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#companycountry_menu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".companycountry_option[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.companycountry_option').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#companyform_country').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#companycountry_link').text("Country: " + new_text);
+                      $('#companyform_country').attr("value",new_text);
+                      $('#companyform_country').val(new_text);
+                      
+                      $("#companycountry_menu").addClass("ui-state-custom-error");
+                        
+                    $('#companyform_country').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#companycountry_menu').removeClass('ui-menu-divider');
+                
+                $('#companyform_country').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#companycountry_menu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        $('#companycountry_link').text("Country: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#companycountry_menu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#companycountry_menu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#companycountry_menu").addClass("ui-state-custom-filled");
+                                                       
+                            
+                            if ($("#companycountry_menu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                            {
+                                $("#companycountry_menu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+            
+            }
+            
+            //DOCUMENT NUMBER Menu Config
+
+                        
+            var docnumber = $( "#docnumber" );
+            
+            if(docnumber.length)
+            {
+            
+                allFields.add(docnumber);
+                
+                
+                
+                $( "#docnumbermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#docnumbermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".docnumberoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.docnumberoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#docnumber').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#docnumberlink').text("Document Number: " + new_text);
+                      $('#docnumber').attr("value",new_text);
+                      $('#docnumber').val(new_text);
+                      
+                      $("#docnumbermenu").addClass("ui-state-custom-error");
+                        
+                    $('#docnumber').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#docnumbermenu').removeClass('ui-menu-divider');
+                
+                $('#docnumber').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#docnumbermenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                        var new_value = event.currentTarget.value;
+                        $('#docnumberlink').text("Document Number: " + new_value);
+                        $(this).attr("value",new_value);
+                        
+                        if ($("#docnumbermenu").hasClass("ui-state-custom-filled"))
+                        {
+                            $("#docnumbermenu").removeClass("ui-state-custom-filled");
+                        }
+                        
+                        if(new_value.length > 0)
+                        {
+                            $("#docnumbermenu").addClass("ui-state-custom-filled");
+                            
+                            if ($("#docnumbermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                            {
+                                $("#docnumbermenu").removeClass("ui-state-custom-error");
+                            }
+                        }
+                
+                    }); 
+                });
+            
+            }
+            
+            //ACCOUNT NUMBER Menu Config
+            
+            var accountnum = $( "#accountnum" );
+           
+            if(accountnum.length)
+            {
+            
+                allFields.add(accountnum);
+
+                
+                $( "#accountnummenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#accountnummenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $(".accountnumoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.accountnumoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#accountnum').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#accountnumlink').text("Account Number: " + new_text);
+                      $('#accountnum').attr("value",new_text);
+                      $('#accountnum').val(new_text);
+                      
+                      
+                      $("#accountnummenu").addClass("ui-state-custom-error");
+                    
+                        
+                    $('#accountnum').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                $('#accountnummenu').removeClass('ui-menu-divider');
+                
+                $('#accountnum').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#accountnummenu").unbind('keydown');
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                var new_value = event.currentTarget.value;
+                $('#accountnumlink').text("Account Number: " + new_value);
+                $(this).attr("value",new_value);
+                
+                if ($("#accountnummenu").hasClass("ui-state-custom-filled"))
+                {
+                    $("#accountnummenu").removeClass("ui-state-custom-filled");
+                }
+                
+                if(new_value.length > 0)
+                {
+                    $("#accountnummenu").addClass("ui-state-custom-filled");
+                    
+                    if ($("#accountnummenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                    {
+                        $("#accountnummenu").removeClass("ui-state-custom-error");
+                    }
+                }
+                           
+                }); 
+            });
+            }
+            
+            //PURCHASE NUMBER Menu Config
+
+            var purchasenumber = $( "#purchasenumber" );
+            
+            if(purchasenumber.length)
+            {
+            
+                allFields.add(purchasenumber);
+                
+                
+                
+                
+                $( "#purchasenumbermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#purchasenumbermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            
+                            $(".purchasenumberoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.purchasenumberoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#purchasenumber').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#purchasenumberlink').text("Purchase Order / Contract Number: " + new_text);
+                      $('#purchasenumber').attr("value",new_text);
+                      $('#purchasenumber').val(new_text);
+                      
+                        $("#purchasenumbermenu").addClass("ui-state-custom-error");
+
+                        
+                    $('#purchasenumber').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                
+                
+                $('#purchasenumbermenu').removeClass('ui-menu-divider');
+                
+                $('#purchasenumber').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#purchasenumbermenu").unbind('keydown');
+                $("#purchasenumbermenu").attr('value',"loco");
+                $("#purchasenumbermenu").attr('value',"");
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                    
+                    var new_value = event.currentTarget.value;
+                    $('#purchasenumberlink').text("Purchase Order / Contract Number: " + new_value);
+                    $(this).attr("value",new_value);
+                                                    
+                    
+                    
+                    if ($("#purchasenumbermenu").hasClass("ui-state-custom-filled"))
+                    {
+                        $("#purchasenumbermenu").removeClass("ui-state-custom-filled");
+                    }
+                    
+                    if(new_value.length > 0)
+                    {
+                        $("#purchasenumbermenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#purchasenumbermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                        {
+                            $("#purchasenumbermenu").removeClass("ui-state-custom-error");
+                        }
+                    }
+                    }); 
+                });
+            }
+            
+            
+            //PIECE NUMBER Menu Config
+
+            var piecenumber = $( "#piecenumber" );
+            
+            if(piecenumber.length)
+            {
+            
+                allFields.add(piecenumber);
+                
+                
+                
+                
+                $( "#piecenumbermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#piecenumbermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            
+                            $(".piecenumberoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.piecenumberoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#piecenumber').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#piecenumberlink').text("Piece Number: " + new_text);
+                      $('#piecenumber').attr("value",new_text);
+                      $('#piecenumber').val(new_text);
+                      
+                        $("#piecenumbermenu").addClass("ui-state-custom-error");
+
+                        
+                    $('#piecenumber').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                
+                
+                $('#piecenumbermenu').removeClass('ui-menu-divider');
+                
+                $('#piecenumber').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#piecenumbermenu").unbind('keydown');
+                
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                    
+                    var new_value = event.currentTarget.value;
+                    $('#piecenumberlink').text("Piece Number: " + new_value);
+                    $(this).attr("value",new_value);
+                                                    
+                    
+                    
+                    if ($("#piecenumbermenu").hasClass("ui-state-custom-filled"))
+                    {
+                        $("#piecenumbermenu").removeClass("ui-state-custom-filled");
+                    }
+                    
+                    if(new_value.length > 0)
+                    {
+                        $("#piecenumbermenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#piecenumbermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                        {
+                            $("#piecenumbermenu").removeClass("ui-state-custom-error");
+                        }
+                    }
+                    }); 
+                });
+            }
+            
+            //PIECE NUMBER Menu Config
+
+            var pagenumber = $( "#pagenumber" );
+            
+            if(pagenumber.length)
+            {
+            
+                allFields.add(pagenumber);
+                
+                
+                
+                
+                $( "#pagenumbermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#pagenumbermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            
+                            $(".pagenumberoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.pagenumberoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#pagenumber').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#pagenumberlink').text("Page Number: " + new_text);
+                      $('#pagenumber').attr("value",new_text);
+                      $('#pagenumber').val(new_text);
+                      
+                        $("#pagenumbermenu").addClass("ui-state-custom-error");
+
+                        
+                    $('#pagenumber').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                
+                
+                $('#pagenumbermenu').removeClass('ui-menu-divider');
+                
+                $('#pagenumber').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#pagenumbermenu").unbind('keydown');
+                
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                    
+                    var new_value = event.currentTarget.value;
+                    $('#pagenumberlink').text("Page Number: " + new_value);
+                    $(this).attr("value",new_value);
+                                                    
+                    
+                    
+                    if ($("#pagenumbermenu").hasClass("ui-state-custom-filled"))
+                    {
+                        $("#pagenumbermenu").removeClass("ui-state-custom-filled");
+                    }
+                    
+                    if(new_value.length > 0)
+                    {
+                        $("#pagenumbermenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#pagenumbermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                        {
+                            $("#pagenumbermenu").removeClass("ui-state-custom-error");
+                        }
+                    }
+                    }); 
+                });
+            }
+            
+            
+            //DOCUMENT TYPE Menu Config
+                        
+            var doctype = $( "#doctype" );
+            
+    
+            if(doctype.length)
+            {
+            
+            allFields.add(doctype);
+            
+            var doc_value = doctype.attr("value");
+            
+            if(doc_value != "Document Type")
+            {
+                if(doc_value == "Blank")
+                {
+                    
+                    $("#doctypemenu").addClass("ui-state-custom-error");
+                }
+                else
+                {
+                    $("#doctypemenu").addClass("ui-state-custom-filled");
+                }
+                
+                $('#doctypelink').text("Document Type: " + doc_value);
+            }
+
+                $( "#doctypemenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                    
+                        var first_elem = ui.item.parent().is($( "#doctypemenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            var new_text = ui.item.text();
+                            $('#doctypelink').text("Document Type: "+ new_text);
+                            $('#doctype').attr("value",new_text);
+                            $('#doctype').val(new_text);
+                            
+                            
+                            $('#fields_form').attr("action","{% url 'enersectapp:dataentryui_spider' %}");
+                            $('#fields_form').submit();
+                        } 
+                        
+                    } 
+                });
+            }
+            
+            //ISSUE DATE Menu Config
+            
+            var issuedate = $( "#issuedate" );
+            
+            var issuedate_day = "";
+            var issuedate_month = "";
+            var issuedate_year = "";
+            
+
+            if(issuedate.length)
+            {
+
+                var issuedate_day = $( "#issuedate_day" );
+                var issuedate_month = $( "#issuedate_month" );
+                var issuedate_year = $( "#issuedate_year" );
+                                
+                allFields.add(issuedate);
+                allFields.add(issuedate_day);
+                allFields.add(issuedate_month);
+                allFields.add(issuedate_year);
+                
+                $(issuedate_day).datepicker( {
+                        
+                        showButtonPanel: true,
+                        dateFormat: 'dd',
+                        defaultDate: $.datepicker.parseDate("dd/mm/yy", "27/08/2003"),
+                        beforeShow: function(input, inst) {
+                           dateturn = "day";
+                        },
+                        onClose: function(dateText, inst) { 
+                           
+                            $('#issuedate_day').attr("value",dateText);
+                            
+                            //issuedate_month.attr("value",("0" + (parseInt(month) + 1)).slice(-2));
+                            dateturn="";
+                            clearTimeout(timer);
+                    }
+                });
+                
+                $(issuedate_month).datepicker( {
+                        changeMonth: true,
+                        
+                        showButtonPanel: true,
+                        dateFormat: 'mm',
+                        
+                        beforeShow: function(input, inst) {
+                           dateturn = "month";
+                        },
+                        onClose: function(dateText, inst) { 
+                            var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                            
+                            //$(this).datepicker('setDate', $.datepicker.parseDate("dd/mm/yy", "27/"+month+"/2003"));
+                            
+                            intern_value = issuedate_month.val();
+                            
+                            if(intern_value=="NaN"){
+                                if(issuedate_month.hasClass("missing"))
+                                {
+                                    issuedate_month.removeClass("missing");
+                                    issuedate_month.attr("value",("0" + (parseInt(month) + 1)).slice(-2));
+                                    issuedate_month.val(("0" + (parseInt(month) + 1)).slice(-2));
+                                }
+                                else
+                                {
+                                    issuedate_month.attr("value","NaN");
+                                    issuedate_month.val("NaN");
+                                    issuedate_month.addClass("missing");
+                                }
+                                
+                            }
+                            else
+                            {
+                                
+                                issuedate_month.attr("value",("0" + (parseInt(month) + 1)).slice(-2));
+                                issuedate_month.val(("0" + (parseInt(month) + 1)).slice(-2));
+                            }
+                            
+                            dateturn="";
+                            clearTimeout(timer);
+                    }
+                });
+                
+                $(issuedate_year).datepicker( {
+                        
+                        changeYear: true,
+                        showButtonPanel: true,
+                        dateFormat: 'yy',
+                        defaultDate: $.datepicker.parseDate("dd/mm/yy", "27/08/2003"),
+                        minDate:$.datepicker.parseDate("dd/mm/yy", "27/08/1998"),
+                        //maxDate:$.datepicker.parseDate("dd/mm/yy", "27/08/2013"),
+                        beforeShow: function(input, inst) {
+                           dateturn = "year";
+                           
+                        },
+                        
+                        onClose: function(dateText, inst) { 
+                           
+                            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                            //$(this).datepicker('setDate', $.datepicker.parseDate("dd/mm/yy", "27/08/"+year));
+                            issuedate_year.attr("value",parseInt(year));
+                            
+                            intern_value = issuedate_year.val();
+                            
+                            if(intern_value=="NaN"){
+                                if(issuedate_year.hasClass("missing"))
+                                {
+                                    issuedate_year.removeClass("missing");
+                                    issuedate_year.attr("value",parseInt(year));
+                                    issuedate_year.val(parseInt(year));
+                                }
+                                else
+                                {
+                                    issuedate_year.attr("value","NaN");
+                                    issuedate_year.val("NaN");
+                                    issuedate_year.addClass("missing");
+                                }
+                                
+                            }
+                            else
+                            {
+                                
+                                issuedate_year.attr("value",parseInt(year));
+                                issuedate_year.val(parseInt(year));
+                            }
+                                                        
+                            dateturn="";
+                            clearTimeout(timer);
+                    }
+                });
+                
+                
+                $(issuedate_day).unbind("click").click(function(){
+                
+                    hideCalendar();
+                    $( "button[data-handler='today']" ).text("MISSING");
+                    
+                });
+                
+                $(issuedate_month).unbind("click").click(function(){
+                
+                    hideCalendar();
+                    $( "button[data-handler='today']" ).text("MISSING");
+                    
+                });
+                
+                $(issuedate_year).unbind("click").click(function(){
+                
+                    hideCalendar();
+                    $( "button[data-handler='today']" ).text("MISSING");
+                    
+                });
+                
+                function hideCalendar() {
+                    
+                    timer = setTimeout(hideCalendar,20);
+                    
+                    if(dateturn == "month")
+                    {
+                        $('.ui-datepicker-calendar').removeClass("invisible");
+                        $('.ui-datepicker-calendar').addClass("invisible");
+                        
+                        $('.ui-datepicker-year').removeClass("invisible");
+                        $('.ui-datepicker-year').addClass("invisible");
+                    }
+                    else if(dateturn == "year")
+                    {
+                        $('.ui-datepicker-calendar').removeClass("invisible");
+                        $('.ui-datepicker-calendar').addClass("invisible");
+                    
+                        $('.ui-datepicker-month').removeClass("invisible");
+                        $('.ui-datepicker-month').addClass("invisible");
+                        
+                        $('.ui-datepicker-prev').removeClass("invisible");
+                        $('.ui-datepicker-prev').addClass("invisible");
+                        
+                        $('.ui-datepicker-next').removeClass("invisible");
+                        $('.ui-datepicker-next').addClass("invisible");
+                    }
+                    
+                    else
+                    {
+                        $('.ui-datepicker-year').removeClass("invisible");
+                        $('.ui-datepicker-year').addClass("invisible");
+                                        
+                        $('.ui-datepicker-month').removeClass("invisible");
+                        $('.ui-datepicker-month').addClass("invisible");
+                        
+                        $('.ui-datepicker-prev').removeClass("invisible");
+                        $('.ui-datepicker-prev').addClass("invisible");
+                        
+                        $('.ui-datepicker-next').removeClass("invisible");
+                        $('.ui-datepicker-next').addClass("invisible");
+                    }
+                    
+
+                }
+                
+                //Edit the "Today" Button in the Datepicker to change the value to MISSING, or NaN
+                
+                                
+                $.datepicker._gotoToday = function(id) {
+                    this._selectDay(id,"MISSING");
+                    
+                };
+                
+                
+                
+                /*$( issuedate_day ).datepicker({
+                  changeMonth: true,
+                  changeYear: true
+                });
+                
+                $( issuedate_month ).datepicker({
+                  changeMonth: true,
+                  changeDay: false
+                });*/
+
+                
+                
+            }
+            
+            //MEMO Menu Config
+            
+            var memo = $( "#memo" );
+            if(memo.length)
+            {
+                allFields.add(memo);
+                
+            }  
+
+            //TRANSLATION MEMO Menu Config
+            
+            var translation_memo = $( "#translation_memo" );
+            if(translation_memo.length)
+            {
+                allFields.add(translation_memo);
+                
+            }    
+            
+            //SOURCE DOC Menu Config
+            
+            var sourcedoc = $( "#sourcedoc" );
+            if(sourcedoc.length)
+            {
+                allFields.add(sourcedoc);
+                
+            }    
+
+            $( "#dialog-form" ).dialog({
+                
+                width: $('#fields_container').width(),
+                height: $('#fields_container').height(),
+                
+                modal: false,
+                draggable:false,
+                resizable: false,
+                closeOnEscape: false,
+                buttons: {
+                    "Save in Database": function() {
+                        
+                        var bValid = true;
+                        var companyValid = true;
+                        
+                  
+                        //allFields.removeClass( "ui-state-error" );
+                        $(".ui-state-error").removeClass( "ui-state-error" );
+                        
+                            if(doctype.attr("value") == "Document Type")
+                            {
+                                bValid = false;
+                            }
+                            if(doctype.length)
+                            {
+                                bValid = bValid && checkLength( doctype, "doctype", 1, 255  );
+                                bValid = bValid && checkRegexp( doctype, /^([0-9a-z_ .,º\/])+$/i, "Document Type must be selected." );
+                            }
+                            
+                            if(amount.length)
+                            {
+                                bValid = bValid && checkLength( amount, "Amount", 1, 255 );
+                                bValid = bValid && checkRegexp( amount, /^-?(0|([1-9]\d*))(\.\d{1,3})?$/, "Amount may consist of 0-9 numbers and up to 3 digits after a decimal point, without spaces. Ex: 1000000.00  , which is 1 million" );
+                                bValid = bValid && checkRange( amount,[0,21000000],"Amount must be in the range from 0 to 21000000.00 ");
+                            }
+                            if(currency.length)
+                            {
+                                bValid = bValid && checkLength( currency, "Currency", 1, 255  );
+                                //bValid = bValid && checkRegexp( currency, /^([a-z .])+$/i, "Currency may consist of letters, points, spaces and parenthesis." );
+                            }
+                            if(company_name.length)
+                            {
+                                bValid = bValid && checkLength( company_name, "Company Name", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_name, /^([0-9a-z_-'\{\}"\(\) .,&º\/\\%$])+$/i, "Company Name field may consist of any character." );
+                                companyValid = companyValid && bValid;
+                            }
+                            if(company_address.length)
+                            {
+                                bValid = bValid && checkLength( company_address, "Company Address", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_address, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Company Address field may consist of any character." );
+                                companyValid = companyValid && bValid;
+                            }
+                            if(company_telephone.length)
+                            {
+                                bValid = bValid && checkLength( company_telephone, "Company Telephone", 1, 255  );
+                                bValid = bValid && checkRegexp( company_telephone, /^([0-9])+$/i, "Company Telephone field may consist of 0-9 numbers, without spaces. Ex:900698653" );
+                                companyValid = companyValid && bValid;
+                            }
+                            if(company_city.length)
+                            {
+                                bValid = bValid && checkLength( company_city, "Company City", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_city, /^([a-z_-.\(\), ])+$/i, "Company City field may consist only of letters, spaces, parenthesis and commas." );
+                                companyValid = companyValid && bValid;
+                            }
+                            if(company_country.length)
+                            {
+                                bValid = bValid && checkLength( company_country, "Company Country", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_country, /^([a-z_-\(\), .])+$/i, "Company Country field field may consist only of letters, spaces, parenthesis and commas." );                                
+                            }
+                            if(issuedate_day.length)
+                            {
+                                
+                                bValid = bValid && checkLength( issuedate_day, "Issuedate Day", 1, 255  );
+                                //bValid = bValid && checkRegexp( issuedate_day, /^([0-9])+$/i, "Issue Date Day Field may consist of 0-9 numbers." );
+                            }
+                            if(issuedate_month.length)
+                            {
+                                bValid = bValid && checkLength( issuedate_month, "Issuedate Month", 1, 255  );
+                                //bValid = bValid && checkRegexp( issuedate_month, /^([0-9])+$/i, "Issue Date Month Field may consist of 0-9 numbers." );
+                            }
+                            if(issuedate_year.length)
+                            {
+                                bValid = bValid && checkLength( issuedate_year, "Issuedate Year", 1, 255  );
+                                //bValid = bValid && checkRegexp( issuedate_year, /^([0-9])+$/i, "Issue Date Year Field may consist of 0-9 numbers." );
+                                bValid = bValid && checkRange( issuedate_year, [2002,2012], "Date Year must be in the range 2002-2012." );
+                            
+                                var concat = issuedate_day.attr("value")+"/"+issuedate_month.attr("value")+"/"+issuedate_year.attr("value");
+                                issuedate.attr("value",concat);
+
+                            }
+                            /*if(issuedate.length)
+                            {
+                                bValid = bValid && checkLength( issuedate, "issuedate", 1, 255  );
+                                bValid = bValid && checkRegexp( issuedate, /^([0-9\\])+$/i, "Issue Date may consist of 0-9 number and slashes in the format 01/03/2013." );
+                            }*/   
+                            if(docnumber.length)
+                            {
+                                bValid = bValid && checkLength( docnumber, "Document Number", 1, 255  );
+                                //bValid = bValid && checkRegexp( docnumber, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Document Number may consist of a-z, 0-9, underscores, spaces, points and commas." );
+                                
+                                if(doctype.attr("value")=="Cheque" || doctype.attr("value")=="Cheque Stub")
+                                {
+                                    bValid = bValid && checkRange( docnumber,[627000 , 3700000],"Incorrect Range: Cheque Number must be in the range from 627000 to 3700000.");
+                                }
+                                //bValid = bValid && checkRange( docnumber, [627000,3700000], "Cheque Number must be in the range 2002-2012." );
+                            }
+                            if(accountnum.length)
+                            {
+                            
+                                bValid = bValid && checkLength( accountnum, "Account Number", 1, 255  );
+                                bValid = bValid && checkRegexp( accountnum, /^([0-9])+$/i, "Account Number may only consist of 0-9 numbers." );
+                                
+                            }                      
+                            if(purchasenumber.length)
+                            {
+                                bValid = bValid && checkLength( purchasenumber, "Purchase Number", 1, 255  );
+                                //bValid = bValid && checkRegexp( purchasenumber, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Purchase Order Number may consist of a-z, 0-9, underscores, spaces, points and commas." );
+                            }
+                            if(arabic.length)
+                            {
+                                bValid = bValid && checkLength( arabic, "Contains Arabic", 1, 255  );
+                                bValid = bValid && checkRegexp( arabic, /^([a-z])+$/i, "Arabic may consist of a-z letters." );
+                            }
+                            if(piecenumber.length)
+                            {
+                                bValid = bValid && checkLength( piecenumber, "Piece Number", 1, 255  );
+                                bValid = bValid && checkRegexp( piecenumber,  /^([jc]{2}[3-50]{1,2})$|^([0-9]{1,4})$/i, "Piece Number may consist of 1 to 4 numbers or, in exceptional cases, the letters 'jc' plus 1 to 4 digits." );
+                                bValid = bValid && checkRange( piecenumber,[1,4341],"Incorrect Range: Piece Number must be in the range from 1 to 4341.");
+                            }
+                            if(pagenumber.length)
+                            {
+                                bValid = bValid && checkLength( pagenumber, "Page Number", 1, 255  );
+                                bValid = bValid && checkRegexp( pagenumber,  /^([0-9])+$/i, "Page Number may only consist of 0-9 numbers." );
+                                
+                            }
+                            /*if(memo.length)
+                            {
+                                bValid = bValid && checkLength( memo, "Memo", 1, 255  );
+                                bValid = bValid && checkRegexp( memo, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Memo may consist of any character." );
+                            }*/
+                            /*if(translation_memo.length)
+                            {
+                                bValid = bValid && checkLength( translation_memo, "Translation Memo", 1, 255  );
+                                bValid = bValid && checkRegexp( translation_memo, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Translation Memo may consist of any character." );
+                            }*/
+                            /*if(sourcedoc.length)
+                            {
+                                bValid = bValid && checkLength( sourcedoc, "Source Document", 1, 255  );
+                                bValid = bValid && checkRegexp( sourcedoc, /^([0-9a-z_ .,º\/])+$/i, "Source Document may consist of a-z, 0-9, underscores, spaces, points and commas." );
+                            }*/
+                            
+                        if ( bValid ) {
+                            
+                            toggleLoadingScreen();
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            $('#company-form').dialog( "close" );
+                            //$( this ).dialog( "close" );
+                            $('#fields_form').submit();
+                            
+                        }
+                    },
+                    
+                },
+                close: function() {
+                    allFields.val( "" ).removeClass( "ui-state-error" );
+                    
+                                        
+                },
+                position: {
+                    my: "left top", at: "left top", of: $('#fields_container')
+                }
+            });
+
+
+            $( "#company-form" ).dialog({
+              
+              height: $('#companyform_container').height(),
+              width: $('#companyform_container').width(),
+              modal: false,
+              autoOpen:false,
+              buttons: {
+                "Accept and Close": function() {
+             
+                            var company_name = $( "#companyform_name" );
+                            var company_address = $( "#companyform_address" );
+                            var company_telephone = $( "#companyform_telephone" );
+                            var company_city = $( "#companyform_city" );
+                            var company_country = $( "#companyform_country" );
+                            var company_template = $( "#companyform_template" );
+                            
+                            var bValid = true;
+                            
+                            $(".ui-state-error").removeClass( "ui-state-error" );
+                    
+           
+                            if(company_name.length)
+                            {
+                                bValid = bValid && checkLength( company_name, "Company Name", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_name, /^([0-9a-z_-'\{\}"\(\) .,&º\/\\%$])+$/i, "Company Name field may consist of any character." );
+                                
+                            }
+                            if(company_address.length)
+                            {
+                                bValid = bValid && checkLength( company_address, "Company Address", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_address, /^([0-9a-z_-'\{\}"\(\)\+\# .,&º\/\\%$])+$/i, "Company Address field may consist of any character." );
+                                
+                            }
+                            if(company_telephone.length)
+                            {
+                                bValid = bValid && checkLength( company_telephone, "Company Telephone", 1, 255  );
+                                bValid = bValid && checkRegexp( company_telephone, /^([0-9])+$/i, "Company Telephone field may consist of 0-9 numbers, without spaces. Ex:900698653" );
+                                
+                            }
+                            if(company_city.length)
+                            {
+                                bValid = bValid && checkLength( company_city, "Company City", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_city, /^([a-z_-.\(\), ])+$/i, "Company City field may consist only of letters, spaces, parenthesis and commas." );
+                                
+                            }
+                            if(company_country.length)
+                            {
+                                bValid = bValid && checkLength( company_country, "Company Country", 1, 255  );
+                                //bValid = bValid && checkRegexp( company_country, /^([a-z_-\(\), .])+$/i, "Company Country field field may consist only of letters, spaces, parenthesis and commas." );                                
+                            }
+                    
+                    
+                        if ( bValid ) {
+                            
+                            $( this ).dialog( "close" ); 
+                            
+                        }
+                    
+                   
+
+                  }
+                },
+              close: function() {
+                             
+                    var temp_name = $("#companyform_name").val();
+                    var temp_telephone = $("#companyform_telephone").val();
+                    var temp_address = $("#companyform_address").val();
+                    var temp_city = $("#companyform_city").val();
+                    var temp_country = $("#companyform_country").val();
+                    
+                    $("#company_name").attr("value",temp_name);
+                    $("#company_telephone").attr("value",temp_telephone);
+                    $("#company_address").attr("value",temp_address);
+                    $("#company_city").attr("value",temp_city);
+                    $("#company_country").attr("value",temp_country);
+                               
+                    if(temp_name.length && temp_telephone.length && temp_address.length && temp_city.length && temp_country.length)
+                    {
+                        if(temp_name=="MISSING NAME" || temp_name=="UNREADABLE NAME")
+                        {
+                            $("#companymenu").removeClass("ui-state-custom-filled");
+                            $("#companymenu").addClass("ui-state-custom-error");
+
+                        }
+                        else
+                        {
+
+                            $("#companymenu").removeClass("ui-state-custom-error");
+                            $("#companymenu").addClass("ui-state-custom-filled");
+                           
+                        }
+                    }
+                    
+              },
+              position: {
+                    my: "left top", at: "left top", of: $('#companyform_container')
+              }
+            });
+        }
+        
+        function updateTips( t ) {
+                  tips
+                    .text( t )
+                    .addClass( "ui-state-error" );
+                    tips.css("display","block");
+                  setTimeout(function() {
+                    tips.removeClass( "ui-state-error", 1500 );
+                    tips.css("display","none");
+                  }, 5000 );
+        }
+        
+        function checkLength( o, n, min, max ) {
+            if ( o.val().length > max || o.val().length < min ) {
+                o.addClass( "ui-state-error" );
+                updateTips(n+" field must be filled and have less than "+max+" characters.");
+                /*updateTips( "Length of " + n + " must be between " +
+                min + " and " + max + "." );*/
+                return false;
+            } 
+            else {
+                return true;
+            }
+        }
+             
+        function checkRegexp( o, regexp, n ) {
+        
+            if((o.val()!="MISSING") && (o.val()!="UNREADABLE"))
+            {
+        
+                if ( !( regexp.test( o.val() ) ) ) {
+                    o.addClass( "ui-state-error" );
+                    updateTips( n );
+                    return false;
+                } 
+                else {
+                    return true;
+                }
+            }
+            else return true;
+        }
+        
+        function checkRange( o, array, n ) {
+        
+            if((o.val()!="MISSING") && (o.val()!="UNREADABLE"))
+            {
+               
+                if ( o.val()<array[0] || o.val()>array[1] ) 
+                {
+                    
+                    o.addClass( "ui-state-error" );
+                    updateTips( n );
+                    return false;
+                } 
+                else {
+                    return true;
+                }
+            }
+            else return true;
+        }
+        
+        function populateFields() {
+            
+            var new_text = $('#doctypelink').text(new_text);
+            $('#doctype').attr("value",new_text);
+            $('#doctype').val(new_text);
+            
+        }
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+        
+        
+    });
+        
+</script>
+{% endblock config_libs %}
+
+<title>Spider- Data Entry App</title>
+
+</head>
+{% endblock page_title %}
+
+
+
+
+
+{% block jqueryui_setups %}
+
+
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+    
+    {% if sourcepdfs_list %}
+    <div id="companyform_container">
+            
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                <div id="company-dialog" >
+
+                    <form id="company-form" title="Company Details">
+                        <h4 id="fromTemplate_dialog"></h4>
+                        <p class="validateTips_Company">Ensure that all fields are correct for the actual document.</p>
+                        <fieldset id="company_fieldset">
+                            <label for="companyform_name">Company Name</label>
+                            <input type="text" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                            <ul class="menuclass" id="companyaddress_menu">
+                                <li>
+                                    <a id="companyaddress_link" href="#">Address</a>
+                                    <ul>
+                                      <li><a href="#"><input type="text" value="" placeholder="Write the Address here" name="companyform_address" id="companyform_address" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      <li>--</li>
+                                      <li><a class="companyaddress_option" value="MISSING" href="#">MISSING</a></li>
+                                      <li>--</li>
+                                      <li><a class="companyaddress_option" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                                    </ul>
+                                </li>  
+                            </ul>
+                            <ul class="menuclass" id="companytelephone_menu">
+                                <li>
+                                    <a id="companytelephone_link" href="#">Telephone</a>
+                                    <ul>
+                                      <li><a href="#"><input type="text" value="" placeholder="Write the Telephone here" name="companyform_telephone" id="companyform_telephone" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      <li>--</li>
+                                      <li><a class="companytelephone_option" value="MISSING" href="#">MISSING</a></li>
+                                      <li>--</li>
+                                      <li><a class="companytelephone_option" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                                    </ul>
+                                </li>  
+                            </ul>
+                            <ul class="menuclass" id="companycity_menu">
+                                <li>
+                                    <a id="companycity_link" href="#">City</a>
+                                    <ul>
+                                      <li><a href="#"><input type="text" value="" placeholder="Try to Search the City first." name="companyform_city" id="companyform_city" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      <li>--</li>
+                                      <li><a class="companycity_option" value="MISSING" href="#">MISSING</a></li>
+                                      <li>--</li>
+                                      <li><a class="companycity_option" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                                    </ul>
+                                </li>  
+                            </ul>
+                            <ul class="menuclass" id="companycountry_menu">
+                                <li>
+                                    <a id="companycountry_link" href="#">Country</a>
+                                    <ul>
+                                      <li><a href="#"><input type="text" value="" placeholder="Write the Country here" name="companyform_country" id="companyform_country" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      <li>--</li>
+                                      <li><a class="companycountry_option" value="MISSING" href="#">MISSING</a></li>
+                                      <li>--</li>
+                                      <li><a class="companycountry_option" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                                    </ul>
+                                </li>  
+                            </ul>
+                        </fieldset>
+                    </form>
+                </div>
+                {% endif %}
+    </div>
+    
+    <div id="left_container">
+    
+        
+    
+    
+        <div id="fields_container">
+        
+            
+            
+            <div id="dialog-form" title="Create new Data Entry">
+                            
+                <p class="validateTips">All form fields are required.</p>
+             
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:dataentryui_savedata' %}" method="post">
+                {% csrf_token %}
+               
+                <fieldset id="fieldset_fields">
+               
+                <input class="invisible" type="text" name="save_filename" id="save_filename" value="{{sourcepdfs_list.filename}}" />
+                
+                <input class="invisible" type="text" name="doctype" id="doctype" value="{{document_type}}" class="text ui-widget-content ui-corner-all" />
+                <ul class="menuclass" id="doctypemenu">
+                    <li>
+                        <a id="doctypelink" href="#">{{document_type}}</a>
+                        <ul>
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
+                          <li><a href="#">Cheque</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
+                          <li><a href="#">Cheque Stub</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
+                          <li><a href="#">Invoice/Facture</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
+                          <li><a href="#">Partial</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
+                          <li><a href="#">Receipt/Recu</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "NathanTeam" %}
+                          <li><a href="#">Purchase Order</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "NathanTeam" %}
+                          <li><a href="#">Contract Page 1</a></li>
+                          {% endif %}
+                          {% if user_group = "INVENSIS" or user_group = "NathanTeam" %}
+                          <li><a href="#">Contract Page X</a></li>
+                          {% endif %}
+                          {% if user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                          <li><a href="#">Arabic</a></li>
+                          {% endif %}
+                          
+                          <li><a href="#">Other</a></li>
+                          <li><a href="#">Blank</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <div class="divisor-line"></div>
+                
+                <!-- AMOUNT -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                
+                <ul class="menuclass" id="amountmenu">
+                    <li>
+                        <a id="amountlink" href="#">Amount:</a>
+                        <ul>
+                          <li><a href="#"><input value="" placeholder="Write the Amount here" type="text" name="amount" id="amount" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="amountoption" href="#" value='MISSING'>MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="amountoption" href="#" value='UNREADABLE'>UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                
+                {% endif %}
+                
+                <!-- CURRENCY -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                <!--<label for="currency">Currency</label>-->
+                
+                <ul class="menuclass" id="currencymenu">
+                    <li>
+                        <a id="currencylink" href="#">Currency:</a>
+                        <ul>
+                          <li><a href="#"><input value="" placeholder="Try to Search the Currency here" type="text" name="currency" id="currency" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="currencyoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="currencyoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                
+                {% endif %}
+                
+                <!-- COMPANY -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                
+                <ul class="menuclass" id="companymenu">
+                    <li>
+                        <a id="companylink" href="#">Company Beneficiary:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Try to Search the Name first." name="companyname_search" id="companyname_search" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="companyoption" value="Add a NEW COMPANY" href="#">Add a NEW COMPANY</a></li>
+                          <li>--</li>
+                          <!--<li><a class="companyoption" value="PetroSA" href="#">PetroSA</a></li>
+                          <li>--</li>
+                          <li><a class="companyoption" value="TrollDad" href="#">TrollDad</a></li>
+                          <li>--</li>-->
+                          <li><a class="companyoption" value="MISSING NAME" href="#">MISSING NAME</a></li>
+                          <li>--</li>
+                          <li><a class="companyoption" value="UNREADABLE NAME" href="#">UNREADABLE NAME</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <input class="invisible" type="text" name="company_name" id="company_name" value="" class="text ui-widget-content ui-corner-all" />
+                <input class="invisible" type="text" name="company_address" id="company_address" value="" class="text ui-widget-content ui-corner-all" />
+                <input class="invisible" type="text" name="company_telephone" id="company_telephone" value="" class="text ui-widget-content ui-corner-all" />
+                <input class="invisible" type="text" name="company_city" id="company_city" value="" class="text ui-widget-content ui-corner-all" />
+                <input class="invisible" type="text" name="company_country" id="company_country" value="" class="text ui-widget-content ui-corner-all" />
+                <input class="invisible" type="text" name="company_template" id="company_template" value="" class="invisible text ui-widget-content ui-corner-all" />
+                                
+                
+                {% endif %}
+                
+                
+                {% if document_type = "Nothing" %}
+                <!-- SOURCE DOCUMENT -->
+                
+                <!--{% if document_type = "Cheque" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                <ul class="menuclass" id="sourcedocmenu">
+                    <li>
+                        <a id="sourcedoclink" href="#">Source of Document</a>
+                        <ul>
+                          <li><a href="#">ThisisthePdfpdf</a></li>
+                          <li><a href="#">No,thisisirtititit.exe</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <label for="sourcedoc">Source Document</label>
+                <input class="invisible" type="text" name="sourcedoc" id="sourcedoc" value="" class="text ui-widget-content ui-corner-all" />
+                {% endif %}-->
+                {% endif %}
+                
+                <!-- ISSUE DATE -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" %}
+                <label for="issuedate-day">Issue Date:</label>
+                <input type="text" name="issuedate" id="issuedate" class="invisible"/>
+                <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="" class="date_text text ui-widget-content ui-corner-all" />
+                <input type="text" readonly="readonly" name="issuedate_month" placeholder="Ex: 06" id="issuedate_month" value="" class="date_text text ui-widget-content ui-corner-all" />
+                <input type="text" readonly="readonly" name="issuedate_year" placeholder="Ex: 2012" id="issuedate_year" value="" class="date_text text ui-widget-content ui-corner-all" />
+                
+                {% endif %}
+                
+                <!-- DOCUMENT NUMBER -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" or document_type = "Contract Page X" %}
+                
+                <ul class="menuclass" id="docnumbermenu">
+                    <li>
+                        <a id="docnumberlink" href="#">{{document_type}} Number:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Document Number here" name="docnumber" id="docnumber" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="docnumberoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="docnumberoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>  
+                </ul>
+                
+                {% endif %}
+                
+                <!-- ACCOUNT NUMBER -->
+                
+                {% if document_type = "Cheque" %}
+                
+                <ul class="menuclass" id="accountnummenu">
+                    <li>
+                        <a id="accountnumlink" href="#">Account Number:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Account Number here" name="accountnum" id="accountnum" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="accountnumoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="accountnumoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                
+                {% endif %}
+                
+                <!-- PURCHASE NUMBER -->
+                
+                {% if document_type = "Invoice/Facture" or document_type = "Partial" %}
+                
+                <ul class="menuclass" id="purchasenumbermenu">
+                    <li>
+                        <a id="purchasenumberlink" href="#">Purchase Order / Contract Number:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Purchase Order Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="purchasenumberoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="purchasenumberoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                              
+                {% endif %}
+                
+                <!-- ARABIC -->
+                
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Cheque Stub" %}
+                <ul class="menuclass" id="arabicmenu">
+                    <li>
+                        <a id="arabiclink" href="#">Contains Arabic:</a>
+                        <ul>
+                          <li><a href="#">Yes</a></li>
+                          <li><a href="#">No</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <input class="invisible" type="text" name="arabic" id="arabic" value="" class="text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
+                <!-- PIECE NUMBER -->
+                
+                {% if document_type = "Cheque" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" %}
+                
+                <ul class="menuclass" id="piecenumbermenu">
+                    <li>
+                        <a id="piecenumberlink" href="#">Piece Number:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Piece Number here" name="piecenumber" id="piecenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="piecenumberoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="piecenumberoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                              
+                {% endif %}
+                
+                <!-- PAGE NUMBER -->
+                
+                {% if document_type = "Contract Page X"  %}
+                
+                <ul class="menuclass" id="pagenumbermenu">
+                    <li>
+                        <a id="pagenumberlink" href="#">Page Number:</a>
+                        <ul>
+                          <li><a href="#"><input type="text" value="" placeholder="Write the Page Number here" name="pagenumber" id="pagenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          <li>--</li>
+                          <li><a class="pagenumberoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="pagenumberoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                              
+                {% endif %}
+                {% if document_type = "Contract Page 1"  %}
+                
+                <input type="text" value="1" name="pagenumber" id="pagenumber" class="invisible" />
+         
+                {% endif %}
+                <!-- MEMO -->
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order" or document_type = "Contract Page 1" or document_type = "Contract Page X" %}
+                <label for="memo">Memo</label>
+                <input type="text" name="memo" id="memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
+                
+                <!-- TRANSLATION MEMO -->
+                {% if document_type = "Arabic" %}
+                <label for="memo">Translation Memo</label>
+                <input type="text" name="translation_memo" id="translation_memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
+              </fieldset>
+                
+                
+              </form>
+            </div>
+            <input type="text" name="companiesarray" id="companiesarray" value="{{ companyname_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
+        </div>
+        
+    </div>
+    
+    <div id="right_container">
+        
+                
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{sourcepdfs_list.job_directory}}\{{sourcepdfs_list.filename}}">
+            
+        </div>
+        
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">{{count_done}} Documents Completed from a total of {{count_assigned}} Documents Assigned.</p>
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    {% else %}
+
+    <div id="right_container">
+              
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <p class="validateTips_Countdown">All Assigned Documents have been Completed.</p>
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
+                
+    </div>
+    
+    {% endif %}
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

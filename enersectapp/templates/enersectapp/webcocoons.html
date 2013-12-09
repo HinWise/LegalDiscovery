@@ -1,0 +1,341 @@
+
+{% load i18n admin_static %}
+
+{% load enersectapp_extras %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/webcocoons.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+
+{% endblock special_libs %}
+
+{% block javascript %} 
+
+<style>
+
+
+
+</style>
+
+
+<script>
+
+    $(document).ready(function () {
+    
+        createUserPanel();
+        configLoadingScreen();
+            
+        $( "#teamleadspanel" ).dialog({
+          autoOpen: true,
+          height: $('#teamleads_container').attr("height"),
+          width: $('#teamleads_container').attr("width")*2,
+          modal: true,
+          closeOnEscape: false,
+          resizable: false,
+          buttons: {
+            "Apply Changes": function() {
+            
+                toggleLoadingScreen();
+                $('#ChooseForm').submit();
+                
+            }
+          }
+          
+        });
+    
+        
+        //Sliders with mutual limit
+        
+        var sliders = $("#sliders .slider");
+
+        sliders.each(function() {
+            var max = document.getElementById("sliderMax").value;
+            var value = Number($(this).text(), 10),
+                availableTotal = max;
+
+            $(this).empty().slider({
+                value: $(this).attr("value"),
+                min: 0,
+                max: $(this).siblings('.value').attr("max"),
+                range: "max",
+                step: 1,
+                animate: 100,
+                disabled: (function(curMax) {
+                    if (curMax < 1) {
+                        return 1;
+                    }
+                    return 0;
+                })($(this).siblings('.value').attr("max")),
+                slide: function(event, ui) {
+                    // Update text box to current value and call .change()
+                    $(this).siblings('.value').attr("value", ui.value);
+                    $(this).siblings('.value').trigger('change');
+                }
+            });
+        });
+        $(".slider").each(function() {
+            var disabled = Number($(this).slider("option", "disabled"));
+            if(disabled == 1) {
+                $(this).siblings('.value').attr('disabled', 'disabled');    
+            }
+        });
+
+        $(".value").change(function() {
+            var thisAmount = Number($(this).prop("value"));
+            var totalMax = Number(document.getElementById("sliderMax").value);
+            var indMin = Number($(this).attr("min"));
+            var indMax = Number($(this).attr("max"));
+            var total = 0;
+
+            //Get the values of all other text boxes
+            $('.value').not(this).each(function() {
+                total += Number($(this).prop("value"));
+            });
+
+            //Find the remaining from our total sliders max
+            var remaining = totalMax - total;
+
+            if(remaining < 0) {
+              remaining = 0;   
+            }
+            //if we are under our minimums, go for it! Otherwise, reduce the number.
+            if (thisAmount >= indMin && thisAmount <= indMax && thisAmount <= totalMax && thisAmount <= remaining) {
+                $(this).siblings(".slider").slider("option", "value", thisAmount);
+                //total += thisAmount;
+            }
+            else {
+                //var setMax = ((indMax + totalMax) - Math.abs(indMax - totalMax)) / 2;
+                var setMax = Math.min(indMax, totalMax, remaining);
+                                
+                $(this).siblings(".slider").slider("option", "value", setMax);
+                $(this).prop("value", setMax);
+                //total += (thisAmount - setMax);
+            }
+
+            //above was getting buggy, so lets just reset total and get it again
+            total = 0;
+            //Get the values of all text boxes
+            $('.value').each(function() {
+                total += Number($(this).prop("value"));
+            });
+            //Find our new remaining number after updating total for this value
+            remaining = totalMax - total;
+            if(remaining < 0) {
+              remaining = 0;
+            }
+            //Set each slider to the current point and update their max values.
+            $('.value').each(function() {
+                var sliderVal = Number($(this).prop("value"));
+                var sliderMin = Number($(this).attr("min"));
+                var sliderMax = Number($(this).attr("max"));
+                var setNewMax = (((sliderMax + totalMax) - Math.abs(sliderMax - totalMax)) / 2);
+                var newMax = sliderVal + remaining;
+
+                if(newMax < setNewMax) {
+                    $(this).siblings('.slider').slider("option", "max", newMax);
+                    $(this).siblings('span').text('/' + (newMax));
+                }
+                else {
+                    $(this).siblings('.slider').slider("option", "max", setNewMax);
+                    $(this).siblings('span').text('/' + (setNewMax));
+                }
+                $(this).prop("max", setNewMax);        
+                $(this).siblings(".slider").slider("option", "value", sliderVal);
+            });
+            $('#sliderTotal').attr("value", total);
+          
+            $('#docs_total_assign').html(total);
+            var all_docs = parseInt($('#docs_total_count').html());
+            var complete = parseInt($('#docs_total_complete').html());
+            var incomplete = all_docs - complete;
+            var incomplete_notassigned = incomplete-total;
+            $('#docs_left_count').html(incomplete_notassigned);
+            
+        });
+        
+        $(".value").change();    
+
+        $( "#new-user" ).dialog({
+          autoOpen: true,
+          height: 380,
+          width: 350,
+          modal: true,
+          closeOnEscape: false,
+          resizable: false,
+          buttons: {
+            "Register New User": function() {
+            
+                var password = $('#password').val();
+                var repeat = $('#repeat_password').val();
+                
+                if(password==repeat) {
+                
+                    toggleLoadingScreen();
+                    $('#RegisterForm').submit();
+                }
+                else alert("Passwords don't match! Please try again.");
+            }
+          },
+          position: {
+                    my: "right bottom", at: "right+1075 bottom+90", of: $('#teamleads_container')
+          }
+          
+        });
+        
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+        }
+        
+        function configLoadingScreen(){
+        
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+            
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+            
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+        
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+        
+        function toggleLoadingScreen(){
+        
+            $('#LoadingScreen').toggleClass("invisible");
+            
+        }
+            
+    });
+
+</script>
+
+{% endblock javascript %}
+<body>
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div>
+
+{% block content %}
+<div id="teamleads_container">
+    <div id="teamleadspanel" title="{{the_user}} Assignment Panel:">
+        <form id="ChooseForm" name="ChooseForm" action="{% url 'enersectapp:cocoons_save' %}" method="post">
+        {% csrf_token %}
+          <h4>The total number of Documents Petitioned to {{user_group}} is <span id="docs_total_count">{{count_total}}</span> </h4>            
+          <h4>The total number of Documents Completed by {{user_group}} is <span id="docs_total_complete">{{count_done}}</span> </h4>
+          <h5>The total number of Categorizations Made by {{user_group}} is <span id="docs_total_categorization">{{count_total_categorizations}}</span> </h5>
+          <h5>The total number of Blank_or_not_Blank Categorizations Made by {{user_group}} is <span id="docs_total_blank_or_not_blank">{{count_total_blank_or_not_blank}}</span> </h5>
+          
+          {% if user_dictionary_values_list%}
+          <h3>You have assigned <span id="docs_total_assign">{{count_assigned}}</span> Documents to Users in your Team </h3>
+          <br>
+          <h1>Documents left to assign: <span id="docs_left_count">{{count_notassigned}}</span> </h1>
+          {% else %}
+          <h3 class="invisible">You have assigned <span class="invisible" id="docs_total_assign">{{count_assigned}}</span> Documents to Users in your Team </h3>
+          <br>
+          <h1 class="invisible">Documents left to assign: <span id="docs_left_count">{{count_notassigned}}</span> </h1>
+          {% endif %}
+          
+          <br><label class="invisible" for="sliderMax">Total Max:</label>
+            <input class="invisible" type='text' id="sliderMax" name='sliderMax' value='{{count_notcomplete}}'/>
+            <br><br><label class="invisible" for="sliderTotal">Slider Totals:</label>
+            <input class="invisible" type="text" id="sliderTotal" name="sliderTotal" value="0" />
+          
+         
+          {% if user_dictionary_values_list%}
+          <ul id="sliders">
+          {% for item in user_dictionary_values_list %}
+            
+            <h2>User {{ item.name }}:</h2>
+            <ul>
+                <li>    
+                        <h4>Pending Docs. Assigned: </h4>
+                        <span class='slideBG'><div class="slider"></div>
+                        <input type="text" class="value" name="name|{{item.name}}" value="{{item.assigned_unchecked_count}}" min="0" max="{{count_notcomplete}}" />
+                        <span>0</span></span>
+                </li>
+                <li>       
+                        <h4>Total Doc. Entries Completed: {{ item.checked_count }}</h4>
+                        
+                       
+                </li>
+                <li> 
+                    <h5>Total Categorizations Completed: {{ item.completed_categorizations }}</h5>
+                </li>
+                <li> 
+                     <h5>Total Blank_or_not_Blank Completed: {{ item.completed_blank_or_not_blank }}</h5>
+                </li>
+            </ul>
+          
+          {% endfor %}
+          </ul>
+          {% else %}
+          
+            <h5>There are no Users registered in your Company other than yourself.</h5>
+            
+          {% endif %}
+
+        </form>
+ 
+    </div>
+    <div id="new-user" title="Or Register New User">
+        <form id="RegisterForm" name="RegisterForm" action="{% url 'enersectapp:cocoons_new_teamuser' %}" method="post">
+        {% csrf_token %}
+              <fieldset>
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username"  class="text ui-widget-content ui-corner-all" />
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
+                <label for="repeat_password">Repeat Password</label>
+                <input type="password" name="repeat_password" id="repeat_password" value="" class="text ui-widget-content ui-corner-all" />
+              </fieldset>
+        </form>
+    </div>
+    
+    <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+    </div>
+</div>
+{% endblock %}
+</body>
+

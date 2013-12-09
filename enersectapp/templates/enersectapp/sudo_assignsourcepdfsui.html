@@ -1,0 +1,93 @@
+
+{% load i18n admin_static %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %} 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dataentryui_spider.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/sudo_assignsourcepdfsui.css' %}" />
+
+{% endblock special_libs %}
+
+{% block javascript %} 
+
+<script>
+
+    $(document).ready(function () {
+    
+        $( "#companychoose" ).dialog({
+          autoOpen: true,
+          height: 450,
+          width: 400,
+          modal: true,
+          closeOnEscape: false,
+          resizable: false,
+          buttons: {
+            "Apply": function() {
+            
+                if($('#company_name').length) $('#ChooseForm').submit();
+                
+            }
+          }
+          
+        });
+        
+        
+        $( "#teamleadsmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#teamleadsmenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            $('#teamleadslink').text("Company: " +new_text);
+                            $('#company_name').attr("value",new_text);
+                            
+                            $("#teamleadsmenu").addClass("ui-state-custom-filled");
+                        } 
+                    } 
+        });
+                  
+    });
+
+</script>
+
+{% endblock javascript %}
+
+{% block content %}
+    <div id="companychoose" title="Choose Company to Assign the Documents to:">
+        <form id="ChooseForm" name="ChooseForm" action="{% url 'enersectapp:sudo_assignsourcepdfsui' %}" method="post">
+        {% csrf_token %}
+                      
+          <fieldset>
+            <ul class="menuclass" id="teamleadsmenu">
+                <li>
+                    <a id="teamleadslink" href="#">Company:</a>
+                    <ul>
+                        {% for group in all_groups %}
+                        <li><a href="#">{{group.name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <input type="text" name="company_name" id="company_name" value="" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="user_group" id="user_group" value="{{user_group.name}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="sourcepdfs_list" id="sourcepdfs_list" value="{{sourcepdfs_list}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="the_user" id="the_user" value="{{the_user}}" class="invisible text ui-widget-content ui-corner-all" />
+            
+            
+          </fieldset>
+            
+        </form>
+    </div>
+{% endblock %}
+
