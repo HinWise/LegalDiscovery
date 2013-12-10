@@ -77,7 +77,7 @@
                 <!--<p class="validateTips_ToolsAvailable">Comment paragraph</p>-->
                 <ul class="menuclass" id="toolspanelmenu">
                     {% for userinterfacetype in uitype_list %}
-                        <li><a href="{{userinterfacetype.redirection_url}}">{{ userinterfacetype.name }}</a></li>
+                        <li><a href="{{userinterfacetype.redirection_url}}">{{userinterfacetype.id}}.{{ userinterfacetype.name }}</a></li>
                         <li>--</li>
                     {% endfor %}
                         <li><a href="{% url 'admin:index' %}">Admin App</a></li>

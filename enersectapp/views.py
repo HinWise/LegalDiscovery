@@ -988,8 +988,7 @@ def dataentryui_spider(request):
     companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
     
     
-    #return response
-
+    
     context = {'document_type':document_type,'companyname_list':companyname_list,
     'sourcepdfs_list':sourcepdfs_list,'the_user':the_user.username,'user_group':user_group.name,
     'count_assigned':count_assigned,'count_done':count_done}
