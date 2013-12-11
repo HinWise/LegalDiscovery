@@ -99,6 +99,46 @@
                 resizable: false,
                 closeOnEscape: false,
                 buttons: {
+                    "Needs Translation": function() {
+                        
+                        var bValid = true;
+
+                        //allFields.removeClass( "ui-state-error" );
+                        $(".ui-state-error").removeClass( "ui-state-error" );
+                        
+                        $('#translation_memo').attr('value','needs arabic translation');
+                        
+                        
+                        if ( bValid ) {
+                            
+                            toggleLoadingScreen();
+                            $('#save_mark').attr("value","save_mark");
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            //$( this ).dialog( "close" );
+                            $('#fields_form').submit();
+                            
+                        }
+                    },
+                    "Not Worth Translation": function() {
+                        
+                        var bValid = true;
+
+                        //allFields.removeClass( "ui-state-error" );
+                        $(".ui-state-error").removeClass( "ui-state-error" );
+                        
+                        $('#translation_memo').attr('value','not worth arabic translation');
+                        
+                                                
+                        if ( bValid ) {
+                            
+                            toggleLoadingScreen();
+                            $('#save_mark').attr("value","save_mark");
+                            $('button').attr("disabled", true).addClass("ui-state-disabled");
+                            //$( this ).dialog( "close" );
+                            $('#fields_form').submit();
+                            
+                        }
+                    },
                     "Save Edit in Database": function() {
                         
                         var bValid = true;
@@ -122,7 +162,6 @@
                             
                         }
                     },
-                    
                 },
                 close: function() {
                     allFields.val( "" ).removeClass( "ui-state-error" );

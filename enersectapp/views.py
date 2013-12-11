@@ -2796,7 +2796,10 @@ def arabic_memo_edit(request):
             
             pdf_to_change.modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
             pdf_to_change.modification_author=the_user
-            pdf_to_change.translated = "arabic translation"
+            if translation_memo == "needs arabic translation" or translation_memo == "not worth arabic translation":
+                pdf_to_change.translated = translation_memo
+            else:
+                pdf_to_change.translated = "arabic translation"
             pdf_to_change.save()
             
             if len(user_profile.modifiedpdfs_translated_arabic.filter(pk=pdf_to_change.pk))==0:
