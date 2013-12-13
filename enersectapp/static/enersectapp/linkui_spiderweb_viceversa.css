@@ -1,25 +1,6 @@
 @charset "UTF-8";
 
-html, body{
-	
-	/*background:url("images/body.jpg");*/
-    background:url("images/body.jpg");
-	background-repeat:repeat;
 
-	color:#fff;
-	letter-spacing:1px;
-	font-family:Georgia, "Times New Roman", Times, serif;
-    
-    
-    background-color:#202020 !important;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#202020), to(#171717)) !important;
-    background-image: -webkit-linear-gradient(top, #202020, #171717) !important;
-    background-image:    -moz-linear-gradient(top, #202020, #171717) !important;
-    background-image:     -ms-linear-gradient(top, #202020, #171717) !important;
-    background-image:      -o-linear-gradient(top, #202020, #171717) !important;
-    background-image:         linear-gradient(top, #202020, #171717) !important;
-
-}
 
 .zebra caption{
 	font-size: 105%;
@@ -29,7 +10,6 @@ html, body{
     padding-bottom: 0%;
     height: 31px;
     }
-    
 
 #unlinked_records_container{
     position: absolute;
@@ -66,102 +46,6 @@ html, body{
 	margin:0 auto;
 }
 
-h2 {
-  
-    
-    top:-20%;
-    left:0;
-    height:50%;
-    width:100%;
-    
-}
-
-table {
-
-    border-collapse: collapse;
-    border-spacing: 0;
-	width:85%;
-    height:50%;
-	-webkit-box-shadow:  0px 2px 1px 5px rgba(242, 242, 242, 0.1);
-    box-shadow:  0px 2px 1px 5px rgba(242, 242, 242, 0.1);
-    text-align:center;
-    
-    
-    border: 1px solid #555;
-    
-}
-
-.zebra {
-
-    /*-webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none !important; */
-    
-}
-
-
-.zebra td {
-    border-left: 1px solid #555;
-    border-top: 1px solid #555;
-    
-    
-}
-
-.zebra th, .zebra th:hover {
-    border-left: 1px solid #555;
-	border-bottom: 1px solid #828282;
-    border-top: 1px solid #828282;
-    padding: 1%;  
-    background-color:#202020 !important;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#202020), to(#191919)) !important;
-    background-image: -webkit-linear-gradient(top, #202020, #191919) !important;
-    background-image:    -moz-linear-gradient(top, #202020, #191919) !important;
-    background-image:     -ms-linear-gradient(top, #202020, #191919) !important;
-    background-image:      -o-linear-gradient(top, #202020, #191919) !important;
-    background-image:         linear-gradient(top, #202020, #191919) !important;
-	color:#fff !important;
-	
-}
-
-.zebra tbody tr:nth-child(even) {
-    background: #303030 !important;
-	color:#fff;
-}
-
-/*.zebra tr:hover *{
-    background: #eeeeee;
-	color:#000;
-}*/
-
-.zebra td:hover {
-    /*background: #eeeeee;*/
-	/*color:#000;*/
-    /*cursor:pointer; cursor: hand*/
-    pointer-events:all;  
-}
-
-.zebra tr {
-	background:#404040;
-	color:#fff;
-}
-
-.down_label {
-    color: #FEF5CA;
-    text-align:center;
-}
-
-.down_number {
-    font-size:40px;
-    padding-top:0.5%;
-    color: #FEF5CA;
-    text-align:center;
-    
-    
-}
-
 .title_text {
 
     /*pointer-events:none !important;
@@ -175,17 +59,6 @@ table {
     
 }
 
-.ui-button {
-
-        
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none !important;
-    
-    
-}
 
 .pdf_table_name {
 
@@ -221,8 +94,6 @@ table {
     text-align:center;
 
 }
-
-.group { zoom: 1 }
 
 .pdf_view {
 
@@ -440,7 +311,6 @@ object {
     left: 305%;
     font-size: 80%;
     text-align: center;
- 
 
 }
 
@@ -581,7 +451,7 @@ object {
     height:80%;
     
     left: 0.5%;
-    top: -7%;
+    top: -4%;
     
  
 }
@@ -1001,10 +871,10 @@ object {
 
 }
 
+
 /*Custom UI States*/
 
 /*.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active*/ 
-
 
 .ui-state-custom-linked {
     
@@ -1018,5 +888,4 @@ object {
 	border: 1px solid #f1ac88;
 	background: #f6ecd5 url("images/ui-bg_gloss-wave_85_d25d72_500x100.png") 50% 50% repeat-x;
 	
-}
-	
+}	

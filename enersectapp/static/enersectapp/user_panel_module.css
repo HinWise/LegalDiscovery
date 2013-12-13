@@ -1,0 +1,16 @@
+#userpanel_container {
+    
+        position:absolute;
+        
+        left:-15.4%;
+        top:79.5%;
+        
+        width:10%;
+        height:36.5%;
+         
+}
+    
+/*Title User Panel Container*/
+#ui-id-1 {
+    font-size: 80%;
+}

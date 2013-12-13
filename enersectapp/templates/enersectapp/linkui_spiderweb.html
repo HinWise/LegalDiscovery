@@ -18,9 +18,11 @@
 {% endblock config_libs %}
 
 {% block special_libs %} 
-<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/linkui_spiderweb.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/linkui_site_titles_etc.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/linkui_spiderweb.css' %}" />
 {% endblock special_libs %}
 
 {% block jqueryui_setups %}
@@ -531,13 +533,6 @@
 
 <div id="container_headers">
 
-{% block branding %}
-<div id="site-header"><div id="site-name">SpiderWeb - Linking App</div></div>
-
-{% endblock branding%}
-
-
-
 </div>
 
 {% endblock container_headers %}
@@ -869,15 +864,6 @@
 
 {% endblock content%}
 
-{% block breadcrumbs %}
-
-<div class="breadcrumbs">
-<a href="{% url 'enersectapp:main' %}">{% trans 'Return to Tools Menu' %}</a>
-
-
-</div>
-
-{% endblock breadcrumbs%}
 
 </div>
 
