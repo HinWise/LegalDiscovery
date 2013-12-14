@@ -2213,8 +2213,8 @@ def categorization_tool(request):
                         
                         pdfrecord_to_change.modified_doctype_from = doctype
                         pdfrecord_to_change.modified_document_type = doctype_class
-                        pdfrecord_to_change.modification_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
-                        pdfrecord_to_change.modification_doctype_author=the_user
+                        pdfrecord_to_change.modified_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
+                        pdfrecord_to_change.modified_doctype_author=the_user
                         pdfrecord_to_change.save()
             
             if len(user_profile.modifiedsourcepdfs_categorization_tool.filter(pk=source_to_change.pk))==0:
@@ -2253,8 +2253,8 @@ def categorization_tool(request):
                 
             pdfrecord_to_change.modified_doctype_from=doctype
             pdfrecord_to_change.modified_document_type = doctype_class
-            pdfrecord_to_change.modification_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
-            pdfrecord_to_change.modification_doctype_author=the_user
+            pdfrecord_to_change.modified_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
+            pdfrecord_to_change.modified_doctype_author=the_user
             
             #Changes also the Source Document DocType, from which the entry was made
             
