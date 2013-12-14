@@ -2203,6 +2203,20 @@ def categorization_tool(request):
             source_to_change.modification_doctype_author=the_user
             source_to_change.save()
             
+            associated_pdfs = PdfRecord.objects.filter(sourcedoc_link = source_to_change)
+            
+            
+            #Changes also the entries made from that Source Document
+            if (len(associated_pdfs)>0):
+                with transaction.commit_on_success():
+                    for pdfrecord_to_change in associated_pdfs:
+                        
+                        pdfrecord_to_change.modified_doctype_from = doctype
+                        pdfrecord_to_change.modified_document_type = doctype_class
+                        pdfrecord_to_change.modification_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
+                        pdfrecord_to_change.modification_doctype_author=the_user
+                        pdfrecord_to_change.save()
+            
             if len(user_profile.modifiedsourcepdfs_categorization_tool.filter(pk=source_to_change.pk))==0:
                 user_profile.modifiedsourcepdfs_categorization_tool.add(source_to_change)
                 user_profile.save()
@@ -2241,6 +2255,14 @@ def categorization_tool(request):
             pdfrecord_to_change.modified_document_type = doctype_class
             pdfrecord_to_change.modification_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
             pdfrecord_to_change.modification_doctype_author=the_user
+            
+            #Changes also the Source Document DocType, from which the entry was made
+            
+            pdfrecord_to_change.sourcedoc_link.original_document_type_string = doctype
+            pdfrecord_to_change.sourcedoc_link.modified_document_type = doctype_class
+            pdfrecord_to_change.sourcedoc_link.modification_doctype_date=datetime.datetime.now().replace(tzinfo=timezone.utc)
+            pdfrecord_to_change.sourcedoc_link.modification_doctype_author=the_user
+            pdfrecord_to_change.sourcedoc_link.save()
             pdfrecord_to_change.save()
             
             if len(user_profile.modifiedpdfs_categorization_tool.filter(pk=pdfrecord_to_change.pk))==0:
