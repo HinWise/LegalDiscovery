@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-
 #left_container {
 
     position:absolute;
@@ -31,6 +30,24 @@
 
 
 }
+
+#fields_container {
+        position: absolute;
+        width: 95%;
+        height: 99%;
+        
+        top: 0.1%;
+        left: 1%;
+        
+       overflow-x:hidden;
+       overflow-y:auto;
+    }
+
+    #dialog-form label, #dialog-form  input { display:block; }
+    #dialog-form input.text { margin-bottom:2%; width:95%; padding: 2%; }
+    #fieldset_fields { padding:0; border:0; margin-top:12%; overflow:hidden;}
+    #dialog-form h1 { font-size: 1.2em; margin: .6em 0; }
+    #dialog-form { margin-left: 20%;  }
 
 
 
