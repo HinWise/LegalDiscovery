@@ -5,7 +5,7 @@ scp -i  LegalRecoveryKey.ppk C:\Dropbox\NathanProject\ProjectFolder\enersectapp\
 
 scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db D:\Dropbox\NathanProject\ProjectFolder\databases\
 
-scp -i  LegalRecoveryKey.ppk C:\Dropbox\NathanProject\ProjectFolder\databases\nathansqlite3db.zip ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/
+scp -i  LegalRecoveryKey.ppk C:\Dropbox\GitHub\LegalDiscovery\databases\nathansqlite3db.zip ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/
 
 scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db.zip C:\Dropbox\GitHub\LegalDiscovery\ProjectFolder\databases\
 
