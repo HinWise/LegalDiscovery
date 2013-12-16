@@ -1,12 +1,18 @@
 from enersectapp.models import *
 from django.db import transaction
+import csv
 
 all_types = SourceDocType.objects.all().order_by('name').distinct()
 
-csv_writer = csv.writer(open("number_docs_per_type.csv", "wd"), delimiter=',') 
+csv_writer = csv.writer(open("number_docs_per_type_2.csv", "wd"), delimiter=',') 
+csv_writer.writerow(["Document Type Name","That are multipart","That aren't multipart"])
 
 with transaction.commit_on_success():
  for item in all_types:
    sources = SourcePdf.objects.filter(modified_document_type = item).distinct()
    sources_count = sources.count()
-   csv_writer.writerow([item.name,sources_count])
+   sources_no_multipart = sources.filter(multipart="no").distinct()
+   sources_no_multipart_count = sources_no_multipart.count()
+   csv_writer.writerow([item.name,sources_count,sources_no_multipart_count])
+
+del csv_writer

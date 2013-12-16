@@ -1,100 +1,101 @@
-accounting,493
-air waybill,457
-appel d'offres,9
-arabic,3241
-autorisation de sortie,8
-avis de credit,158
-avis de debit,929
-avis de passage,1
-back of invoice,1
-backwards,2271
-bank statement,1527
-blank,37072
-blank probable,3575
-bon d'insertion,0
-bon de commande,2936
-bon de garantie,0
-bon de livraison,4238
-bon de location,21
-bon de pesage,11
-bon de prestation,4
-bon de reception,50
-bon de sortie,18
-bon de transport,230
-bon pour,21
-borderaux de reglements,15
-bordereau de depot,23
-bulletin de paie,2488
-call off order,24
-catering,1576
-certificat de retenue d'impots,37
-certificat de visite,4
-certificate of conformity,1
-certificate of origin,3
-cheque,17311
-cheque stub,2777
-confirmation of booking,0
-contract page 1,0
-contract page x,10
-contractual,2935
-credit note,333
-customs entry advice,0
-customs form,897
-daily report,1
-declaration de versement,0
-delivery ticket,35
-demande de credit,101
-email,1779
-eni tunisia,441
-enquiry,11
-etat de rapprochement,3
-etat recaputilatif salaire,0
-expense claim,1594
-export declaration,30
-extrait du compte,0
-facture,2277
-fax,532
-fiche d'intervention,41
-fuel authorization form,35
-funds transfer,218
-grande livre,3921
-hotel related,3898
-insurance,462
-invoice,51647
-journal de paie,984
-letter,234
-list of expenses,1
-list of invoices,0
-misc,7395
-note d'expedition material,8
-note d'expedition materiel,8
-note de remboursement,1
-notes d'honoraires,247
-ordre d'insertion,0
-other,2907
-packing list,127
-packing slip,1137
-partial,201
-payment confirmation,350
-payment order,2959
-phone records,339
-preavis d'arrivee,92
-purchase order,1080
-quittance,1808
-quotation,6
-quote,906
-receipt,10111
-reconnaissance,0
-releve de compte,0
-remise de cheques,0
-rent ticket,82
-requisition for electronic payment transfer,0
-sales order,1
-service order,4124
-service ticket,14
-shipping invoice,7
-tax form,1704
-time sheet,1974
-uncategorized,0
-virement,1270
-voucher,3
+Document Type Name,That are multipart,That aren't multipart
+accounting,499,343
+air waybill,460,190
+appel d'offres,9,9
+arabic,3242,1508
+autorisation de sortie,8,8
+avis de credit,158,88
+avis de debit,929,716
+avis de passage,1,1
+back of invoice,1,0
+backwards,2271,859
+bank statement,1530,1008
+blank,37073,4867
+blank probable,3575,2
+bon d'insertion,0,0
+bon de commande,2930,1888
+bon de garantie,0,0
+bon de livraison,4240,2599
+bon de location,21,15
+bon de pesage,11,7
+bon de prestation,4,4
+bon de reception,50,36
+bon de sortie,18,10
+bon de transport,230,133
+bon pour,21,2
+borderaux de reglements,15,4
+bordereau de depot,23,6
+bulletin de paie,2489,750
+call off order,26,18
+catering,1577,547
+certificat de retenue d'impots,50,27
+certificat de visite,4,3
+certificate of conformity,1,1
+certificate of origin,3,0
+cheque,17304,904
+cheque stub,2774,250
+confirmation of booking,0,0
+contract page 1,0,0
+contract page x,10,6
+contractual,2954,2095
+credit note,333,226
+customs entry advice,0,0
+customs form,897,266
+daily report,2,2
+declaration de versement,0,0
+delivery ticket,35,29
+demande de credit,101,74
+email,1788,1010
+eni tunisia,447,332
+enquiry,11,6
+etat de rapprochement,4,2
+etat recaputilatif salaire,0,0
+expense claim,1595,1043
+export declaration,30,4
+extrait du compte,0,0
+facture,2283,989
+fax,536,395
+fiche d'intervention,41,24
+fuel authorization form,35,20
+funds transfer,218,0
+grande livre,3921,2561
+hotel related,3899,2525
+insurance,462,263
+invoice,51598,29038
+journal de paie,984,504
+letter,240,144
+list of expenses,1,1
+list of invoices,1,1
+misc,7414,3921
+note d'expedition material,8,8
+note d'expedition materiel,8,8
+note de remboursement,1,1
+notes d'honoraires,247,124
+ordre d'insertion,0,0
+other,2907,5
+packing list,127,72
+packing slip,1137,439
+partial,203,49
+payment confirmation,350,0
+payment order,2966,1895
+phone records,340,258
+preavis d'arrivee,92,45
+purchase order,1082,379
+quittance,1809,1051
+quotation,6,3
+quote,909,456
+receipt,10045,4668
+reconnaissance,0,0
+releve de compte,1,0
+remise de cheques,0,0
+rent ticket,82,65
+requisition for electronic payment transfer,0,0
+sales order,1,0
+service order,4127,3299
+service ticket,14,13
+shipping invoice,7,4
+tax form,1705,1052
+time sheet,1977,761
+uncategorized,0,0
+virement,1270,811
+voucher,3,1
