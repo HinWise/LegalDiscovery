@@ -379,19 +379,7 @@ object {
 
 #left_container {
 
-    position:absolute;
     
-    width:45%;
-    height:80%;
-    
-    left: 0.5%;
-    top: -7%;
-    
- 
-}
-
-#right_container {
-
     position:absolute;
     
     width:47%;
@@ -400,6 +388,20 @@ object {
     left:25%;
     top:5.5%;
     
+    
+    
+ 
+}
+
+#right_container {
+
+    position:absolute;
+    
+    width:45%;
+    height:100%;
+    
+    left: 0.5%;
+    top: 0;
 }
 
 #search_container {
@@ -410,6 +412,7 @@ object {
     height: 10%;
     left: 25%;
     top: -2%;
+    
     
  
 }

@@ -3085,8 +3085,6 @@ def search_tool(request):
             
             constructed_date = word_date.split("/")
             
-            
-
             helper_list = final_list
 
             if len(constructed_date) > 0:
@@ -3205,6 +3203,6 @@ def search_tool(request):
     context = {
     'pdf_records_list':pdf_records_list,'searchword_filterword': p,'word_amount':word_amount,'word_companyname':word_companyname,
     'word_date':word_date,'word_doctype':word_doctype,'word_piecenumber':word_piecenumber,'word_docname':word_docname,'word_id_docname':word_id_docname,'total_pdf_records':total_pdf_records,
-    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit}
+    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,'the_user':the_user}
     
     return render(request,'enersectapp/search_tool.html',context)

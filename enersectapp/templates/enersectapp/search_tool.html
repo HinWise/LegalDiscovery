@@ -47,6 +47,7 @@
   
         classLocator();
         configLoadingScreen();
+        createUserPanel();
     
         $(".toggle_pdf_button")
         .button({
@@ -509,6 +510,30 @@
             
         }
     
+        function createUserPanel(){
+        
+            $( "#user-panel" ).dialog({
+                  
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  autoOpen:true,
+                  closeOnEscape: false,
+                  resizable:true,
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+                  
+                });
+                
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+                        
+                    } 
+                });
+            }
+    
+    
     });
     
     
@@ -543,13 +568,21 @@
 
 {% block content%}
 
-    <div id="left_container">
+    <div id="right_container">
     
-    
+        <div id="userpanel_container">
+            <div id="user-panel" title="{{the_user}}">
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                </ul>
+            </div>
+        </div>
     
     </div>
     
-    <div id="right_container">
+    <div id="left_container">
         
         <div id="pdf_records_container">   
     
