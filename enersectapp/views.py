@@ -217,10 +217,8 @@ def linkui_spiderweb(request):
         
         
         if isAmount:
-              
             
             helper_list = final_list.filter(ocrrecord_link__Amount__icontains=word_amount)
-            
             final_list = helper_list
             
         
@@ -3053,17 +3051,33 @@ def search_tool(request):
         
         
         if isAmount:
-              
             
-            helper_list = final_list.filter(ocrrecord_link__Amount__icontains=word_amount)
+            if word_amount.startswith('"') and word_amount.endswith('"'):
+            
+                word_amount = word_amount.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Amount__exact=word_amount)
+                word_amount = '"'+word_amount+'"'
+            
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Amount__icontains=word_amount)
+            
             
             final_list = helper_list
             
         
         
         if isCompanyname:
-                     
-            helper_list = final_list.filter(ocrrecord_link__Company__icontains=word_companyname)
+            
+            if word_companyname.startswith('"') and word_companyname.endswith('"'):
+            
+                word_companyname = word_companyname.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Company__iexact=word_companyname)
+                word_companyname = '"'+word_companyname+'"'
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Company__icontains=word_companyname)
+            
             final_list = helper_list
             
         
@@ -3108,12 +3122,30 @@ def search_tool(request):
         
         if isPiecenumber:
             
-            helper_list = final_list.filter(ocrrecord_link__Piece_Number__iexact=word_piecenumber)
+            if word_piecenumber.startswith('"') and word_piecenumber.endswith('"'):
+            
+                word_piecenumber = word_piecenumber.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Piece_Number__iexact=word_piecenumber)
+                word_piecenumber = '"'+word_piecenumber+'"'
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Piece_Number__icontains=word_piecenumber)
+            
+            
             final_list = helper_list
             
         if isDocname:
-                    
-            helper_list = final_list.filter(sourcedoc_link__filename__icontains=word_docname)
+            
+            if word_docname.startswith('"') and word_docname.endswith('"'):
+            
+                word_docname = word_docname.replace('"', '')
+                helper_list = final_list.filter(sourcedoc_link__filename__iexact=word_docname)
+                word_docname = '"'+word_docname+'"'
+                
+            else:
+            
+                helper_list = final_list.filter(sourcedoc_link__filename__icontains=word_docname)
+            
             final_list = helper_list
 
         if isIdDocname:
