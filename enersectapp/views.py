@@ -2851,4 +2851,282 @@ def arabic_memo_edit(request):
     
     return render(request,'enersectapp/arabic_memo_edit.html',context)    
     
+def search_tool(request):
     
+    the_user = request.user
+    
+    if not request.user.is_authenticated():
+        
+        return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
+
+    
+    p = FilterSearchWords.objects.get(pk=1) 
+    #word = p.pdf_searchword
+    word="all"
+    word_amount= ""
+    word_companyname=""
+    word_date=""
+    word_docname=""
+    filterword = p.pdf_filterword
+    pdf_records_list=[]
+    search_options = ""
+    
+    '''try:
+        word = request.POST['search_word']
+    except (KeyError):
+        
+        word = p.pdf_searchword'''
+        
+    try:
+        word_amount = request.POST['search_word_amount']
+    except (KeyError):
+        
+        word_amount = ""
+    
+    try:
+        word_companyname = request.POST['search_word_companyname']
+    except (KeyError):
+        
+        word_companyname=""
+        
+    try:
+        word_date = request.POST['search_word_date']
+    except (KeyError):
+        
+        word_date=""
+    
+    try:
+        word_doctype = request.POST['search_word_doctype']
+    except (KeyError):
+        
+        word_doctype=""
+    
+    try:
+        word_piecenumber = request.POST['search_word_piecenumber']
+    except (KeyError):
+        
+        word_piecenumber=""
+    
+    try:
+        word_docname = request.POST['search_word_docname']
+    except (KeyError):
+        
+        word_docname=""
+    
+    try:
+        word_id_docname = request.POST['search_word_id_docname']
+    except (KeyError):
+        
+        word_id_docname=""
+    
+    try:
+        filterword = request.POST['filter_word']
+    except (KeyError):
+        
+        filterword = p.pdf_filterword
+    
+    #word = str(word)
+    word_amount= str(word_amount).encode("utf8")
+    word_companyname= word_companyname.encode("utf8")
+    word_date= str(word_date).encode("utf8")
+    word_doctype= str(word_doctype).encode("utf8")
+    word_piecenumber= str(word_piecenumber).encode("utf8")
+    word_docname= str(word_docname).encode("utf8")
+    word_id_docname= str(word_id_docname).encode("utf8")
+    filterword = filterword.lower()    
+    
+    #p.pdf_searchword = word 
+    p.pdf_filterword = filterword
+    p.save()    
+        
+    #Filters block
+    
+    if filterword=="pdf_all":
+    
+        pdf_records_list = PdfRecord.objects.all()
+        
+    elif filterword=="pdf_error":
+    
+        pdf_records_list = PdfRecord.objects.filter(commentary__contains="Error detected")
+        
+    elif filterword=="pdf_linked":
+    
+        pdf_records_list = PdfRecord.objects.filter(status="pdf_linked")
+        
+    elif filterword=="pdf_unlinked":
+    
+        pdf_records_list = PdfRecord.objects.filter(status="pdf_unlinked")
+        
+       
+    #Making lists to use in the Search of Coincidences
+    
+    temp_list = pdf_records_list
+    final_list = pdf_records_list.filter(status__exact="Test")
+    
+    
+    #Check which Search Options are covered
+    
+
+    if len(word_amount) != 0:
+        isAmount = True
+        
+    else:
+        isAmount = False
+        
+
+    if len(word_companyname) != 0:
+        isCompanyname = True
+       
+    else:
+        isCompanyname = False
+        
+        
+    if len(word_date) != 0:
+        isDate = True
+        
+    else:
+        isDate = False
+    
+    if len(word_doctype) != 0:
+        isDoctype = True
+   
+    else:
+        isDoctype = False
+    
+    if len(word_piecenumber) != 0:
+        isPiecenumber = True
+   
+    else:
+        isPiecenumber = False
+    
+    if len(word_docname) != 0:
+        isDocname = True
+   
+    else:
+        isDocname = False
+    
+    if len(word_id_docname) != 0:
+        isIdDocname = True
+   
+    else:
+        isIdDocname = False
+    
+    
+    #When at least a word is being searched and there are no Search Options
+    
+    if word =="all" and isAmount == False and isCompanyname == False and isDate == False and isDoctype == False and isPiecenumber == False and isDocname == False and isIdDocname == False:
+          
+        #helper_list = temp_list.filter(ocrrecord_link__Company__icontains=word) | temp_list.filter(ocrrecord_link__Amount__icontains=word)  | temp_list.filter(ocrrecord_link__IssueDate__icontains=word)
+
+        final_list = pdf_records_list
+                    
+        # Unused filters:
+        '''no_options_wordlist.filter(sourcedoc_link__filename__icontains=word)| no_options_wordlist.filter(modification_date=word) | no_options_wordlist.filter(record_link__name__icontains=word) | no_options_wordlist.filter(filename__icontains=word) '''
+
+    #When there are Search Options (Amount,etc)
+    
+    else:
+        
+        final_list=temp_list
+        
+        
+        if isAmount:
+              
+            
+            helper_list = final_list.filter(ocrrecord_link__Amount__icontains=word_amount)
+            
+            final_list = helper_list
+            
+        
+        
+        if isCompanyname:
+                     
+            helper_list = final_list.filter(ocrrecord_link__Company__icontains=word_companyname)
+            final_list = helper_list
+            
+        
+        if isDate:
+                
+            helper_list = final_list.filter(ocrrecord_link__IssueDate__icontains=word_date)
+            final_list = helper_list
+        
+        if isDoctype:
+            
+            doctype = SourceDocType.objects.filter(pretty_name__iexact=word_doctype)|SourceDocType.objects.filter(name__iexact=word_doctype.lower())
+            doctype = doctype.distinct()
+                        
+            if len(doctype) == 1:
+            
+                helper_list = final_list.filter(modified_document_type = doctype[0])
+                final_list = helper_list
+        
+        if isPiecenumber:
+            
+            helper_list = final_list.filter(ocrrecord_link__Piece_Number__iexact=word_piecenumber)
+            final_list = helper_list
+            
+        if isDocname:
+                    
+            helper_list = final_list.filter(sourcedoc_link__filename__icontains=word_docname)
+            final_list = helper_list
+
+        if isIdDocname:
+    
+            separated_string = word_id_docname.split('.', 1)
+        
+            if len(separated_string) == 2:
+                helper_list = final_list.filter(pk=separated_string[0],sourcedoc_link__filename=separated_string[1])
+                final_list = helper_list
+                
+            else:
+                final_list = PdfRecord.objects.none()
+    
+    actual_min_num = 0
+    
+    try:
+        prev_next_results = request.POST['prev_next_results']
+        prev_next_results = str(prev_next_results)
+    except (KeyError):
+        
+        prev_next_results = ""
+        
+    try:
+        actual_min_num = request.POST['actual_min_num']
+        actual_min_num = int(actual_min_num)
+    except (KeyError):
+        
+        actual_min_num = 0
+    
+    
+    if(prev_next_results == ""):
+        actual_min_num = 0
+    
+    if(prev_next_results == "Prev"):
+        actual_min_num -= 10
+        
+    if(prev_next_results == "Next"):
+        actual_min_num += 10
+    
+    max_num = actual_min_num + 10
+    
+    pdf_records_list = final_list       
+    
+    total_pdf_records = pdf_records_list.count()
+    
+    if pdf_records_list:
+    
+        pdf_records_list = pdf_records_list.order_by('commentary').order_by('-status')[actual_min_num:max_num]
+
+    showing_records = pdf_records_list.count()
+    
+    page_counter_end = actual_min_num+showing_records
+    
+    plus_limit = total_pdf_records-10
+     
+    
+    context = {
+    'pdf_records_list':pdf_records_list,'searchword_filterword': p,'word_amount':word_amount,'word_companyname':word_companyname,
+    'word_date':word_date,'word_doctype':word_doctype,'word_piecenumber':word_piecenumber,'word_docname':word_docname,'word_id_docname':word_id_docname,'total_pdf_records':total_pdf_records,
+    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit}
+    
+    return render(request,'enersectapp/search_tool.html',context)

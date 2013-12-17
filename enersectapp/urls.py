@@ -238,5 +238,11 @@ urlpatterns = patterns('',
     # Arabic Memo Edit Tool
     # ex: enersectapp/editui/arabic_memo_edit/
     url(r'^editui/arabic_memo_edit/$', views.arabic_memo_edit, name='arabic_memo_edit'),
+    
+    # Search Tool
+    # Allows to search entries by multiple filters:
+    # Company Name, Document Name, Amount, Date Range, Piece Number
+    # ex: enersectapp/searchui/search_tool/
+    url(r'^searchui/search_tool/$', views.search_tool, name='search_tool'),
    
 )
