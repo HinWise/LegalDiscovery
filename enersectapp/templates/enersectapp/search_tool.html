@@ -559,7 +559,10 @@
                 {% for pdfrecord in pdf_records_list %}
         
                     <div id="group{{pdfrecord.id}}" class="group">
-                    <h3 id="pdf_table_name{{pdfrecord.id}}" class="pdf_table_name {{pdfrecord.linked_style_class}} {{pdfrecord.error_style_class}}">Amount:     <span class ="title_text"> {{pdfrecord.ocrrecord_link.Amount}}  {{pdfrecord.ocrrecord_link.Currency}}</span><br>Company Name:     <span class ="title_text">{{pdfrecord.ocrrecord_link.Company}}</span><br>Issue Date:     <span class ="title_text">{{pdfrecord.ocrrecord_link.IssueDate}}</span></h3>
+                    <h3 id="pdf_table_name{{pdfrecord.id}}" class="pdf_table_name {{pdfrecord.linked_style_class}} {{pdfrecord.error_style_class}}">
+                        Amount:     <span class ="title_text"> {% if pdfrecord.ocrrecord_link.Amount != "MISSING" and pdfrecord.ocrrecord_link.Amount != "UNREADABLE"  %}{{pdfrecord.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if pdfrecord.ocrrecord_link.Currency != "MISSING" and pdfrecord.ocrrecord_link.Currency != "UNREADABLE"  %}{{pdfrecord.ocrrecord_link.Currency}}{% endif %}</span>
+                        <br>Company Name:     <span class ="title_text">{% if pdfrecord.ocrrecord_link.Company != "MISSING NAME" and pdfrecord.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{pdfrecord.ocrrecord_link.Company}}{% else %}?{% endif %}</span>
+                        <br>Issue Date:     <span class ="title_text">{% if pdfrecord.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{pdfrecord.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</span></h3>
                         <div>
                             <table class="pdf_zebra zebra">
                             <thead>
