@@ -232,9 +232,31 @@ def linkui_spiderweb(request):
             
         
         if isDate:
+            
+            constructed_date = word_date.split("/")
+
+            helper_list = final_list
+
+            if len(constructed_date) > 0:
+                day = constructed_date[0]
+                if day != "XX" and day !="NaN" and day != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Day__exact=day)
                 
-            helper_list = final_list.filter(ocrrecord_link__IssueDate__icontains=word_date)
+            if len(constructed_date) > 1:
+                month = constructed_date[1]
+                if month != "XX" and month !="NaN" and month != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Month__exact=month)
+                
+            if len(constructed_date) > 2:
+                year = constructed_date[2]
+                if year != "XXXX" and year !="NaN" and year != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Year__exact=year)
+
+
             final_list = helper_list
+            
+            '''helper_list = final_list.filter(ocrrecord_link__IssueDate__icontains=word_date)
+            final_list = helper_list'''
             
             
         if isDocname:
@@ -3046,9 +3068,33 @@ def search_tool(request):
             
         
         if isDate:
+            
+            constructed_date = word_date.split("/")
+            
+            
+
+            helper_list = final_list
+
+            if len(constructed_date) > 0:
+                day = constructed_date[0]
+                if day != "XX" and day !="NaN" and day != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Day__exact=day)
                 
-            helper_list = final_list.filter(ocrrecord_link__IssueDate__icontains=word_date)
+            if len(constructed_date) > 1:
+                month = constructed_date[1]
+                if month != "XX" and month !="NaN" and month != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Month__exact=month)
+                
+            if len(constructed_date) > 2:
+                year = constructed_date[2]
+                if year != "XXXX" and year !="NaN" and year != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Year__exact=year)
+
+
             final_list = helper_list
+            
+            '''helper_list = final_list.filter(ocrrecord_link__IssueDate__icontains=word_date)
+            final_list = helper_list'''
         
         if isDoctype:
             
