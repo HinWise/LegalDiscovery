@@ -86,6 +86,9 @@
 
         function createFieldsForm(){
           
+            $user_type = $('#user_type').attr('value');
+            
+          
             //Save Error Prevention; If there are no Candidates for Auditing, don't create the "Marking" Buttons, only the "Execute"
             if(($('#pdf_record_id').attr("value").length) == 0)
             {
@@ -121,79 +124,158 @@
           
             else
             {
-                $( "#dialog-form" ).dialog({
-                
-                    width: $('#fields_container').width(),
-                    height: $('#fields_container').height(),
-                    
-                    modal: false,
-                    draggable:true,
-                    resizable: true,
-                    closeOnEscape: false,
-                    buttons: {
-                        "Mark Entry as Correct": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_as_correct");
-                            $('#fields_form').submit();
-                            
-                            
-                        },
-                        "Mark Entry as Incorrect": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_as_incorrect");
-                            $('#fields_form').submit();
-                            
-                            
-                        },
-                        "Send Incorrect Entries from Selection to Re-Entry": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_as_incorrect_reentry");
-                            $('#fields_form').submit();
-                            
-                            
-                        },
-                        "Send Entire Lot/User Selection to Re-Entry": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_as_selection_reentry");
-                            $('#fields_form').submit();
-                            
-                            
-                        },
-                        "Execute Re-Entry": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_confirmed_reassignment");
-                            $('#fields_form').submit();
-                            
-                            
-                        },
-                        
-                        
-                    },
-                    position: {
-                        my: "left top", at: "left top", of: $('#fields_container')
-                    }
-                });
             
+                if($user_type=="TeamLeader") {
+                
+                    $( "#dialog-form" ).dialog({
+                    
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+                        
+                        modal: false,
+                        draggable:true,
+                        resizable: true,
+                        closeOnEscape: false,
+                        buttons: {
+                            "Mark Entry as Correct": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_correct");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            "Mark Entry as Incorrect": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_incorrect");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            "Send Incorrect Entries from Selection to Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_incorrect_reentry");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            "Send Entire Lot/User Selection to Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_selection_reentry");
+                                $('#fields_form').submit();
+                                
+                                
+                            }, 
+                            "Execute Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_confirmed_reassignment");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            
+                            
+                        },
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+                
+                }
+                else
+                {
+                    $( "#dialog-form" ).dialog({
+                    
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+                        
+                        modal: false,
+                        draggable:true,
+                        resizable: true,
+                        closeOnEscape: false,
+                        buttons: {
+                            "Mark Entry as Correct": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_correct");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            "Mark Entry as Incorrect": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_incorrect");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            /*"Send Incorrect to Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_incorrect_reentry");
+                                $('#fields_form').submit();
+                                
+                                
+                            },
+                            "Send Selected to Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_as_selection_reentry");
+                                $('#fields_form').submit();
+                                
+                                
+                            }, 
+                            "Execute Re-Entry": function() {
+                                
+                                toggleLoadingScreen();
+                                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                disableButtonsets();
+                                savePanelSizes();
+                                $('#save_mark').attr("value","auditmarked_confirmed_reassignment");
+                                $('#fields_form').submit();
+                                
+                                
+                            },*/
+                            
+                            
+                        },
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+                }
             }
           
             
@@ -526,6 +608,7 @@
                 {% endif %}
                 <input class="invisible" type="text" name="selected_date" id="selected_date" value="{{selected_date}}" />
                 <input class="invisible" type="text" name="pdf_record_id" id="pdf_record_id" value="{{pdf_random_item.id}}" />
+                <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
      
                 {% if pdf_item_list %}
         
