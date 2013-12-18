@@ -1870,9 +1870,10 @@ def randomqa_spider(request):
         else:
         
             pdf_item_list = PdfRecord.objects.none()
-            pdf_random_item = pdf_item_list.order_by('-modification_date')
+            pdf_random_item = pdf_item_list
       
         
+        pdf_item_list.order_by('-modification_date')
         
         context = {'user_type':"superuser",'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
