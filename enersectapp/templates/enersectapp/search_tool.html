@@ -103,7 +103,12 @@
                 $pdf.append(s); 
 
                 if($('#pdf_view').hasClass("opened-pdf")==false)
-                {            
+                {   
+                   
+                    $('#pdf_records_container').animate({left:'55%'},1000, 'easeInOutQuart');
+                    
+                    $( "#user-panel" ).dialog( "close" );
+                
                     $('#pdf_view').addClass("opened-pdf",1000);
                     $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
                    
@@ -116,6 +121,10 @@
                 
                 if($('#pdf_view').hasClass("opened-pdf")==true)
                 {            
+                    $('#pdf_records_container').animate({left:'0%'},1000, 'easeInOutQuart');
+                    
+                    $( "#user-panel" ).dialog( "open" );
+                
                     $('#pdf_view').removeClass("opened-pdf",1000);
                     $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
                 }
@@ -520,6 +529,14 @@
                   autoOpen:true,
                   closeOnEscape: false,
                   resizable:true,
+                  show: {
+                    effect: "drop",
+                    duration: 1000
+                  },
+                  hide: {
+                    effect: "drop",
+                    duration: 1000
+                  },
                   position: {
                     my: "left bottom", at: "left bottom", of: $('#userpanel_container')
                     }
@@ -583,9 +600,9 @@
     </div>
     
     <div id="left_container">
-        
+        <div id="pdf_view"></div>
         <div id="pdf_records_container">   
-    
+            
             <div id="accordion_table">
         
                 <div id="accordion">
@@ -740,7 +757,7 @@
                                 </div>
                                  
                 </form>
-                <div id="pdf_view"></div>
+                
         </div>
     </div>
     

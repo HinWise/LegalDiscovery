@@ -70,20 +70,22 @@
 }
 
 
-.pdf_view {
+#pdf_view {
 
-    padding-top: 4.7%;
+    position:relative;
+
+    padding-top: 9.5%;
     
-    z-index:10;
+    z-index:500;
 }
 
 object {
     border-radius:2%;
     position:absolute;
-    left:-21.3%;
+    left:-51.3%;
     display:block;
     
-    z-index:10;
+    z-index:500;
 }
 
 #accordion_table {
@@ -387,8 +389,6 @@ object {
     
     left:25%;
     top:5.5%;
-    
-    
     
  
 }
