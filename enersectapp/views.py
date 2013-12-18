@@ -1230,8 +1230,9 @@ def dataentryui_savedata(request):
     if is_duplicated_list.count() > 0:
         
         for item in is_duplicated_list:
-            item.audit_mark = "duplicatemarked_reentered"
-            item.save()
+            if item.audit_mark != "auditmarked_confirmed_reassignment":
+                item.audit_mark = "duplicatemarked_reentered"
+                item.save()
     
     translation_type = "no"
 
@@ -1808,7 +1809,6 @@ def randomqa_spider(request):
                         pdf.save()
                     
         
-        
         #Creating an Editor/Modification Authors List:
         
         modification_authors_selection = User.objects.filter(groups__name="NathanTeam")|User.objects.filter(groups__name="TeamLeaders")|User.objects.filter(groups__name="Auditors")
@@ -1836,7 +1836,7 @@ def randomqa_spider(request):
             error_rate = incorrect/(correct + incorrect)*100
             error_rate = int(error_rate)
             
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry")
+        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
         
         pdf_id_list_to_randomize = []
         
@@ -2055,9 +2055,9 @@ def randomqa_spider(request):
                 incorrect_list = pdf_records_list.filter(audit_mark="auditmarked_as_incorrect")
                 
                 with transaction.commit_on_success():
+                
                     for pdf in incorrect_list:
 
-                        
                         pdf.audit_mark = "auditmarked_as_incorrect_reentry"
                         pdf.save()
         
@@ -2069,6 +2069,25 @@ def randomqa_spider(request):
                         pdf.audit_mark = "auditmarked_as_selection_reentry"
                         pdf.save()
                     
+        
+            elif save_mark == "auditmarked_confirmed_reassignment":
+            
+                reentry_list = pdf_records_list.filter(audit_mark="auditmarked_as_incorrect_reentry")|pdf_records_list.filter(audit_mark="auditmarked_as_selection_reentry")
+                reentry_list = reentry_list.order_by().distinct()
+            
+                with transaction.commit_on_success():
+                
+                    for pdf in reentry_list:
+
+                        to_reassign_handles = pdf.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+                        
+                        for handle in to_reassign_handles:
+                        
+                            handle.checked = "unchecked"
+                            handle.save()
+                        
+                        pdf.audit_mark = "auditmarked_confirmed_reassignment"
+                        pdf.save()
         
         
         #Creating an Editor/Modification Authors List:
@@ -2097,7 +2116,7 @@ def randomqa_spider(request):
             error_rate = int(error_rate)
             
         
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="duplicatemarked_reentered")
+        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="duplicatemarked_reentered").exclude(audit_mark="auditmarked_confirmed_reassignment")
         
         pdf_id_list_to_randomize = []
         
@@ -2608,7 +2627,7 @@ def progress_report(request):
     
     # Number of total documents entered
     
-    total_pdf_entered_list = PdfRecord.objects.exclude(audit_mark="duplicatemarked_reentered").exclude(ocrrecord_link__OcrByCompany=test_group).exclude(ocrrecord_link__OcrByCompany=invensis_group).exclude(ocrrecord_link__OcrByCompany=super_group).values('ocrrecord_link','modified_document_type','sourcedoc_link','status','audit_mark').order_by().distinct()
+    total_pdf_entered_list = PdfRecord.objects.exclude(audit_mark="duplicatemarked_reentered").exclude(audit_mark="auditmarked_confirmed_reassignment").exclude(ocrrecord_link__OcrByCompany=test_group).exclude(ocrrecord_link__OcrByCompany=invensis_group).exclude(ocrrecord_link__OcrByCompany=super_group).values('ocrrecord_link','modified_document_type','sourcedoc_link','status','audit_mark').order_by().distinct()
     
     total_pdf_entered = len(total_pdf_entered_list)
     
