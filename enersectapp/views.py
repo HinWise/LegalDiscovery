@@ -938,7 +938,7 @@ def dataentryui_spider(request):
         
         
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     
     if(the_user.username=="dimaelkezee"):
         document_type = 'Arabic'
@@ -1195,7 +1195,7 @@ def dataentryui_savedata(request):
            
     
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     
     new_ocr.OcrAuthor = the_user
     new_ocr.OcrByCompany = user_group
@@ -1386,7 +1386,7 @@ def webcocoons(request):
         return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
     
     
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     noneuser = User.objects.get(username="None")
     
     
@@ -1468,7 +1468,7 @@ def cocoons_save(request):
             return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
     
     
-        user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+        user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     
         sourcepdfstohandle_list = SourcePdfToHandle.objects.filter(assignedcompany=user_group).exclude(checked="checked")
     
@@ -1519,7 +1519,7 @@ def cocoons_new_teamuser(request):
 
     the_user = request.user;
     
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
 
     if request.POST:
         username = request.POST['username']
@@ -1544,54 +1544,33 @@ def randomqa_spider(request):
 
     the_user = request.user
 
-    the_user_is_teamleader = False
-    
-    
     if not the_user.is_authenticated():
         
         return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
     
+    user_type= ""
     
-    if the_user.is_superuser == True or len(the_user.groups.filter(name="Auditors"))>0:
+    if len(the_user.groups.filter(name="TeamLeaders")) >0:
+    
+        user_type = "TeamLeader"
         
+    elif the_user.is_superuser == True :
+    
+        user_type = "superuser"
+    
+    elif len(the_user.groups.filter(name="TeamAuditors")) >0:
+    
+        user_type = "TeamAuditor"
         
-        '''lot_number = 0;
+    elif len(the_user.groups.filter(name="Auditors")) >0:
+    
+        user_type = "Auditor"
         
-        pdf_records_list = PdfRecord.objects.none()
-        
-        company_list = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="INVENSIS")
-        
-        for company in company_list:
-        
-            pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = company, sourcedoc_link__assigndata__lot_number = lot_number).distinct()
-        
-        
-        
-        pdf_id_list_to_randomize = []
-        
-        for item in pdf_records_list:
-            
-            pdf_id_list_to_randomize.append(int(item.id))
-            
-            
-        random_id = random.choice(pdf_id_list_to_randomize)
-        
-        pdf_random_item = PdfRecord.objects.filter(id=random_id)[0]
-        pdf_random_source = pdf_random_item.sourcedoc_link
-        pdf_random_company = pdf_random_item.ocrrecord_link.OcrByCompany
-        
-        pdf_item_list = PdfRecord.objects.none()
-
-     
-        for company in company_list:
-            
-            pdf_item_list = pdf_item_list | PdfRecord.objects.filter(sourcedoc_link = pdf_random_source, sourcedoc_link__assigndata__assignedcompany=company).distinct()
-            
-
-        context = {'pdf_random_item':pdf_random_item,'pdf_item_list':pdf_item_list,"lot_number":lot_number}
-        return render(request,'enersectapp/randomqa_spider.html',context)'''
     
     
+    
+    if user_type == "superuser" or user_type == "Auditor":
+        
         try:
             selected_modification_author = request.POST['selected_modification_author']
         except (KeyError):
@@ -1637,13 +1616,13 @@ def randomqa_spider(request):
         
         pdf_records_list = PdfRecord.objects.none()
         
-        user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+        user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
    
-        company_names_list = Group.objects.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="INVENSIS").order_by().values_list('name',flat=True)
+        company_names_list = Group.objects.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS").order_by().values_list('name',flat=True)
    
         if selected_company == "all":
    
-            company_list = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").exclude(name="INVENSIS")
+            company_list = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
         
         else:
         
@@ -1762,8 +1741,8 @@ def randomqa_spider(request):
         else:
             startdate = enddate - timedelta(days=10000)
             
-        
-        pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
+        if selected_date != "all":
+            pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
 
         
         #Saving the Audit Marks and making the necessary changes in the database
@@ -1872,10 +1851,10 @@ def randomqa_spider(request):
             pdf_item_list = PdfRecord.objects.none()
             pdf_random_item = pdf_item_list
       
-        
-        pdf_item_list = pdf_item_list.order_by('-modification_date')
-        
-        context = {'user_type':"superuser",'pdf_random_item':pdf_random_item,
+        if len(pdf_item_list)>1:
+            pdf_item_list = pdf_item_list.order_by('-modification_date')
+       
+        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
         'error_rate':error_rate,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
@@ -1885,17 +1864,18 @@ def randomqa_spider(request):
         'selected_user': selected_user,'selected_doctype': selected_doctype,'selected_company': selected_company,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,
         'filters_panel_width':filters_panel_width,
-        'filters_panel_width':filters_panel_height}
+        'filters_panel_width':filters_panel_height,'company_name':user_company.name}
         return render(request,'enersectapp/randomqa_spider.html',context)
     
-    
-    elif len(the_user.groups.filter(name="TeamLeaders")) >0:
+   
+    elif user_type == "TeamLeader" or user_type == "TeamAuditor":
+          
+        user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]  
      
-        
         try:
             selected_modification_author = request.POST['selected_modification_author']
         except (KeyError):
-            selected_modification_author =  "all"
+            selected_modification_author =  user_company.name
         
         try:
             lot_number_check = request.POST['selected_lot']
@@ -1936,7 +1916,7 @@ def randomqa_spider(request):
         
         pdf_records_list = PdfRecord.objects.none()
         
-        user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+        
    
         
         pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values('lot_number').distinct()
@@ -2024,8 +2004,8 @@ def randomqa_spider(request):
         else:
             startdate = enddate - timedelta(days=10000)
             
-        
-        pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
+        if selected_date != "all":
+            pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
 
         
         #Saving the Audit Marks and making the necessary changes in the database
@@ -2093,17 +2073,32 @@ def randomqa_spider(request):
         
         #Creating an Editor/Modification Authors List:
         
-        modification_authors_selection = User.objects.filter(groups=user_company).filter(groups__name="TeamLeaders")
-        modification_authors_list = modification_authors_selection.values_list('username',flat=True).order_by().distinct()
+        modification_authors_selection = User.objects.filter(groups=user_company).filter(groups__name="TeamLeaders") | User.objects.filter(groups=user_company).filter(groups__name="TeamAuditors")
+        
+        modification_authors_list = modification_authors_selection.values_list('username',flat=True).order_by()
+        
+        #Add Company Name to modification_authors_list, so it can be selected as the global Error Rate for that Company:
+        
+        '''user_company_name = user_company.name
+        modification_authors_list = '''
         
         #Selection by Modification Author
         
         pdf_authors_list = pdf_records_list
         
-        if selected_modification_author!="all":
-            pdf_authors_list = pdf_records_list.filter(modification_author=selected_modification_author)
-            
+        if selected_modification_author!="all" and selected_modification_author!=user_company.name:
            
+            pdf_authors_list = pdf_records_list.filter(modification_author=selected_modification_author)
+        
+        elif selected_modification_author==user_company.name:
+            
+            pdf_authors_list = PdfRecord.objects.none()
+            
+            for item in modification_authors_list:
+            
+                pdf_authors_list = pdf_authors_list | pdf_records_list.filter(modification_author=item)
+                print pdf_authors_list
+                
         pdf_total_count = len(pdf_records_list)
         
         pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
@@ -2137,9 +2132,9 @@ def randomqa_spider(request):
         
             pdf_item_list = PdfRecord.objects.none()
             pdf_random_item = pdf_item_list
-        
-        
-        context = {'user_type':"TeamLeader",'pdf_random_item':pdf_random_item,
+             
+       
+        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
         'pdf_total_count':pdf_total_count,'pdf_correct_count':pdf_correct_count,
@@ -2148,7 +2143,7 @@ def randomqa_spider(request):
         'selected_user': selected_user,'selected_doctype': selected_doctype,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,
         'filters_panel_width':filters_panel_width,
-        'filters_panel_width':filters_panel_height}
+        'filters_panel_width':filters_panel_height,'company_name':user_company.name}
         return render(request,'enersectapp/randomqa_spider.html',context)
     
     else:
@@ -2194,7 +2189,7 @@ def categorization_tool(request):
         
         
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     user_profile = UserProfile.objects.get(user = the_user)
     
     if the_user.is_superuser == False and user_group.name != "Enersect_Berlin":
@@ -2374,7 +2369,7 @@ def blank_or_not_blank(request):
         blank_or_not_blank='NoChoice'
           
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     user_profile = UserProfile.objects.get(user = the_user)
     
     if the_user.is_superuser == False and user_group.name != "Enersect_Berlin":
@@ -2509,7 +2504,7 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
     
     num_toassign = int(num_toassign)
     
-    company_names_list = Group.objects.exclude(name="INVENSIS").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic").values_list('name',flat=True).distinct()
+    company_names_list = Group.objects.exclude(name="INVENSIS").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").values_list('name',flat=True).distinct()
     doctype_names_list = []
     #print "DonE!----------------2"
     number_follow_assign_criteria = 0
@@ -2804,7 +2799,7 @@ def category_changer(request):
 def arabic_memo_edit(request):
     
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     user_profile = UserProfile.objects.get(user = the_user)
     is_arabic_group = the_user.groups.filter(name = "Arabic")
     
@@ -3226,3 +3221,319 @@ def search_tool(request):
     'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,'the_user':the_user}
     
     return render(request,'enersectapp/search_tool.html',context)
+
+
+    
+'''def search_tool_source_pdfs(request):
+    
+    the_user = request.user
+    
+    if not request.user.is_authenticated():
+        
+        return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
+
+    
+    p = FilterSearchWords.objects.get(pk=1) 
+    #word = p.pdf_searchword
+    word="all"
+    word_jobdirectory= ""
+    word_checked=""
+    word_doctype = ""
+    word_docname=""
+    filterword = p.pdf_filterword
+    pdf_records_list=[]
+    search_options = ""
+    
+        
+    try:
+        word_jobdirectory = request.POST['search_word_jobdirectory']
+    except (KeyError):
+        
+        word_jobdirectory = ""
+    
+    try:
+        word_checked = request.POST['search_word_checked']
+    except (KeyError):
+        
+        word_checked=""
+    
+    try:
+        word_doctype = request.POST['search_word_doctype']
+    except (KeyError):
+        
+        word_doctype=""
+    
+    try:
+        word_docname = request.POST['search_word_docname']
+    except (KeyError):
+        
+        word_docname=""
+    
+    try:
+        word_id_docname = request.POST['search_word_id_docname']
+    except (KeyError):
+        
+        word_id_docname=""
+    
+    try:
+        filterword = request.POST['filter_word']
+    except (KeyError):
+        
+        filterword = p.pdf_filterword
+    
+    #word = str(word)
+    word_jobdirectory= str(word_jobdirectory).encode("utf8")
+    word_checked= word_checked.encode("utf8")
+    word_doctype= str(word_doctype).encode("utf8")
+    word_docname= str(word_docname).encode("utf8")
+    word_id_docname= str(word_id_docname).encode("utf8")
+    filterword = filterword.lower()    
+    
+    #p.pdf_searchword = word 
+    p.pdf_filterword = filterword
+    p.save()    
+        
+    #Filters block
+    
+    if filterword=="pdf_all":
+    
+        pdf_records_list = PdfRecord.objects.all()
+        
+    elif filterword=="pdf_error":
+    
+        pdf_records_list = PdfRecord.objects.filter(commentary__contains="Error detected")
+        
+    elif filterword=="pdf_linked":
+    
+        pdf_records_list = PdfRecord.objects.filter(status="pdf_linked")
+        
+    elif filterword=="pdf_unlinked":
+    
+        pdf_records_list = PdfRecord.objects.filter(status="pdf_unlinked")
+        
+       
+    #Making lists to use in the Search of Coincidences
+    
+    temp_list = pdf_records_list
+    final_list = pdf_records_list.filter(status__exact="Test")
+    
+    
+    #Check which Search Options are covered
+    
+
+    if len(word_jobdirectory) != 0:
+        isAmount = True
+        
+    else:
+        isAmount = False
+        
+
+    if len(word_checked) != 0:
+        isCompanyname = True
+       
+    else:
+        isCompanyname = False
+        
+        
+    if len(word_date) != 0:
+        isDate = True
+        
+    else:
+        isDate = False
+    
+    if len(word_doctype) != 0:
+        isDoctype = True
+   
+    else:
+        isDoctype = False
+    
+    if len(word_piecenumber) != 0:
+        isPiecenumber = True
+   
+    else:
+        isPiecenumber = False
+    
+    if len(word_docname) != 0:
+        isDocname = True
+   
+    else:
+        isDocname = False
+    
+    if len(word_id_docname) != 0:
+        isIdDocname = True
+   
+    else:
+        isIdDocname = False
+    
+    
+    #When at least a word is being searched and there are no Search Options
+    
+    if word =="all" and isAmount == False and isCompanyname == False and isDate == False and isDoctype == False and isPiecenumber == False and isDocname == False and isIdDocname == False:
+          
+        #helper_list = temp_list.filter(ocrrecord_link__Company__icontains=word) | temp_list.filter(ocrrecord_link__Amount__icontains=word)  | temp_list.filter(ocrrecord_link__IssueDate__icontains=word)
+
+        final_list = pdf_records_list
+                    
+       
+
+    #When there are Search Options (Amount,etc)
+    
+    else:
+        
+        final_list=temp_list
+        
+        
+        if isAmount:
+            
+            if word_jobdirectory.startswith('"') and word_jobdirectory.endswith('"'):
+            
+                word_jobdirectory = word_jobdirectory.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Amount__exact=word_jobdirectory)
+                word_jobdirectory = '"'+word_jobdirectory+'"'
+            
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Amount__icontains=word_jobdirectory)
+            
+            
+            final_list = helper_list
+            
+        
+        
+        if isCompanyname:
+            
+            if word_checked.startswith('"') and word_checked.endswith('"'):
+            
+                word_checked = word_checked.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Company__iexact=word_checked)
+                word_checked = '"'+word_checked+'"'
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Company__icontains=word_checked)
+            
+            final_list = helper_list
+            
+        
+        if isDate:
+            
+            constructed_date = word_date.split("/")
+            
+            helper_list = final_list
+
+            if len(constructed_date) > 0:
+                day = constructed_date[0]
+                if day != "XX" and day !="NaN" and day != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Day__exact=day)
+                
+            if len(constructed_date) > 1:
+                month = constructed_date[1]
+                if month != "XX" and month !="NaN" and month != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Month__exact=month)
+                
+            if len(constructed_date) > 2:
+                year = constructed_date[2]
+                if year != "XXXX" and year !="NaN" and year != "?":
+                    helper_list = helper_list.filter(ocrrecord_link__Year__exact=year)
+
+
+            final_list = helper_list
+            
+        
+        if isDoctype:
+            
+            doctype = SourceDocType.objects.filter(pretty_name__iexact=word_doctype)|SourceDocType.objects.filter(name__iexact=word_doctype.lower())
+            doctype = doctype.distinct()
+                        
+            if len(doctype) == 1:
+            
+                helper_list = final_list.filter(modified_document_type = doctype[0])
+                final_list = helper_list
+        
+        if isPiecenumber:
+            
+            if word_piecenumber.startswith('"') and word_piecenumber.endswith('"'):
+            
+                word_piecenumber = word_piecenumber.replace('"', '')
+                helper_list = final_list.filter(ocrrecord_link__Piece_Number__iexact=word_piecenumber)
+                word_piecenumber = '"'+word_piecenumber+'"'
+            else:
+            
+                helper_list = final_list.filter(ocrrecord_link__Piece_Number__icontains=word_piecenumber)
+            
+            
+            final_list = helper_list
+            
+        if isDocname:
+            
+            if word_docname.startswith('"') and word_docname.endswith('"'):
+            
+                word_docname = word_docname.replace('"', '')
+                helper_list = final_list.filter(sourcedoc_link__filename__iexact=word_docname)
+                word_docname = '"'+word_docname+'"'
+                
+            else:
+            
+                helper_list = final_list.filter(sourcedoc_link__filename__icontains=word_docname)
+            
+            final_list = helper_list
+
+        if isIdDocname:
+    
+            separated_string = word_id_docname.split('.', 1)
+        
+            if len(separated_string) == 2:
+                helper_list = final_list.filter(pk=separated_string[0],sourcedoc_link__filename=separated_string[1])
+                final_list = helper_list
+                
+            else:
+                final_list = PdfRecord.objects.none()
+    
+    actual_min_num = 0
+    
+    try:
+        prev_next_results = request.POST['prev_next_results']
+        prev_next_results = str(prev_next_results)
+    except (KeyError):
+        
+        prev_next_results = ""
+        
+    try:
+        actual_min_num = request.POST['actual_min_num']
+        actual_min_num = int(actual_min_num)
+    except (KeyError):
+        
+        actual_min_num = 0
+    
+    
+    if(prev_next_results == ""):
+        actual_min_num = 0
+    
+    if(prev_next_results == "Prev"):
+        actual_min_num -= 10
+        
+    if(prev_next_results == "Next"):
+        actual_min_num += 10
+    
+    max_num = actual_min_num + 10
+    
+    pdf_records_list = final_list       
+    
+    total_pdf_records = pdf_records_list.count()
+    
+    if pdf_records_list:
+    
+        pdf_records_list = pdf_records_list.order_by('commentary').order_by('-status')[actual_min_num:max_num]
+
+    showing_records = pdf_records_list.count()
+    
+    page_counter_end = actual_min_num+showing_records
+    
+    plus_limit = total_pdf_records-10
+     
+    
+    context = {
+    'pdf_records_list':pdf_records_list,'searchword_filterword': p,'word_jobdirectory':word_jobdirectory,'word_checked':word_checked,
+    'word_date':word_date,'word_doctype':word_doctype,'word_piecenumber':word_piecenumber,'word_docname':word_docname,'word_id_docname':word_id_docname,'total_pdf_records':total_pdf_records,
+    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,'the_user':the_user}
+    
+    return render(request,'enersectapp/search_tool.html',context)'''
