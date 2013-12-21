@@ -1,7 +1,6 @@
 import datetime
 from django.utils import timezone
 from datetime import timedelta
-import datetime
 from django.db import models
 from django.contrib.auth.models import User,Group
 from django.db.models.signals import post_save
@@ -32,6 +31,7 @@ class Record(models.Model):
     name = models.CharField(max_length=300, default="None")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
     modification_author = models.CharField(max_length=200, default="No one")
+    datetime_date = models.DateTimeField('joined day/month/year of internalrecord linked',null=True, blank=True)
     commentary = models.CharField(max_length=2000, default="None")
     skip_counter = models.CharField(max_length=10, default='0')
     status = models.CharField(max_length=100, default="unlinked")
@@ -141,6 +141,7 @@ class OcrRecord(models.Model):
     OcrByCompany = models.ForeignKey(Group)
     OcrAuthor = models.ForeignKey(User)
     OcrCreationDate = models.CharField('OcrCreationDate',max_length=255)
+    
     def __unicode__(self):
         return self.Company
 
@@ -168,6 +169,7 @@ class PdfRecord(models.Model):
     name = models.CharField(max_length=255, default="Pdf Record")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
     modification_author = models.CharField(max_length=255, default="Xanto")
+    datetime_date = models.DateTimeField('joined day/month/year of ocrrecord linked',null=True, blank=True)
     modified_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='pdf_modified_document_type')
     modified_doctype_from = models.CharField(max_length=255, default="uncategorized")
     original_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='pdf_original_document_type')
@@ -194,6 +196,16 @@ class FilterSearchWords(models.Model):
     pdf_filterword = models.CharField(max_length=255, default="pdf_all")
     def __unicode__(self):
         return self.pdf_filterword
+
+class Report(models.Model):
+    report_type = models.CharField(max_length=31, default="None")
+    report_memo = models.CharField(max_length=255, default="")
+    report_author = models.ForeignKey(User)
+    report_company = models.ForeignKey(Group)
+    report_date = models.DateTimeField('date the report was created', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    report_viewed = models.CharField(max_length=7, default="No")
+    def __unicode__(self):
+        return self.report_memo
 
         
 class UserProfile(models.Model):  

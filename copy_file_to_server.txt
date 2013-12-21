@@ -24,3 +24,8 @@ Migration, copy database from server to local:
 python manage.py dumpdata enersectapp --format=json --natural --indent=4 > enersectapp/fixtures/NotAllSources_7_11_2013.json
 
 python manage.py loaddata NotAllSources_7_11_2013.json
+
+if len(item.internalrecord_link.Day)>1 and item.internalrecord_link.Day != 'NaN' and len(item.internalrecord_link.Month)>1 and item.internalrecord_link.Month != 'NaN' and len(item.internalrecord_link.Year)>3:
+timestring = item.internalrecord_link.Day+'/'+item.internalrecord_link.Month+'/'+item.internalrecord_link.Year
+timetest = datetime.strptime(timestring, '%d/%m/%Y').replace(tzinfo=timezone.utc)
+)
