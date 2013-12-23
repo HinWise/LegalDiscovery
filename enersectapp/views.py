@@ -20,7 +20,7 @@ from django.core import serializers
 import random
 
 
-from enersectapp.models import Record,UserInterfaceType,PdfRecord,SourceDocType,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,CompanyOriginal,CompanyTemplate,SourcePdfToHandle,UserProfile
+from enersectapp.models import Report,Record,UserInterfaceType,PdfRecord,SourceDocType,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,CompanyOriginal,CompanyTemplate,SourcePdfToHandle,UserProfile
 
 
 def maintenance_screen(request):
@@ -1767,7 +1767,7 @@ def randomqa_spider(request):
                     recover_pdf.audit_mark = save_mark
                     recover_pdf.modification_author = the_user.username
                     recover_pdf.save()
-                    memo_report = "Marked PdfRecord PK."+recover_pdf.pk+" as"+save_mark+"."
+                    memo_report = "Marked PdfRecord PK."+str(recover_pdf.pk)+" as"+save_mark+"."
                     report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                     report.save()
         
@@ -1780,7 +1780,7 @@ def randomqa_spider(request):
 
                         pdf.audit_mark = "auditmarked_as_incorrect_reentry"
                         pdf.save()
-                        memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+len(incorrect_list)+" objs."
+                        memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+str(len(incorrect_list))+" objs."
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
         
@@ -1792,7 +1792,7 @@ def randomqa_spider(request):
 
                         pdf.audit_mark = "auditmarked_as_selection_reentry"
                         pdf.save()
-                        memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+len(pdf_records_list)+" objs."
+                        memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+str(len(pdf_records_list))+" objs."
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
                     
@@ -2039,7 +2039,7 @@ def randomqa_spider(request):
                     recover_pdf.modification_author = the_user.username
                     recover_pdf.audit_mark = save_mark
                     recover_pdf.save()
-                    memo_report = "Marked PdfRecord PK."+recover_pdf.pk+" as"+save_mark+"."
+                    memo_report = "Marked PdfRecord PK."+str(recover_pdf.pk)+" as"+save_mark+"."
                     report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                     report.save()
         
@@ -2053,7 +2053,7 @@ def randomqa_spider(request):
 
                         pdf.audit_mark = "auditmarked_as_incorrect_reentry"
                         pdf.save()
-                        memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+len(incorrect_list)+" objs."
+                        memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+str(len(incorrect_list))+" objs."
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
         
@@ -2064,7 +2064,7 @@ def randomqa_spider(request):
 
                         pdf.audit_mark = "auditmarked_as_selection_reentry"
                         pdf.save()
-                        memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+len(pdf_records_list)+" objs."
+                        memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+str(len(pdf_records_list))+" objs."
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
                     
@@ -2087,7 +2087,7 @@ def randomqa_spider(request):
                         
                         pdf.audit_mark = "auditmarked_confirmed_reassignment"
                         pdf.save()
-                        memo_report = "Pressed the Execute Re-Entry Button, "+len(reentry_list)+" elements reassigned."
+                        memo_report = "Pressed the Execute Re-Entry Button, "+str(len(reentry_list))+" elements reassigned."
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
         
