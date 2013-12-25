@@ -20,6 +20,7 @@ from django.core import serializers
 import random
 
 
+
 from enersectapp.models import Report,Record,UserInterfaceType,PdfRecord,SourceDocType,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,CompanyOriginal,CompanyTemplate,SourcePdfToHandle,UserProfile
 
 
@@ -1696,7 +1697,12 @@ def randomqa_spider(request):
         
         #Making a list of Document Types and selecting the PdfRecords that are of that Document Type
         
+        ''' Disabled temporarily, the ability to choose Audit by Document Type, due to speed limitations
         pdf_doctype_distinct = pdf_records_list.order_by().values('modified_document_type__name').distinct()
+        
+        Changed for the next line instead: (Delete to return to normal, all types list)
+        '''
+        pdf_doctype_distinct = PdfRecord.objects.none()
         
         pdf_doctype_list = []
         
@@ -1926,8 +1932,6 @@ def randomqa_spider(request):
         
         pdf_records_list = PdfRecord.objects.none()
         
-        
-   
         
         pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values('lot_number').distinct()
         
@@ -2166,7 +2170,7 @@ def randomqa_spider(request):
         
             pdf_item_list = PdfRecord.objects.none()
             pdf_random_item = pdf_item_list
-             
+   
        
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,
