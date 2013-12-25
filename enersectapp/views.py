@@ -1720,28 +1720,29 @@ def randomqa_spider(request):
         
         enddate = enddate.replace(tzinfo=timezone.utc)
         
-        if selected_date == "today":
-            startdate = enddate - timedelta(days=1)  
-
-        elif selected_date == "lastdays":
-            startdate = enddate - timedelta(days=4)  
-        
-        elif selected_date == "lastweek":
-            startdate = enddate - timedelta(days=7)  
-        
-        elif selected_date == "lastmonth":
-            startdate = enddate - timedelta(days=30)  
-        
-        elif selected_date == "lastmonths":
-            startdate = enddate - timedelta(days=90)
-        
-        elif selected_date == "lastyear":
-            startdate = enddate - timedelta(days=365)
-            
-        else:
-            startdate = enddate - timedelta(days=10000)
-            
         if selected_date != "all":
+            
+            if selected_date == "today":
+                startdate = enddate - timedelta(days=2)  
+
+            elif selected_date == "lastdays":
+                startdate = enddate - timedelta(days=4)  
+            
+            elif selected_date == "lastweek":
+                startdate = enddate - timedelta(days=7)  
+            
+            elif selected_date == "lastmonth":
+                startdate = enddate - timedelta(days=30)  
+            
+            elif selected_date == "lastmonths":
+                startdate = enddate - timedelta(days=90)
+            
+            elif selected_date == "lastyear":
+                startdate = enddate - timedelta(days=365)
+            
+            else:
+                startdate = enddate - timedelta(days=10000)
+            
             pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
 
         
@@ -1818,9 +1819,9 @@ def randomqa_spider(request):
 
         if pdf_correct_count!=0 and pdf_incorrect_count!=0:
             correct = float(pdf_correct_count)
-            print correct
+            
             incorrect = float(pdf_incorrect_count)
-            print incorrect
+            
             error_rate = incorrect/(correct + incorrect)*100
             error_rate = int(error_rate)
             
@@ -1967,8 +1968,12 @@ def randomqa_spider(request):
                 for user_name in user_names_list:
                     pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
         
-        
+        ''' Disabled temporarily, the ability to choose Audit by Document Type, due to speed limitations
         pdf_doctype_distinct = pdf_records_list.order_by().values('modified_document_type__name').distinct()
+        
+        Changed for the next line instead: (Delete to return to normal, all types list)
+        '''
+        pdf_doctype_distinct = PdfRecord.objects.none()
         
         pdf_doctype_list = []
         
@@ -1992,28 +1997,29 @@ def randomqa_spider(request):
         
         enddate = enddate.replace(tzinfo=timezone.utc)
         
-        if selected_date == "today":
-            startdate = enddate - timedelta(days=2)  
-
-        elif selected_date == "lastdays":
-            startdate = enddate - timedelta(days=4)  
-        
-        elif selected_date == "lastweek":
-            startdate = enddate - timedelta(days=7)  
-        
-        elif selected_date == "lastmonth":
-            startdate = enddate - timedelta(days=30)  
-        
-        elif selected_date == "lastmonths":
-            startdate = enddate - timedelta(days=90)
-        
-        elif selected_date == "lastyear":
-            startdate = enddate - timedelta(days=365)
-            
-        else:
-            startdate = enddate - timedelta(days=10000)
-            
         if selected_date != "all":
+            
+            if selected_date == "today":
+                startdate = enddate - timedelta(days=2)  
+
+            elif selected_date == "lastdays":
+                startdate = enddate - timedelta(days=4)  
+            
+            elif selected_date == "lastweek":
+                startdate = enddate - timedelta(days=7)  
+            
+            elif selected_date == "lastmonth":
+                startdate = enddate - timedelta(days=30)  
+            
+            elif selected_date == "lastmonths":
+                startdate = enddate - timedelta(days=90)
+            
+            elif selected_date == "lastyear":
+                startdate = enddate - timedelta(days=365)
+            
+            else:
+                startdate = enddate - timedelta(days=10000)
+            
             pdf_records_list = pdf_records_list.filter(modification_date__range=[startdate, enddate])
 
         
@@ -2104,9 +2110,9 @@ def randomqa_spider(request):
         modification_authors_list = '''
         
         #Selection by Modification Author
-        
+      
         pdf_authors_list = pdf_records_list
-        
+       
         if selected_modification_author!="all" and selected_modification_author!=user_company.name:
            
             pdf_authors_list = pdf_records_list.filter(modification_author=selected_modification_author)
@@ -2116,10 +2122,10 @@ def randomqa_spider(request):
             pdf_authors_list = PdfRecord.objects.none()
             
             for item in modification_authors_list:
-            
+                ''''''
                 pdf_authors_list = pdf_authors_list | pdf_records_list.filter(modification_author=item)
-                print pdf_authors_list
                 
+               
         pdf_total_count = len(pdf_records_list)
         
         pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
@@ -2132,8 +2138,9 @@ def randomqa_spider(request):
             error_rate = incorrect/(correct + incorrect)*100
             error_rate = int(error_rate)
             
-        
+        ''''''
         pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="duplicatemarked_reentered").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        ''''''
         
         pdf_id_list_to_randomize = []
         
@@ -2146,8 +2153,14 @@ def randomqa_spider(request):
             random_id = random.choice(pdf_id_list_to_randomize)
               
             pdf_item_list = PdfRecord.objects.filter(id=random_id)[:1]'''
+        
+            
             pdf_random_item = random.choice(pdf_records_list)
+            
+           
             pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item.id)[:1]
+            
+         
         
         else:
         
