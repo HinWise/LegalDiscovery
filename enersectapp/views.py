@@ -1823,6 +1823,8 @@ def randomqa_spider(request):
            
         if show_progress_mark == "show_progress_mark":
         
+            show_progress_mark = "show" 
+        
             pdf_total_count = len(pdf_records_list)
             
             pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
@@ -1834,7 +1836,7 @@ def randomqa_spider(request):
                 incorrect = float(pdf_incorrect_count)
                 error_rate = incorrect/(correct + incorrect)*100
                 error_rate = int(error_rate)
-                show_progress_mark = "show" 
+                
             
         else:
 
@@ -2152,6 +2154,8 @@ def randomqa_spider(request):
         
         if show_progress_mark == "show_progress_mark":
         
+            show_progress_mark = "show" 
+        
             pdf_total_count = len(pdf_records_list)
             
             pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
@@ -2163,7 +2167,7 @@ def randomqa_spider(request):
                 incorrect = float(pdf_incorrect_count)
                 error_rate = incorrect/(correct + incorrect)*100
                 error_rate = int(error_rate)
-                show_progress_mark = "show" 
+                
             
         else:
 
