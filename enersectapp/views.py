@@ -1581,7 +1581,12 @@ def randomqa_spider(request):
             lot_number_check = request.POST['selected_lot']
         except (KeyError):
             lot_number_check =  "all"
-     
+        
+        try:
+            show_progress_mark = request.POST['show_progress_mark']
+        except (KeyError):
+            show_progress_mark =  "no"
+        
         try:
             selected_user = request.POST['selected_user']
         except (KeyError):
@@ -1816,20 +1821,28 @@ def randomqa_spider(request):
         if selected_modification_author!="all":
             pdf_authors_list = pdf_authors_list.filter(modification_author=selected_modification_author)
            
-        pdf_total_count = len(pdf_records_list)
+        if show_progress_mark == "show_progress_mark":
         
-        pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
-        pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
-        pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
-        
+            pdf_total_count = len(pdf_records_list)
+            
+            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
+            pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
+            pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
+            
+            if pdf_correct_count!=0 and pdf_incorrect_count!=0:
+                correct = float(pdf_correct_count)
+                incorrect = float(pdf_incorrect_count)
+                error_rate = incorrect/(correct + incorrect)*100
+                error_rate = int(error_rate)
+                show_progress_mark = "show" 
+            
+        else:
 
-        if pdf_correct_count!=0 and pdf_incorrect_count!=0:
-            correct = float(pdf_correct_count)
-            
-            incorrect = float(pdf_incorrect_count)
-            
-            error_rate = incorrect/(correct + incorrect)*100
-            error_rate = int(error_rate)
+            pdf_total_count = 0
+            pdf_correct_count = 0
+            pdf_incorrect_count = 0
+            pdf_reentry_count = 0
+            error_rate = 0
             
         pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
         
@@ -1872,7 +1885,7 @@ def randomqa_spider(request):
        
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
-        'error_rate':error_rate,
+        'error_rate':error_rate,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
         'pdf_total_count':pdf_total_count,'pdf_correct_count':pdf_correct_count,'company_names_list':company_names_list,
         'pdf_incorrect_count':pdf_incorrect_count,'pdf_reentry_count':pdf_reentry_count,
@@ -1897,6 +1910,11 @@ def randomqa_spider(request):
             lot_number_check = request.POST['selected_lot']
         except (KeyError):
             lot_number_check =  "all"
+        
+        try:
+            show_progress_mark = request.POST['show_progress_mark']
+        except (KeyError):
+            show_progress_mark =  "no"
         
         try:
             selected_user = request.POST['selected_user']
@@ -2129,21 +2147,33 @@ def randomqa_spider(request):
                 ''''''
                 pdf_authors_list = pdf_authors_list | pdf_records_list.filter(modification_author=item)
                 
-               
-        pdf_total_count = len(pdf_records_list)
         
-        pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
-        pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
-        pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_records_list.filter(audit_mark="auditmarked_as_selection_reentry"))
         
-        if pdf_correct_count!=0 and pdf_incorrect_count!=0:
-            correct = float(pdf_correct_count)
-            incorrect = float(pdf_incorrect_count)
-            error_rate = incorrect/(correct + incorrect)*100
-            error_rate = int(error_rate)
+        if show_progress_mark == "show_progress_mark":
+        
+            pdf_total_count = len(pdf_records_list)
+            
+            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
+            pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
+            pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
+            
+            if pdf_correct_count!=0 and pdf_incorrect_count!=0:
+                correct = float(pdf_correct_count)
+                incorrect = float(pdf_incorrect_count)
+                error_rate = incorrect/(correct + incorrect)*100
+                error_rate = int(error_rate)
+                show_progress_mark = "show" 
+            
+        else:
+
+            pdf_total_count = 0
+            pdf_correct_count = 0
+            pdf_incorrect_count = 0
+            pdf_reentry_count = 0
+            error_rate = 0
             
         ''''''
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="duplicatemarked_reentered").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct")
         ''''''
         
         pdf_id_list_to_randomize = []
@@ -2170,10 +2200,20 @@ def randomqa_spider(request):
         
             pdf_item_list = PdfRecord.objects.none()
             pdf_random_item = pdf_item_list
-   
+        
        
+
+        
+        '''user_type = "Auditor"
+        pdf_random_item = PdfRecord.objects.all()[50]
+        pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item.id)[:1]
+        lot_number_check = "all"
+        error_rate = 50
+        pdf_doctype_distinct = {}'''
+        
+        
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
-        'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,
+        'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
         'pdf_total_count':pdf_total_count,'pdf_correct_count':pdf_correct_count,
         'pdf_incorrect_count':pdf_incorrect_count,'pdf_reentry_count':pdf_reentry_count,

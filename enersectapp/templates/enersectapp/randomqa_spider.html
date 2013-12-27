@@ -138,6 +138,17 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
+                                "Show Progress / Error Rate": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#show_progress_mark').attr("value","show_progress_mark");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                },
                                 "Mark Entry as Correct": function() {
                                     
                                     toggleLoadingScreen();
@@ -215,6 +226,17 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
+                                "Show Progress / Error Rate": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#show_progress_mark').attr("value","show_progress_mark");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                },
                                 "Mark Entry as Correct": function() {
                                     
                                     toggleLoadingScreen();
@@ -291,6 +313,17 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
+                                "Show Progress / Error Rate": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#show_progress_mark').attr("value","show_progress_mark");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                },
                                 "Mark Entry as Correct": function() {
                                     
                                     toggleLoadingScreen();
@@ -367,6 +400,17 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
+                                "Show Progress / Error Rate": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#show_progress_mark').attr("value","show_progress_mark");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                },
                                 "Mark Entry as Correct": function() {
                                     
                                     toggleLoadingScreen();
@@ -421,7 +465,8 @@
                                     $('#fields_form').submit();
                                     
                                     
-                                },*/
+                                },
+                                */
                                 
                                 
                             },
@@ -748,11 +793,13 @@
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
-                
+                {% if show_progress_mark == "show" %}
                 <div id="statistics_panel">
+                    
                     <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
                     <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
                 </div>
+                {% endif %}
                 
                 <fieldset id="fieldset_fields">
                
@@ -771,6 +818,7 @@
                 <input class="invisible" type="text" name="selected_date" id="selected_date" value="{{selected_date}}" />
                 <input class="invisible" type="text" name="pdf_record_id" id="pdf_record_id" value="{{pdf_random_item.id}}" />
                 <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
+                <input class="invisible" type="text" name="show_progress_mark" id="show_progress_mark" value="{{show_progress_mark}}" />
      
                 {% if pdf_item_list %}
         
