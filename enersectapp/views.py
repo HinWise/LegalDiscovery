@@ -1843,6 +1843,7 @@ def randomqa_spider(request):
             pdf_incorrect_count = 0
             pdf_reentry_count = 0
             error_rate = 0
+            show_progress_mark = "no" 
             
         pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
         
@@ -2171,6 +2172,7 @@ def randomqa_spider(request):
             pdf_incorrect_count = 0
             pdf_reentry_count = 0
             error_rate = 0
+            show_progress_mark = "no" 
             
         ''''''
         pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct")
