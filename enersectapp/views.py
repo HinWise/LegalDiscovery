@@ -1196,7 +1196,7 @@ def dataentryui_savedata(request):
            
     
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     
     new_ocr.OcrAuthor = the_user
     new_ocr.OcrByCompany = user_group
@@ -2178,9 +2178,9 @@ def randomqa_spider(request):
             error_rate = 0
             show_progress_mark = "no" 
             
-        ''''''
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct")
-        ''''''
+        
+        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        
         
         pdf_id_list_to_randomize = []
         
