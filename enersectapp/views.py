@@ -2989,7 +2989,7 @@ def search_tool(request):
     filterword = p.pdf_filterword
     pdf_records_list=[]
     search_options = ""
-    
+    print "THIS IS AMOUNT --"+str(word_amount)
     '''try:
         word = request.POST['search_word']
     except (KeyError):
@@ -3001,7 +3001,6 @@ def search_tool(request):
     except (KeyError):
         
         word_amount = ""
-    
     try:
         word_companyname = request.POST['search_word_companyname']
     except (KeyError):
@@ -3130,6 +3129,14 @@ def search_tool(request):
     else:
         isIdDocname = False
     
+    
+    #DocTypes list for the Menu
+    
+    types_list = SourceDocType.objects.exclude(name="other").exclude(name="recuperation").exclude(name="blank probable").exclude(name="contract page 1").exclude(name="contract page X").order_by('name')
+    
+    #Company Names list for the Menu
+    
+    companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
     
     #When at least a word is being searched and there are no Search Options
     
@@ -3300,7 +3307,7 @@ def search_tool(request):
      
     
     context = {
-    'pdf_records_list':pdf_records_list,'searchword_filterword': p,'word_amount':word_amount,'word_companyname':word_companyname,
+    'pdf_records_list':pdf_records_list,'types_list':types_list,'companyname_list':companyname_list,'searchword_filterword': p,'word_amount':word_amount,'word_companyname':word_companyname,
     'word_date':word_date,'word_doctype':word_doctype,'word_piecenumber':word_piecenumber,'word_docname':word_docname,'word_id_docname':word_id_docname,'total_pdf_records':total_pdf_records,
     'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,'the_user':the_user}
     
