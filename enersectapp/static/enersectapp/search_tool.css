@@ -12,7 +12,7 @@
     }
 
 
-#pdf_records_container{
+#records_container{
     position:absolute;
     top: 11%;
     left:0%;
@@ -125,7 +125,7 @@ object {
 
 
 
-.pdf_tools_container {
+.record_tools_container {
 
     position: relative;
     display:inline-block;
@@ -592,21 +592,54 @@ object {
 
 }
 
-#filter_text {
 
-    display:none;
 
+#corpus_container {
+
+
+    position: absolute;
+    top: 35%;
+    left: -12%;
+    height: 50%;
+    width: 100%;
+    z-index: 20;
+    pointer-events: all;
+    text-align: center;
+   
+}
+
+.corpus_choice_label {
+
+
+    width:18%;
+    height:98%;
+     
+}
+
+.corpus_choice_label .ui-button-text {
+
+    position:absolute;
+
+    width:80%;
+    
+    left:-7%;
+    top:2%;
+    
+    font-size:73%;   
+    
 }
 
 #filter_container {
 
 
     position:absolute;
-    top: 53%;
-    left: 10%;
-    height: 60%;
+    top: 105%;
+    left: 15%;
+    height: 40%;
     width: 50%;
     z-index: 20;
+    text-align: center;
+    
     pointer-events:all;
    
 }
@@ -616,9 +649,7 @@ object {
 
     width:18%;
     height:98%;
-    
-    
-    
+     
 }
 
 .filter_choice_label .ui-button-text {
@@ -645,6 +676,12 @@ object {
     
     font-size:73%;   
     
+}
+
+#filter_text {
+
+    display:none;
+
 }
 
 #skip_form {

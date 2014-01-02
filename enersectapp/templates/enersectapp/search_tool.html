@@ -127,7 +127,7 @@
                 if($('#pdf_view').hasClass("opened-pdf")==false)
                 {   
                    
-                    $('#pdf_records_container').animate({left:'55%'},1000, 'easeInOutQuart');
+                    $('#records_container').animate({left:'55%'},1000, 'easeInOutQuart');
                     
                    
                     
@@ -146,7 +146,7 @@
                 
                 if($('#pdf_view').hasClass("opened-pdf")==true)
                 {            
-                    $('#pdf_records_container').animate({left:'0%'},1000, 'easeInOutQuart');
+                    $('#records_container').animate({left:'0%'},1000, 'easeInOutQuart');
                     
                     
                     $( "#user-panel" ).dialog( "open" );
@@ -302,12 +302,35 @@
         });
         
         
+        $( "#corpus_container" ).buttonset();
+        
+        $('#corpus_source_records').click(function(){
+        
+           $('#corpus_text').attr("value","corpus_source_records");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+           
+        
+        });
+
+        $('#corpus_ocr_records').click(function(){
+        
+           $('#corpus_text').attr("value","corpus_ocr_records");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+        $('#corpus_internal_records').click(function(){
+        
+           $('#corpus_text').attr("value","corpus_internal_records");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
         
         
         $( "#filter_container" ).buttonset();
-        
-        
-               
         
         $('#filter_pdf_all').click(function(){
         
@@ -317,15 +340,7 @@
            
         
         });
-        
-        /*$('#filter_pdf_xanto').click(function(){
-        
-           $('#filter_text').attr("value","pdf_xanto");
-           toggleLoadingScreen();
-           $("#search_form").submit();
-         
-        });*/
-        
+
         $('#filter_pdf_linked').click(function(){
         
            $('#filter_text').attr("value","pdf_linked");
@@ -385,6 +400,29 @@
     
         function classLocator()
         {
+            //Mark the correct corpus filter, from the corpus_container
+        
+            var corpus_choice = $('#corpus_text').attr("value");
+        
+            switch(corpus_choice)
+            {
+                case "corpus_source_records":
+                    $('#corpus_source_records').attr("checked","checked");
+                break;
+                               
+                case "corpus_ocr_records":
+                    $('#corpus_ocr_records').attr("checked","checked");
+                break;
+                
+                case "corpus_internal_records":
+                    $('#corpus_internal_records').attr("checked","checked");
+                break;
+                
+                default:
+                    $('#corpus_ocr_records').attr("checked","checked");
+                break;
+            }
+        
             //Mark the correct initial filter, from the filter_container
         
             var filter_choice = $('#filter_text').attr("value");
@@ -746,141 +784,303 @@
     
     <div id="left_container">
         <div id="pdf_view"></div>
-        <div id="pdf_records_container">   
+        <div id="records_container">   
             
             <div id="accordion_table">
         
                 <div id="accordion">
-                {% for pdfrecord in pdf_records_list %}
-        
-                    <div id="group{{pdfrecord.id}}" class="group">
-                    <h3 id="pdf_table_name{{pdfrecord.id}}" class="pdf_table_name {{pdfrecord.linked_style_class}} {{pdfrecord.error_style_class}}">
-                        Amount:     <span class ="title_text"> {% if pdfrecord.ocrrecord_link.Amount != "MISSING" and pdfrecord.ocrrecord_link.Amount != "UNREADABLE"  %}{{pdfrecord.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if pdfrecord.ocrrecord_link.Currency != "MISSING" and pdfrecord.ocrrecord_link.Currency != "UNREADABLE"  %}{{pdfrecord.ocrrecord_link.Currency}}{% endif %}</span>
-                        <br>Company Name:     <span class ="title_text">{% if pdfrecord.ocrrecord_link.Company != "MISSING NAME" and pdfrecord.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{pdfrecord.ocrrecord_link.Company}}{% else %}?{% endif %}</span>
-                        <br>Issue Date:     <span class ="title_text">{% if pdfrecord.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{pdfrecord.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</span></h3>
-                        <div>
-                            <table class="pdf_zebra zebra">
-                            <thead>
-                                <tr>
-                                    <th>Id.Filename</th>
+                {% if corpus_word == "corpus_source_records" %}
+                    {% for record in records_list %}
+            
+                        <div id="group{{record.id}}" class="group">
+                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name">
+                            Job Directory:     <span class ="title_text"> {% if record.job_directory %}{{record.job_directory}}{% else %}?{% endif %} </span>
+                            <br>Doc. Name:     <span class ="title_text">{% if record.filename %}{{record.filename}}{% else %}?{% endif %}</span>
+                            <br>Document Type:     <span class ="title_text">{% if record.modified_document_type.pretty_name %}{{record.modified_document_type.pretty_name}}{% else %}?{% endif %}</span></h3>
+                            <!--<br>Multipart:     <span class ="title_text">{% if record.multipart %}{{record.multipart}}{% else %}?{% endif %}</span></h3>-->
+                            <div>
+                                <table class="pdf_zebra zebra">
+                                <thead>
+                                    <tr>
+                                        <th>Id.Filename</th>
+                                        
+                                        <td>{{record.pk}}.{{record.filename}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Multipart</th>
+                                        
+                                        <td>{{record.multipart}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Multipart Total Parts</th>
+                                        
+                                        <td>{{record.multipart_num_total}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Multipart Filename</th>
+                                        
+                                        <td>{{record.multipart_filename}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Times entered</th>
+                                        
+                                        <td>{{record.visitedonce}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Corrupt</th>
+                                        
+                                        <td>{{record.corrupt}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Size</th>
+                                        
+                                        <td>{{record.size}}</td>
+                                        
+                                    </tr>
                                     
-                                    <td>{{pdfrecord.pk}}.{{pdfrecord.sourcedoc_link.filename}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Document Type</th>
-                                    
-                                    <td>{{pdfrecord.modified_document_type.pretty_name}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Piece Number</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Piece_Number}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Document Name</th>
-                                    
-                                    <td>{{pdfrecord.sourcedoc_link.filename}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Address</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Address}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Telephone</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Telephone}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>City</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.City}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Country</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Country}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Bank Account Number</th>
-                                   
-                                    <td>{{pdfrecord.ocrrecord_link.Source_Bank_Account}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Document Number</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Document_Number}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Purchase Order Number</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.PurchaseOrder_Number}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Contains Arabic</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.ContainsArabic}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Source Bank Account</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Source_Bank_Account}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Memo</th>
-                                    
-                                    <td>{{pdfrecord.ocrrecord_link.Notes}}</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <th>Error Reports</th>
-                                    
-                                    <td>{{pdfrecord.commentary}}</td>
-                                    
-                                </tr>
 
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
+                                        
+                                </tbody>
+               
+                                </table>
+                                
+                                <div class= "record_tools_container">          
+                                    <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.job_directory}}\{{record.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
                                     
-                            </tbody>
-           
-                            </table>
-                            
-                            <div class= "pdf_tools_container">          
-                                <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{pdfrecord.id}}" value="http:\\54.200.180.182\sourcepdfs\{{pdfrecord.sourcedoc_link.job_directory}}\{{pdfrecord.sourcedoc_link.filename}}" value2="{{pdfrecord.id}}"><label id="toggle_pdf_label{{pdfrecord.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{pdfrecord.id}}">PDF</label>
-                                
-                                <!--{% if pdfrecord.error_style_class = "noerror" %}
-                                <input class="flag_button" type="checkbox" id="flag_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="flag_button_label" for="flag_button{{pdfrecord.id}}">FLAG</label>
-                                
-                                {% else %}
-                                <form class="unflag_form" id="unflag_form{{pdfrecord.id}}" action="{% url 'enersectapp:linkui_unflag' pdfrecord.id %}" method="post">
-                                {% csrf_token %}    
-                                    <input class="unflag_button" type="checkbox" id="unflag_button{{pdfrecord.id}}" value="{{pdfrecord.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{pdfrecord.id}}">UNFLAG</label>
-                                </form>
-                                {% endif %}-->
+                                    <!--{% if record.error_style_class = "noerror" %}
+                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+                                    
+                                    {% else %}
+                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                    {% csrf_token %}    
+                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                    </form>
+                                    {% endif %}-->
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {% empty %}
-                    <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
-                    {% endfor %}
-                    
+                        {% empty %}
+                        <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
+                        {% endfor %}
+                
+                {% endif%}
+                {% if corpus_word == "corpus_ocr_records" %}
+                    {% for record in records_list %}
+            
+                        <div id="group{{record.id}}" class="group">
+                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
+                            Amount:     <span class ="title_text"> {% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</span>
+                            <br>Company Name:     <span class ="title_text">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</span>
+                            <br>Issue Date:     <span class ="title_text">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</span></h3>
+                            <div>
+                                <table class="pdf_zebra zebra">
+                                <thead>
+                                    <tr>
+                                        <th>Id.Filename</th>
+                                        
+                                        <td>{{record.pk}}.{{record.sourcedoc_link.filename}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Document Type</th>
+                                        
+                                        <td>{{record.modified_document_type.pretty_name}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Piece Number</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Piece_Number}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Document Name</th>
+                                        
+                                        <td>{{record.sourcedoc_link.filename}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Address</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Address}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Telephone</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Telephone}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>City</th>
+                                        
+                                        <td>{{record.ocrrecord_link.City}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Country</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Country}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Bank Account Number</th>
+                                       
+                                        <td>{{record.ocrrecord_link.Source_Bank_Account}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Document Number</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Document_Number}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Purchase Order Number</th>
+                                        
+                                        <td>{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Contains Arabic</th>
+                                        
+                                        <td>{{record.ocrrecord_link.ContainsArabic}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Source Bank Account</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Source_Bank_Account}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Memo</th>
+                                        
+                                        <td>{{record.ocrrecord_link.Notes}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Error Reports</th>
+                                        
+                                        <td>{{record.commentary}}</td>
+                                        
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                        
+                                </tbody>
+               
+                                </table>
+                                
+                                <div class= "record_tools_container">          
+                                    <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
+                                    
+                                    <!--{% if record.error_style_class = "noerror" %}
+                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+                                    
+                                    {% else %}
+                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                    {% csrf_token %}    
+                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                    </form>
+                                    {% endif %}-->
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
+                        {% endfor %}
+                
+                {% endif%}
+                {% if corpus_word == "corpus_internal_records" %}
+                    {% for record in records_list %}
+            
+                        <div id="group{{record.id}}" class="group">
+                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
+                            Amount Credit | Debit:     <span class ="title_text"> {% if record.internalrecord_link.Credit or record.internalrecord_link.Debit  %}{{record.internalrecord_link.Credit}} | {{record.internalrecord_link.Debit}}{% else %}?{% endif %} </span>
+                            <br>Company Name:     <span class ="title_text">{% if record.internalrecord_link.Company %}{{record.internalrecord_link.Company}}{% else %}?{% endif %}</span>
+                            <br>Transaction Date:     <span class ="title_text">{% if record.internalrecord_link.Day %}{{record.internalrecord_link.Day}}{% else %}?{% endif %}/{% if record.internalrecord_link.Month %}{{record.internalrecord_link.Month}}{% else %}?{% endif %}/{% if record.internalrecord_link.Year %}{{record.internalrecord_link.Year}}{% else %}?{% endif %}</span></h3>
+                            <div>
+                                <table class="pdf_zebra zebra">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        
+                                        <td>{{record.pk}}</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <td>{{record.internalrecord_link.AccountNum}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Number of Movement</th>
+                                        <td>{{record.internalrecord_link.NoMvt}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Journal</th>
+                                        <td>{{record.internalrecord_link.Journal}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ledger Year</th>
+                                        <td>{{record.internalrecord_link.LedgerYear}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Piece Number</th>
+                                        <td>{{record.internalrecord_link.NoPiece}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Lett</th>
+                                        <td>{{record.internalrecord_link.Lett}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>S</th>
+                                        <td>{{record.internalrecord_link.S}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Memo Field</th>
+                                        <td>{{record.internalrecord_link.Memo}}</td>
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                        
+                                </tbody>
+               
+                                </table>
+                                
+                                <div class= "record_tools_container">          
+                                    <!--<input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>-->
+                                    
+                                    <!--{% if record.error_style_class = "noerror" %}
+                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+                                    
+                                    {% else %}
+                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                    {% csrf_token %}    
+                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                    </form>
+                                    {% endif %}-->
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
+                        {% endfor %}
+                
+                {% endif%}
                 </div>
         
-       
+            
             </div>
                 <!--<form class="flag_form" id="flag_form" action="{% url 'enersectapp:linkui_flag'%}" method="post">
                             {% csrf_token %}
@@ -918,59 +1118,140 @@
                     <!-- AMOUNT -->
                     <!--{% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}-->
                      <!--{% endif %}-->
-                    
-                    <label for="option_text_input_amount">Amount</label>
-                    <input type="text" name="search_word_amount" id="option_text_input_amount" value="{{word_amount}}" class="text ui-widget-content ui-corner-all" />
- 
-                    <label for="option_text_input_name">Company Name</label>
-                    
-                    <ul class="menuclass" id="companynamemenu">
+                    {% if corpus_word == "corpus_source_records" %}
+                        <label for="option_text_input_job_directory">Job Directory</label>
+                        <input type="text" name="search_job_directory" id="option_text_input_job_directory" value="{{word_job_directory}}" class="text ui-widget-content ui-corner-all" />
+     
+                        <label for="option_text_input_docname">Doc. Name</label>
+                        <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
                         
-                        <li>
-                        
-                            <a id="companynamelink" href="#">Company Name: {{word_companyname}}</a>
-                            <ul>
-                                <li><a href="#"><input type="text" name="search_word_companyname" id="option_text_input_name" value="{{word_companyname}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                        <ul class="menuclass" id="doctypemenu">
                             
-                             </ul>
-                        </li>  
-                          
-                    </ul>
-                    
-                    <label for="option_text_input_date">Issue Date</label>
-                    <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
-                    
-                    
-                    <ul class="menuclass" id="doctypemenu">
-                        
-                        <li>
-                        
-                            <a id="doctypelink" href="#">Document Type: {{word_doctype}}</a>
-                            <ul>
-                                <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                            <li>
                             
-                            {% for type in types_list %}
-                              <li>--</li>
-                              <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                                <a id="doctypelink" href="#">Document Type: {{word_doctype}}</a>
+                                <ul>
+                                    <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                                
+                                {% for type in types_list %}
+                                  <li>--</li>
+                                  <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                                  
+                                 {% endfor %}
+                                 </ul>
+                            </li>  
                               
-                             {% endfor %}
-                             </ul>
-                        </li>  
-                          
-                    </ul>
-                    
-                    <label for="option_text_input_piecenumber">Piece Number</label>
-                    <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="option_text_input_docname">Doc. Name</label>
-                    <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
-                    
-                    <label for="option_text_input_id_docname">Id.Filename</label>
-                    <input type="text" name="search_word_id_docname" id="option_text_input_id_docname" value="{{word_id_docname}}" class="text ui-widget-content ui-corner-all" />
+                        </ul>
+                        
+                        <label for="option_text_input_multipart_filename">Multipart Filename</label>
+                        <input type="text" name="search_word_multipart_filename" id="option_text_input_multipart_filename" value="{{word_multipart_filename}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_id_docname">Id.Filename</label>
+                        <input type="text" name="search_word_id_docname" id="option_text_input_id_docname" value="{{word_id_docname}}" class="text ui-widget-content ui-corner-all" />
+                        
+                    {% endif %}
+                    {% if corpus_word == "corpus_ocr_records" %}
+                        <label for="option_text_input_amount">Amount</label>
+                        <input type="text" name="search_word_amount" id="option_text_input_amount" value="{{word_amount}}" class="text ui-widget-content ui-corner-all" />
+     
+                        <ul class="menuclass" id="companynamemenu">
+                            
+                            <li>
+                            
+                                <a id="companynamelink" href="#">Company Name: {{word_companyname}}</a>
+                                <ul>
+                                    <li><a href="#"><input type="text" name="search_word_companyname" id="option_text_input_name" value="{{word_companyname}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                                
+                                 </ul>
+                            </li>  
+                              
+                        </ul>
+                        
+                        <label for="option_text_input_date">Issue Date</label>
+                        <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        
+                        <ul class="menuclass" id="doctypemenu">
+                            
+                            <li>
+                            
+                                <a id="doctypelink" href="#">Document Type: {{word_doctype}}</a>
+                                <ul>
+                                    <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                                
+                                {% for type in types_list %}
+                                  <li>--</li>
+                                  <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                                  
+                                 {% endfor %}
+                                 </ul>
+                            </li>  
+                              
+                        </ul>
+                        
+                        <label for="option_text_input_piecenumber">Piece Number</label>
+                        <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_docname">Doc. Name</label>
+                        <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_id_docname">Id.Filename</label>
+                        <input type="text" name="search_word_id_docname" id="option_text_input_id_docname" value="{{word_id_docname}}" class="text ui-widget-content ui-corner-all" />
+                        
+                    {% endif %}
+                    {% if corpus_word == "corpus_internal_records" %}
+                        <label for="option_text_input_amount_credit">Amount Credit</label>
+                        <input type="text" name="search_word_amount_credit" id="option_text_input_amount_credit" value="{{word_amount_credit}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_amount_credit">Amount Debit</label>
+                        <input type="text" name="search_word_amount_debit" id="option_text_input_amount_debit" value="{{word_amount_debit}}" class="text ui-widget-content ui-corner-all" />
+     
+                        <ul class="menuclass" id="companynamemenu">
+                            
+                            <li>
+                            
+                                <a id="companynamelink" href="#">Company Name: {{word_companyname}}</a>
+                                <ul>
+                                    <li><a href="#"><input type="text" name="search_word_companyname" id="option_text_input_name" value="{{word_companyname}}" class="text ui-widget-content ui-corner-all" /></a></li>
+                                
+                                 </ul>
+                            </li>  
+                              
+                        </ul>
+                        
+                        <label for="option_text_input_date">Transaction Date</label>
+                        <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        
+                        <label for="option_text_input_piecenumber">Piece Number</label>
+                        <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_accountnumber">Account Number</label>
+                        <input type="text" name="search_word_accountnumber" id="option_text_input_accountnumber" value="{{word_accountnumber}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_movnumber">Movement Number</label>
+                        <input type="text" name="search_word_movnumber" id="option_text_input_movnumber" value="{{word_movnumber}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_journal">Journal</label>
+                        <input type="text" name="search_word_journal" id="option_text_input_journal" value="{{word_journal}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_s">S Field</label>
+                        <input type="text" name="search_word_s" id="option_text_input_s" value="{{word_s}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_lett">Lett</label>
+                        <input type="text" name="search_word_lett" id="option_text_input_lett" value="{{word_lett}}" class="text ui-widget-content ui-corner-all" />
+                        
+                        <label for="option_text_input_id_docname">Id</label>
+                        <input type="text" name="search_word_id" id="option_text_input_id" value="{{word_id}}" class="text ui-widget-content ui-corner-all" />
+                        
+                    {% endif %}
                     
                     <input class="invisible" type="text" name='prev_next_results' value="" id="paginator_text"/>
                     <input class="invisible" type="text" name='actual_min_num' value="{{page_counter_beginning}}" id="paginator_text"/>
-                    <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{searchword_filterword.pdf_filterword}}"> 
+                    
+                    <input class="invisible" id="corpus_text" type="text" name='corpus_word' value="{{corpus_word}}"> 
+                    <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}"> 
+                    
                     
                 </fieldset>
                 </form>
@@ -984,12 +1265,12 @@
     <div id="search_container">
         
         
-            <input class="show-option" id="search_text" type="text" name='search_word' title="Want to search faster? Double click on any table's element!" value="{{searchword_filterword.pdf_searchword}}" placeholder="Search candidates">
+        <input class="show-option" id="search_text" type="text" name='search_word' title="Want to search faster? Double click on any table's element!" value="{{searchword_filterword.pdf_searchword}}" placeholder="Search candidates">
             
             
             
         <div id="paginator">
-            <h6 id="paginator_informer"> You are seeing Candidates {{page_counter_beginning}} through {{page_counter_end}} from a Total of {{total_pdf_records}}.</h6>
+            <h6 id="paginator_informer"> You are seeing Candidates {{page_counter_beginning}} through {{page_counter_end}} from a Total of {{total_records}}.</h6>
             {% if page_counter_beginning >= 10 %} 
             <h5 id="paginator_prev"> Prev. </h5>
             {% endif %}
@@ -1001,15 +1282,22 @@
             
         </div>
         
+        <div class="show-option" id="corpus_container" title="Filter the Search Results by one Corpus of Documents">
         
+            <input type="radio" class="corpus_choice" id="corpus_source_records" name="radio2" /><label class="corpus_choice_label" for="corpus_source_records">Source Pdfs</label>
+            <input type="radio" class="corpus_choice" id="corpus_ocr_records" name="radio2" checked="checked"/><label class="corpus_choice_label" for="corpus_ocr_records">Ocr/Icr Records</label>
+            <input type="radio" class="corpus_choice" id="corpus_internal_records" name="radio2" /><label class="corpus_choice_label" for="corpus_internal_records">Grande Livre</label>
+        
+        </div>
         
         <div class="show-option" id="filter_container" title="Filter the Search Results by one Category">
+        
+                {% if corpus_word == "corpus_ocr_records" or corpus_word == "corpus_internal_records" %}
                 <input type="radio" class="filter_choice" id="filter_pdf_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_pdf_all">All</label>
-                <!--<input type="radio" class="filter_choice" id="filter_pdf_xanto" name="radio"  /><label class="filter_choice_label" for="filter_pdf_xanto">Xanto</label>-->
                 <input type="radio" class="filter_choice" id="filter_pdf_linked" name="radio" /><label class="filter_choice_label" for="filter_pdf_linked">Linked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_unlinked" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_pdf_unlinked">Unlinked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_error" name="radio" /><label class="filter_choice_label" for="filter_pdf_error">Error</label>
-            
+                {% endif %}
         </div>
         
     </div>
