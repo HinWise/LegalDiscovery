@@ -1723,6 +1723,8 @@ def randomqa_spider(request):
         
         pdf_records_list.distinct()
         
+        pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
+        
         #Compare the Time to the selected TimeFrame in Filter
         
         enddate = datetime.datetime.now()
@@ -1790,6 +1792,7 @@ def randomqa_spider(request):
                 with transaction.commit_on_success():
                     for pdf in incorrect_list:
 
+                        pdf.modification_author = the_user.username
                         pdf.audit_mark = "auditmarked_as_incorrect_reentry"
                         pdf.save()
                         memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+str(len(incorrect_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
@@ -1802,6 +1805,7 @@ def randomqa_spider(request):
                 with transaction.commit_on_success():
                     for pdf in pdf_records_list:
 
+                        pdf.modification_author = the_user.username
                         pdf.audit_mark = "auditmarked_as_selection_reentry"
                         pdf.save()
                         memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
@@ -2012,7 +2016,10 @@ def randomqa_spider(request):
         
         #Getting rid of Duplicates
         
+        pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
+        
         pdf_records_list.distinct()
+
         
         #Compare the Time to the selected TimeFrame in Filter
         
@@ -2082,6 +2089,7 @@ def randomqa_spider(request):
                 
                     for pdf in incorrect_list:
 
+                        pdf.modification_author = the_user.username
                         pdf.audit_mark = "auditmarked_as_incorrect_reentry"
                         pdf.save()
                         memo_report = "Pressed the Send Incorrect Entries for Re-Entry Button for "+str(len(incorrect_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
@@ -2093,6 +2101,7 @@ def randomqa_spider(request):
                 with transaction.commit_on_success():
                     for pdf in pdf_records_list:
 
+                        pdf.modification_author = the_user.username
                         pdf.audit_mark = "auditmarked_as_selection_reentry"
                         pdf.save()
                         memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
