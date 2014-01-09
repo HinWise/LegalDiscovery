@@ -84,10 +84,10 @@ class PdfRecordAdmin(admin.ModelAdmin):
     fieldsets = [
     ("Record Details",               {'fields': ['status','commentary','sourcedoc_link','companytemplate_link']}),
     ("Versioning Information",               {'fields': ['modification_date','modification_author','createdbymean','linked_style_class','error_style_class']}),]
-    list_display = ('ocrrecord_link','sourcedoc_link','id','record_link','status','commentary','modification_date','modification_author')
+    list_display = ('ocrrecord_link','sourcedoc_link','id','record_link','status','audit_mark','commentary','modification_date','modification_author')
     
     ''','record_link','sourcedoc_link','ocrrecord_link','companytemplate_link'''
-    search_fields = ['status','modification_author','commentary','sourcedoc_link__filename','ocrrecord_link__OcrByCompany__name']
+    search_fields = ['status','audit_mark','modification_author','commentary','sourcedoc_link__filename','ocrrecord_link__OcrByCompany__name']
     
     
 class OcrRecordAdmin(admin.ModelAdmin):
