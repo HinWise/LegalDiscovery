@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelMultipleChoiceField
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from enersectapp.models import Record,UserInterfaceType,PdfRecord,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,SourceDocType,CompanyOriginal,CompanyTemplate,SourcePdfToHandle
+from enersectapp.models import Record,UserInterfaceType,PdfRecord,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,SourceDocType,Report,CompanyOriginal,CompanyTemplate,SourcePdfToHandle
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User,Group
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -178,6 +178,14 @@ class CompanyTemplateAdmin(admin.ModelAdmin):
     
     search_fields = ['companyname_base', 'companyaddress_base','companytelephone_base','companycity_base','companycountry_base','company_original']
 
+    
+class ReportAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Report Details",               {'fields': ['report_type', 'report_memo','report_author','report_company','report_date','report_viewed']}),]
+    list_display = ('report_type', 'report_memo','report_author','report_company','report_date','report_viewed')
+    
+    
+    search_fields = ['report_type', 'report_memo','report_author','report_company','report_date','report_viewed']
 
 '''class UserProfileForm(forms.ModelForm): 
     def __init__(self, *args, **kwargs):
@@ -288,6 +296,7 @@ admin.site.register(InternalRecord, InternalRecordAdmin)
 admin.site.register(SourcePdf, SourcePdfAdmin)
 admin.site.register(SourceDocType, SourceDocTypeAdmin)
 admin.site.register(SourcePdfToHandle, SourcePdfToHandleAdmin)
+admin.site.register(Report, ReportAdmin)
 '''admin.site.register(UserProfile, UserProfileAdmin)'''
 admin.site.register(CompanyOriginal, CompanyOriginalAdmin)
 admin.site.register(CompanyTemplate, CompanyTemplateAdmin)

@@ -163,6 +163,57 @@
         })
         .filter(":checked").button({icons: {primary: "ui-icon-close"}});
         
+        //Click events and initial set up of Assign to your Group Button//
+        
+        $(".assign_to_group_button")
+        .button({
+            icons: {primary: "ui-icon-document"}
+        })
+        .click(function () {
+            
+            var $element_id = $(this).attr("value");
+            var $is_checked = $(this).attr("checked");
+            
+            if ($is_checked == "checked") {
+                
+                
+                $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
+                
+                alert("DEASSIGNATION IS NOT IMPLEMENTED AT THE MOMENT");
+                            
+                
+            }
+            else {
+            
+                $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
+                $(this).button("option", "icons", {primary: "ui-icon-close"});
+                $(this).attr("checked","checked");
+            
+                $("#id_assign").attr("value",$element_id);
+                toggleLoadingScreen();
+                $("#search_form").submit();
+                    
+            }
+           
+
+        });
+        
+        $('.assign_to_group_button').each(function(){
+                
+                var $element_id = $(this).attr("value");
+                var $is_checked = $(this).attr("checked");
+                
+                if($is_checked == "checked")
+                {
+                    
+                    $(this).button("option", "icons", {primary: "ui-icon-close"});
+                    $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
+                    
+                    
+                }
+ 
+        });
+        
         //ui-state-custom-linked
         
         $(".linking_button")
@@ -365,6 +416,29 @@
          
         });
         
+        $('#filter_source_all').click(function(){
+        
+           $('#filter_text').attr("value","source_all");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+        $('#filter_source_assigned').click(function(){
+        
+           $('#filter_text').attr("value","source_assigned");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
+        
+        $('#filter_source_notassigned').click(function(){
+        
+           $('#filter_text').attr("value","source_notassigned");
+           toggleLoadingScreen();
+           $("#search_form").submit();
+         
+        });
         
         //When click in one field of a table, it copies the contents in the Search button
         // and updates the search with that in mind
@@ -443,6 +517,18 @@
                 
                 case "pdf_error":
                     $('#filter_pdf_error').attr("checked","checked");
+                break;
+                
+                case "source_all":
+                    $('#filter_source_all').attr("checked","checked");
+                break;
+                
+                case "source_assigned":
+                    $('#filter_source_assigned').attr("checked","checked");
+                break;
+                
+                case "source_notassigned":
+                    $('#filter_source_notassigned').attr("checked","checked");
                 break;
                 
                 default:
@@ -855,6 +941,16 @@
                                 <div class= "record_tools_container">          
                                     <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.job_directory}}\{{record.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
                                     
+                                    
+                                    {% if user_type == "superuser" or user_type == "TeamLeader" %}
+                                    
+                                        {% if record.assigndata.count == 0 %}    
+                                            <input class="assign_to_group_button" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" assigned="no" operation="none" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                        {% else%}
+                                            <input class="assign_to_group_button checked" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" operation="none" checked="checked" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label ui-state-active" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                        {% endif%}
+                
+                                    {% endif%}
                                     <!--{% if record.error_style_class = "noerror" %}
                                     <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
                                     
@@ -1115,9 +1211,7 @@
                 <form id="search_form" action="{% url 'enersectapp:search_tool' %}" method="post">
                 {% csrf_token %}           
                 <fieldset id="fieldset_fields">
-                    <!-- AMOUNT -->
-                    <!--{% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}-->
-                     <!--{% endif %}-->
+                    
                     {% if corpus_word == "corpus_source_records" %}
                         <label for="option_text_input_job_directory">Job Directory</label>
                         <input type="text" name="search_job_directory" id="option_text_input_job_directory" value="{{word_job_directory}}" class="text ui-widget-content ui-corner-all" />
@@ -1252,6 +1346,7 @@
                     <input class="invisible" id="corpus_text" type="text" name='corpus_word' value="{{corpus_word}}"> 
                     <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}"> 
                     
+                    <input class="invisible" id="id_assign" type="text" name='id_assign' value="none"> 
                     
                 </fieldset>
                 </form>
@@ -1297,6 +1392,14 @@
                 <input type="radio" class="filter_choice" id="filter_pdf_linked" name="radio" /><label class="filter_choice_label" for="filter_pdf_linked">Linked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_unlinked" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_pdf_unlinked">Unlinked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_error" name="radio" /><label class="filter_choice_label" for="filter_pdf_error">Error</label>
+                {% endif %}
+                
+                {% if corpus_word == "corpus_source_records" %}
+                
+                <input type="radio" class="filter_choice" id="filter_source_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_source_all">All</label>
+                <input type="radio" class="filter_choice" id="filter_source_assigned" name="radio" /><label class="filter_choice_label" for="filter_source_assigned">Assigned</label>
+                <input type="radio" class="filter_choice" id="filter_source_notassigned" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_source_notassigned">Not Assigned</label>
+                
                 {% endif %}
         </div>
         

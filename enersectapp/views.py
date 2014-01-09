@@ -2454,6 +2454,7 @@ def blank_or_not_blank(request):
           
     the_user = request.user
     user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
+    
     user_profile = UserProfile.objects.get(user = the_user)
     
     if the_user.is_superuser == False and user_group.name != "Enersect_Berlin":
@@ -2581,7 +2582,6 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
     
         save_data='dont_save'
     
-    #print "DonE!----------------1"
     success_message = ""
     
     none_user = User.objects.get(username="None")
@@ -2590,33 +2590,33 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
     
     company_names_list = Group.objects.exclude(name="INVENSIS").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").values_list('name',flat=True).distinct()
     doctype_names_list = []
-    #print "DonE!----------------2"
+
     number_follow_assign_criteria = 0
     number_docs_not_in_company = 0
-    #print "DonE!----------------3"
+    
     lot_number_list = SourcePdfToHandle.objects.exclude(assignedcompany__name="TestGroup").order_by().values_list('lot_number',flat=True).distinct()
-    #print "DonE!----------------4"            
+                
     max_lotnum = int(max(lot_number_list))
-    #print "DonE!----------------5"
+    
     
     
     if company_name != "NoCompanyName":
-        #print "DonE!----------------6"
+        
         the_company = Group.objects.get(name=company_name)
-        #print "DonE!----------------7"
+        
         if doctype_name != "NoDocType":
         
             #Inside this If I will take up to the selected number of documents to assign
             #from the chosen Company and assign them to the chosen Company, to the helper
             #user "None", and mark them with a Lot Number equal to the maximum existing Lot Number + 1
-            #print "DonE!----------------8"
+            
             
             the_doctype =  SourceDocType.objects.get(name=doctype_name)
             
             if num_toassign !=0 and save_data=="save_data":
 
                 docs_to_assign = SourcePdf.objects.exclude(assigndata__assignedcompany = the_company).filter(modified_document_type = the_doctype).order_by()[:num_toassign]
-                #print "DonE!----------------9"
+                
                 with transaction.commit_on_success():
                     for source in docs_to_assign:
                         if source:
@@ -2625,53 +2625,39 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
                             source.assigndata.add(tohandle)
                             source.save()
 
-                    #print "DonE!----------------10"
+                    
                     max_lotnum = max_lotnum+1
                     success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + " as Lot "+ str(max_lotnum) + "."
-                    #print "DonE!----------------11"
+                    
                             
             the_doctype =  SourceDocType.objects.get(name=doctype_name)
-            #print "DonE!----------------12"
+            
             docs_not_in_company = SourcePdf.objects.exclude(assigndata__assignedcompany = the_company).order_by()
-            #print "DonE!----------------13"
+            
             docs_in_doctype = docs_not_in_company.filter(modified_document_type = the_doctype).order_by()
-            #print "DonE!----------------14"
+            
             number_follow_assign_criteria = len(docs_in_doctype)
-            #print "DonE!----------------15"
+            
             number_docs_not_in_company = len(docs_not_in_company)
-            #print "DonE!----------------16"
+            
             doctype_names_list = docs_not_in_company.values_list('modified_document_type__name',flat=True).distinct()
-            #print "LENGTH OF DOCTYPE -------->" + str(len(doctype_names_list))
-            #print "DonE!----------------17"
+            
         else:
-            #print "DonE!----------------18"
+            
             docs_not_in_company = SourcePdf.objects.exclude(assigndata__assignedcompany = the_company).order_by()
-            #print "DonE!----------------19"
+            
             number_follow_assign_criteria = 0
             number_docs_not_in_company = len(docs_not_in_company)
             
-            #print "DonE!----------------20"
             
             doctype_names_list = docs_not_in_company.values_list('modified_document_type__name',flat=True).distinct()
-            #print "LENGTH OF DOCTYPE2 -------->" + str(len(doctype_names_list))
-            #print "DonE!----------------21"
             
-    
-    #print "DonE!----------------22"
-    #print len(doctype_name)
-    #print len(company_name)
-    #print len(success_message)
-    #print number_follow_assign_criteria
-    #print number_docs_not_in_company
-    #print len(doctype_names_list)
-    #print max_lotnum
-    #print len(company_names_list)
-    #print len(doctype_names_list)
+
     
     context = {'doctype_name':doctype_name,'company_name':company_name,'success_message':success_message,
     'number_follow_assign_criteria':number_follow_assign_criteria,'number_docs_not_in_company':number_docs_not_in_company,
     'max_lotnum':max_lotnum,'company_names_list':company_names_list,'doctype_names_list':doctype_names_list}
-    #print "DonE!----------------23"
+    
     return render(request,'enersectapp/sudo_assign_by_doctype_and_number.html',context)
         
 
@@ -2977,6 +2963,18 @@ def search_tool(request):
     if not request.user.is_authenticated():
         
         return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
+        
+    if len(the_user.groups.filter(name="TeamLeaders")) >0:
+    
+        user_type = "TeamLeader"
+        
+    elif the_user.is_superuser == True :
+    
+        user_type = "superuser"
+        
+    else:
+    
+        user_type = "user"
 
     ###COMMON BLOCK###    
     
@@ -3123,6 +3121,13 @@ def search_tool(request):
         
         filter_word = "pdf_all"
     
+    try:
+        id_assign = request.POST['id_assign']
+    except (KeyError):
+        
+        id_assign = "none"
+    
+    
     #word = str(word)
     word_amount= str(word_amount).encode("utf8")
     word_amount_credit= str(word_amount_credit).encode("utf8")
@@ -3142,8 +3147,9 @@ def search_tool(request):
     word_job_directory= str(word_job_directory).encode("utf8")
     word_multipart_filename= str(word_multipart_filename).encode("utf8")
     filter_word = filter_word.lower()    
-    corpus_word = corpus_word.lower()    
+    corpus_word = corpus_word.lower()
     
+
     
     #DocTypes list for the Menu
     
@@ -3187,9 +3193,44 @@ def search_tool(request):
     
     if corpus_word=="corpus_source_records":
     
+        # If button "Assign to Group" is pressed by the superuser or TeamLeader, there is access to this block,
+        # which creates a SourcePdfToHandle for the SourcePdf chosen, and assigns it to the company of that user.
         
-        records_list = SourcePdf.objects.all()
+        if (user_type == "superuser" or user_type == "TeamLeader") and id_assign !="none":
         
+            print id_assign
+            id_assign = int(id_assign)
+        
+            source = SourcePdf.objects.filter(pk = id_assign)
+        
+            user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
+            none_user = User.objects.get(username="None")
+        
+            if len(source):
+                        
+                source = source[0]                
+                tohandle = SourcePdfToHandle(assignedcompany=user_group,assigneduser=none_user,lot_number=-1)
+                tohandle.save()
+                source.assigndata.add(tohandle)
+                source.save()
+        
+        
+        
+        #Filters block
+     
+        if filter_word=="source_assigned":
+        
+            records_list = SourcePdf.objects.exclude(assigndata=None)
+            
+        elif filter_word=="source_notassigned":
+        
+            records_list = SourcePdf.objects.filter(assigndata=None)
+            
+        else:
+            
+            filter_word="source_all"
+            records_list = SourcePdf.objects.all()
+
         #Making lists to use in the Search of Coincidences
         
         temp_list = records_list
@@ -3233,7 +3274,7 @@ def search_tool(request):
         #When at least a word is being searched and there are no Search Options
         
         if word =="all" and isJobdirectory == False and isDocname == False and isDoctype == False and isMultipartfilename == False and isIdDocname == False:
-            print "FALSEEE"
+            
             #helper_list = temp_list.filter(ocrrecord_link__Company__icontains=word) | temp_list.filter(ocrrecord_link__Amount__icontains=word)  | temp_list.filter(ocrrecord_link__IssueDate__icontains=word)
 
             final_list = records_list
@@ -3326,11 +3367,8 @@ def search_tool(request):
     
         #Filters block
     
-        if filter_word=="pdf_all":
-        
-            records_list = PdfRecord.objects.all()
-            
-        elif filter_word=="pdf_error":
+         
+        if filter_word=="pdf_error":
         
             records_list = PdfRecord.objects.filter(commentary__contains="Error detected")
             
@@ -3342,6 +3380,10 @@ def search_tool(request):
         
             records_list = PdfRecord.objects.filter(status="pdf_unlinked")
         
+        else:
+            
+            filter_word="pdf_all"
+            records_list = PdfRecord.objects.all()
 
         #Making lists to use in the Search of Coincidences
         
@@ -3538,11 +3580,8 @@ def search_tool(request):
         
         #Filters block
     
-        if filter_word=="pdf_all":
-        
-            records_list = Record.objects.all()
-            
-        elif filter_word=="pdf_error":
+  
+        if filter_word=="pdf_error":
         
             records_list = Record.objects.filter(commentary__contains="Error detected")
             
@@ -3554,6 +3593,10 @@ def search_tool(request):
         
             records_list = Record.objects.filter(status="unlinked")
         
+        else:
+            
+            filter_word="pdf_all"
+            records_list = Record.objects.all()
 
         #Making lists to use in the Search of Coincidences
         
@@ -3840,7 +3883,7 @@ def search_tool(request):
      
     
     
-    context = {
+    context = {'user_type':user_type,
     'records_list':records_list,'types_list':types_list,'companyname_list':companyname_list,'corpus_word':corpus_word,'filter_word': filter_word,
     'word_amount':word_amount,'word_companyname':word_companyname,'word_amount_credit':word_amount_credit,'word_amount_debit':word_amount_debit,
     'word_date':word_date,'word_doctype':word_doctype,'word_piecenumber':word_piecenumber,'word_accountnumber':word_accountnumber,
