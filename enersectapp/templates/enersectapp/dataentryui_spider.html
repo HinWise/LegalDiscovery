@@ -2258,6 +2258,9 @@
                           {% if user_group = "NathanTeam" or user_group = "FlatWorld" %}
                           <li><a href="#">Bulletin de Paie</a></li>
                           {% endif %}
+                          {% if user_group = "NathanTeam" or user_group = "Enersect_Berlin" %}
+                          <li><a href="#">Teletec</a></li>
+                          {% endif %}
                           
                           <li><a href="#">Other</a></li>
                           <li><a href="#">Blank</a></li>
@@ -2361,7 +2364,7 @@
                 
                 <!-- ISSUE DATE -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" %}
+                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Teletec" %}
                 <label for="issuedate-day">Issue Date:</label>
                 <input type="text" name="issuedate" id="issuedate" class="invisible"/>
                 <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="" class="date_text text ui-widget-content ui-corner-all" />
