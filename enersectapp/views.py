@@ -1469,7 +1469,7 @@ def cocoons_save(request):
             return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
     
     
-        user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+        user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     
         sourcepdfstohandle_list = SourcePdfToHandle.objects.filter(assignedcompany=user_group).exclude(checked="checked")
     
@@ -2295,7 +2295,7 @@ def categorization_tool(request):
     count_other = "No Others in this Mode"
     count_total = 0
     
-    types_list = SourceDocType.objects.exclude(name="other").exclude(name="recuperation").exclude(name="blank probable").exclude(name="contract page 1").exclude(name="contract page X").order_by('name')
+    types_list = SourceDocType.objects.exclude(name="other").exclude(name="recuperation").exclude(name="blank probable").order_by('name')
     
     if(doctype!="NoDocType"):
     
@@ -3162,7 +3162,7 @@ def search_tool(request):
     
     #DocTypes list for the Menu
     
-    types_list = SourceDocType.objects.exclude(name="other").exclude(name="recuperation").exclude(name="blank probable").exclude(name="contract page 1").exclude(name="contract page X").order_by('name')
+    types_list = SourceDocType.objects.exclude(name="other").exclude(name="recuperation").exclude(name="blank probable").order_by('name')
     
     #Company Names list for the Menu
     
