@@ -35,6 +35,7 @@
     $(document).ready(function () {
     
         createUserPanel();
+        createButtons();
         configLoadingScreen();
             
         $( "#teamleadspanel" ).dialog({
@@ -55,6 +56,7 @@
           
         });
     
+        
         
         //Sliders with mutual limit
         
@@ -194,6 +196,35 @@
           
         });
         
+        function createButtons(){
+        
+
+        $(".locked_button")
+            .button({
+                icons: {primary: "ui-icon-unlocked"}
+            })
+            .click(function () {
+            
+                $element_id = $(this).attr("value");
+                
+                
+                if (this.checked) {
+                    $(this).button("option", "icons", {primary: "ui-icon-locked"});
+                    
+                    $('#assignation_locked_'+$element_id).attr("value","locked");
+                }
+                else {
+                    $(this).button("option", "icons", {primary: "ui-icon-unlocked"});
+                    
+                    $('#assignation_locked_'+$element_id).attr("value","not_locked");
+                }
+            })
+            .filter(":checked").button({icons: {primary: "ui-icon-locked"}});
+            
+        }
+        
+        //<input type="text" class="" name="assignation_locked|{{item.name}}" value="{{item.assignation_locked}}" />
+        
         function createUserPanel(){
         
             $( "#user-panel" ).dialog({
@@ -286,8 +317,16 @@
                 <li>    
                         <h4>Pending Docs. Assigned: </h4>
                         <span class='slideBG'><div class="slider"></div>
-                        <input type="text" class="value" name="name|{{item.name}}" value="{{item.assigned_unchecked_count}}" min="0" max="{{count_notcomplete}}" />
-                        <span>0</span></span>
+                            <input type="text" class="value" name="name|{{item.name}}" value="{{item.assigned_unchecked_count}}" min="0" max="{{count_notcomplete}}" />
+                            <span>0</span>
+                            {% if item.assignation_locked == "locked" %}
+                            <input type="checkbox" class = "locked_button" checked="checked" id="locked|{{item.name}}" value = "{{item.name}}" ><label for="locked|{{item.name}}"></label>
+                            {% else %}
+                            <input type="checkbox" class = "locked_button" id="locked|{{item.name}}" value = "{{item.name}}" ><label for="locked|{{item.name}}"></label>
+                            {% endif %}
+                            <input type="text" class="invisible" id="assignation_locked_{{item.name}}" name="assignation_locked|{{item.name}}" value="{{item.assignation_locked}}" />
+                        </span>
+                        
                 </li>
                 <li>       
                         <h4>Total Doc. Entries Completed: {{ item.checked_count }}</h4>

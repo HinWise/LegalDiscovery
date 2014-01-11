@@ -1427,6 +1427,7 @@ def webcocoons(request):
             user_profile = UserProfile.objects.get(user = item)
             completed_categorizations = len(user_profile.modifiedsourcepdfs_categorization_tool.all())+ len(user_profile.modifiedpdfs_categorization_tool.all())
             completed_blank_or_not_blank = len(user_profile.modifiedsourcepdfs_blank_or_not_tool.all())
+            assignation_locked = user_profile.assignation_locked
             
             count_total_categorizations = count_total_categorizations+completed_categorizations
             count_total_blank_or_not_blank = count_total_blank_or_not_blank+completed_blank_or_not_blank
@@ -1440,6 +1441,8 @@ def webcocoons(request):
             user_dictionary.update({"completed_categorizations":completed_categorizations})
             
             user_dictionary.update({"completed_blank_or_not_blank":completed_blank_or_not_blank})
+            
+            user_dictionary.update({"assignation_locked":assignation_locked})
             
             user_dictionary_values_list.append(user_dictionary)
             
@@ -1476,11 +1479,29 @@ def cocoons_save(request):
         #count_before_exclusion = len(sourcepdfstohandle_list)
         
         all_users_from_group_not_myself = User.objects.filter(groups=user_group).exclude(username=the_user.username)
-    
+
         none_user = User.objects.get(username="None")
     
         count = 0
     
+        
+        #Locks and Unlocks users, in agreement what has been sent in TeamLeader's Interface
+        print str(len(all_users_from_group_not_myself))+"--THIS IS LEN"
+        for item in all_users_from_group_not_myself:
+                        
+            locked = request.POST['assignation_locked|'+item.username]
+            user_profile = UserProfile.objects.get(user = item)
+                        
+            if user_profile.assignation_locked != locked:
+            
+                if locked == "locked":
+                    user_profile.assignation_locked = "locked"
+                else:
+                    user_profile.assignation_locked = "not_locked"
+                    
+                    
+                user_profile.save()
+                
         
         #Resetting all the unassigned files to User None before making the real assignment
         #This ensures that you can actually delete an assignation without assigning to another user
