@@ -199,6 +199,7 @@ class FilterSearchWords(models.Model):
 
 class Report(models.Model):
     report_type = models.CharField(max_length=31, default="None")
+    report_subtype = models.CharField(max_length=31, default="None")
     report_memo = models.CharField(max_length=255, default="")
     report_author = models.ForeignKey(User)
     report_company = models.ForeignKey(Group)
@@ -210,6 +211,8 @@ class Report(models.Model):
         
 class UserProfile(models.Model):  
     user = models.OneToOneField(User)
+    user_company = models.ForeignKey(Group,null=True,blank=True)
+    assignation_locked = models.CharField(max_length=31, default="not_locked")
     modifiedsourcepdfs_categorization_tool = models.ManyToManyField(SourcePdf,related_name='sourcepdfs_modified_categorization_tool', null=True, blank=True, default=None)
     modifiedsourcepdfs_blank_or_not_tool = models.ManyToManyField(SourcePdf,related_name='sourcepdfs_modified_blank_or_not_blank_tool', null=True, blank=True, default=None)
     modifiedpdfs_categorization_tool = models.ManyToManyField(PdfRecord,related_name='pdfs_modified_categorization_tool', null=True, blank=True, default=None)
@@ -221,6 +224,8 @@ class UserProfile(models.Model):
 
 def create_user_profile(sender, instance, created, **kwargs):  
     if created:  
-       profile, created = UserProfile.objects.get_or_create(user=instance)  
+        
+        profile, created = UserProfile.objects.get_or_create(user=instance)  
 
+        
 post_save.connect(create_user_profile, sender=User)

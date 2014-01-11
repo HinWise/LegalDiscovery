@@ -22,6 +22,9 @@ def make_teamuser(modeladmin, request, queryset):
                 user_item.is_staff = True
                 user_item.is_active = True
                 user_item.save()
+                user_profile = UserProfile.objects.get(user = user)
+                user_profile.user_company = user_group
+                user_profile.save()
             
             
     '''if obj.is_superuser == False:
@@ -231,7 +234,7 @@ class MyUserAdmin(UserAdmin):
         
         else:
             the_user = request.user
-            user_group = the_user.groups.all().exclude(name="TeamLeaders")[0]
+            user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
             all_groups = Group.objects.all()
             all_users = User.objects.all()
             non_user_groups = all_groups.exclude(name=user_group)

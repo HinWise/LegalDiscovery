@@ -1520,7 +1520,7 @@ def cocoons_new_teamuser(request):
 
     the_user = request.user;
     
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
 
     if request.POST:
         username = request.POST['username']
@@ -1529,6 +1529,7 @@ def cocoons_new_teamuser(request):
         repeat_password = request.POST['repeat_password'].encode('ascii','replace')
 
         if password == repeat_password:
+        
             user = User.objects.create_user(username, password)
             user.username = username
             user.set_password(repeat_password)
@@ -1536,6 +1537,11 @@ def cocoons_new_teamuser(request):
             user.is_staff = True
             user.is_active = True
             user.save()
+            
+            user_profile = UserProfile.objects.get(user = user)
+            user_profile.user_company = user_group
+            user_profile.save()
+        
             return HttpResponseRedirect(reverse('enersectapp:webcocoons', args=()))
         else:
             return HttpResponseRedirect(reverse('enersectapp:main', args=()))
