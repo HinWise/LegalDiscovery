@@ -1473,15 +1473,29 @@ def cocoons_save(request):
     
         sourcepdfstohandle_list = SourcePdfToHandle.objects.filter(assignedcompany=user_group).exclude(checked="checked")
     
+        #count_before_exclusion = len(sourcepdfstohandle_list)
+        
         all_users_from_group_not_myself = User.objects.filter(groups=user_group).exclude(username=the_user.username)
     
         none_user = User.objects.get(username="None")
     
         count = 0
     
+        
         #Resetting all the unassigned files to User None before making the real assignment
         #This ensures that you can actually delete an assignation without assigning to another user
     
+        #Edit: Will only update the ones whose User is not locked. This is what the next for-loop is for.
+        
+        all_locked_userprofiles_company = UserProfile.objects.filter(user_company = user_group,assignation_locked = "locked")
+        
+        for user_profile in all_locked_userprofiles_company:
+        
+            sourcepdfstohandle_list = sourcepdfstohandle_list.exclude(assigneduser = user_profile.user)
+    
+        #count_after_exclusion = len(sourcepdfstohandle_list)
+    
+        #count_difference = count_before_exclusion-count_after_exclusion
     
         for item in sourcepdfstohandle_list:
             item.assigneduser = none_user
@@ -1493,13 +1507,18 @@ def cocoons_save(request):
         #and proceeds from there on.
     
         for item in all_users_from_group_not_myself:
-            maxNum = request.POST['name|'+item.username]
-            maxNum = int(maxNum)
-            temp_list = sourcepdfstohandle_list[count:count+maxNum]
-            count = count + maxNum
-            for to_assign in temp_list:
-                to_assign.assigneduser = item
-                to_assign.save()
+            
+            is_user_locked = all_locked_userprofiles_company.filter(user=item)
+            
+            if len(is_user_locked) == 0:
+            
+                maxNum = request.POST['name|'+item.username]
+                maxNum = int(maxNum)
+                temp_list = sourcepdfstohandle_list[count:count+maxNum]
+                count = count + maxNum
+                for to_assign in temp_list:
+                    to_assign.assigneduser = item
+                    to_assign.save()
     
     
         retval = HttpResponseRedirect(reverse('enersectapp:main', args=()))
