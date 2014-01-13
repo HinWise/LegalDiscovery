@@ -2622,7 +2622,14 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
     except (KeyError):
     
         doctype_name='NoDocType'
+     
+    try:
+        user_name = request.POST['user_name']
         
+    except (KeyError):
+    
+        user_name='NoUserName'
+     
     try:
         num_toassign = request.POST['num_toassign']
         
@@ -2641,10 +2648,23 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
     
     none_user = User.objects.get(username="None")
     
+    if user_name != "NoUserName":
+    
+        user_to_assign = User.objects.get(username=user_name)
+        user_to_assign_profile = UserProfile.objects.get(user = user_to_assign )
+        if user_to_assign_profile.assignation_locked != "locked" and save_data=="save_data":
+            user_to_assign_profile.assignation_locked = "locked"
+            user_to_assign_profile.save()
+        
+    else:
+    
+        user_to_assign = none_user
+    
     num_toassign = int(num_toassign)
     
     company_names_list = Group.objects.exclude(name="INVENSIS").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").values_list('name',flat=True).distinct()
     doctype_names_list = []
+    user_names_list = []
 
     number_follow_assign_criteria = 0
     number_docs_not_in_company = 0
@@ -2659,7 +2679,10 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
         
         the_company = Group.objects.get(name=company_name)
         
+
         if doctype_name != "NoDocType":
+        
+            user_names_list = User.objects.filter(groups = the_company).exclude(groups__name ="TeamLeaders").values_list('username',flat=True).distinct()
         
             #Inside this If I will take up to the selected number of documents to assign
             #from the chosen Company and assign them to the chosen Company, to the helper
@@ -2675,15 +2698,18 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
                 with transaction.commit_on_success():
                     for source in docs_to_assign:
                         if source:
-                            tohandle = SourcePdfToHandle(assignedcompany=the_company,assigneduser=none_user,lot_number=max_lotnum+1)
+                             
+                            tohandle = SourcePdfToHandle(assignedcompany=the_company,assigneduser=user_to_assign,lot_number=max_lotnum+1)  
                             tohandle.save()
                             source.assigndata.add(tohandle)
                             source.save()
 
                     
                     max_lotnum = max_lotnum+1
-                    success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + " as Lot "+ str(max_lotnum) + "."
-                    
+                    if user_name != "NoUserName":
+                        success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + ", User '"+ user_name +"' as Lot "+ str(max_lotnum) + "."
+                    else:
+                        success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + " as Lot "+ str(max_lotnum) + "."
                             
             the_doctype =  SourceDocType.objects.get(name=doctype_name)
             
@@ -2709,9 +2735,9 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
             
 
     
-    context = {'doctype_name':doctype_name,'company_name':company_name,'success_message':success_message,
+    context = {'doctype_name':doctype_name,'company_name':company_name,'user_name':user_name,'success_message':success_message,
     'number_follow_assign_criteria':number_follow_assign_criteria,'number_docs_not_in_company':number_docs_not_in_company,
-    'max_lotnum':max_lotnum,'company_names_list':company_names_list,'doctype_names_list':doctype_names_list}
+    'max_lotnum':max_lotnum,'company_names_list':company_names_list,'doctype_names_list':doctype_names_list,'user_names_list':user_names_list}
     
     return render(request,'enersectapp/sudo_assign_by_doctype_and_number.html',context)
         

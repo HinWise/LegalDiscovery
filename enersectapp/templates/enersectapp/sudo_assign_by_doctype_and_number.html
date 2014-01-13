@@ -85,6 +85,8 @@
                         } 
             });
             
+           
+            
             $( "#doctypesmenu" ).menu({ position: { my: "left top", at: "left top+30" },
                         select: function( event, ui ) {
                                                 
@@ -100,6 +102,25 @@
                                 $("#doctypesmenu").addClass("ui-state-custom-filled");
                             } 
                             saveFieldsAndSubmit();
+                        } 
+            });
+        
+            $( "#usersmenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#usersmenu" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $('#userslink').text("User: " +new_text);
+                                $('#user_name').attr("value",new_text);
+                                
+                                $("#usersmenu").addClass("ui-state-custom-filled");
+                            }
+                            saveFieldsAndSubmit();
+                            
                         } 
             });
         
@@ -119,6 +140,7 @@
                 $('button').attr("disabled", true).addClass("ui-state-disabled").addClass("invisible");
                 $("#num_toassign").addClass("invisible");
             }
+            
             var new_text = $('#doctype_name').attr("value");
             if (new_text != "NoDocType") {
                 $('#doctypeslink').text("Document Type: " +new_text);
@@ -131,7 +153,18 @@
                 $("#num_toassign").addClass("invisible");
             }
             
-
+            var new_text = $('#user_name').attr("value");
+            if (new_text != "NoUserName") {
+                $('#userslink').text("User: " +new_text);
+                $("#usersmenu").addClass("ui-state-custom-filled");
+                
+            }
+            else
+            {
+                //$("#usersmenu").menu({ disabled: true }).addClass("invisible");
+                //$('button').attr("disabled", true).addClass("ui-state-disabled").addClass("invisible");
+                //$("#num_toassign").addClass("invisible");
+            }
         }
     
         function saveFieldsAndSubmit(){
@@ -202,12 +235,24 @@
                     </ul>
                 </li>
             </ul>
+            <ul class="menuclass" id="usersmenu">
+                <li>
+                    <a id="userslink" href="#">User: (Optional)</a>
+                    <ul>
+                        {% for user in user_names_list %}
+                        <li><a href="#">{{user}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            
             <h5>There are <span style="color:wheat;">{{number_docs_not_in_company}}</span> Documents not assigned to this Company yet. From the Selection made, there are <span style="color:limegreen"> {{number_follow_assign_criteria}} </span> that can be Assigned. </h5>
             <h4><span style="color:limegreen"> {{success_message}} </span></h4>
             <input id="num_toassign" type="text" class="value" name="num_toassign" value="0" min="0" max="{{number_follow_assign_criteria}}" />
             
             <input type="text" name="company_name" id="company_name" value="{{company_name}}" class="invisible text ui-widget-content ui-corner-all" />
             <input type="text" name="doctype_name" id="doctype_name" value="{{doctype_name}}" class="invisible text ui-widget-content ui-corner-all" />
+            <input type="text" name="user_name" id="user_name" value="{{user_name}}" class="invisible text ui-widget-content ui-corner-all" />
             <input type="text" name="max_assign" id="max_assign" value="{{number_follow_assign_criteria}}" class="invisible text ui-widget-content ui-corner-all" />
             <input type="text" name="save_data" id="save_data" value="" class="invisible text ui-widget-content ui-corner-all" />
             <!--<input type="text" name="user_group" id="user_group" value="{{user_group.name}}" class="invisible text ui-widget-content ui-corner-all" />
