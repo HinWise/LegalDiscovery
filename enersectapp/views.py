@@ -941,6 +941,12 @@ def dataentryui_spider(request):
     the_user = request.user
     user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
     
+    types_list = {}
+    
+    if document_type == "Custom Generic Template":
+    
+        types_list = SourceDocType.objects.exclude(name="other").exclude(name="uncategorized").exclude(name="blank").exclude(name="recuperation").exclude(name="blank probable").order_by('name')
+    
     if(the_user.username=="dimaelkezee"):
         document_type = 'Arabic'
     
@@ -1012,7 +1018,7 @@ def dataentryui_spider(request):
     
     context = {'document_type':document_type,'companyname_list':companyname_list,
     'sourcepdfs_list':sourcepdfs_list,'the_user':the_user.username,'user_group':user_group.name,
-    'count_assigned':count_assigned,'count_done':count_done}
+    'count_assigned':count_assigned,'count_done':count_done,'types_list':types_list}
     return render(request,'enersectapp/dataentryui_spider.html',context)
     
 '''def link(request, pdfrecord_id, record_id):
@@ -1024,6 +1030,11 @@ def dataentryui_savedata(request):
         doctype = request.POST['doctype']
     except:
         doctype = "NoDocTypeField"
+   
+    try:
+        doctype2 = request.POST['doctype2']
+    except:
+        doctype2 = "NoDocType2Field"
    
     try:
         currency = request.POST['currency']
@@ -1147,6 +1158,10 @@ def dataentryui_savedata(request):
 
     control_rec = Record.objects.get(name="ControlRecord")
     
+    if(doctype2!="NoDocType2Field"):
+    
+        doctype = doctype2
+    
     if(doctype!="NoDocTypeField"):
     
         doctype = doctype.lower()
@@ -1171,8 +1186,14 @@ def dataentryui_savedata(request):
             translation_type = "arabic translation"
             
 
-            
-    doctype_class = SourceDocType.objects.get(name=doctype)
+    doctype_class = SourceDocType.objects.filter(name=doctype)[:1]
+    if (len(doctype_class)>0):
+        doctype_class=doctype_class[0]
+    else:
+        doctype_class = SourceDocType()
+        doctype_class.name = doctype
+        doctype_class.pretty_name = doctype
+        doctype_class.save()
     
     
     if(doctype == "blank"):

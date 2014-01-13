@@ -430,10 +430,10 @@
                           <li><a href="#"><input value="{{chosen_item.modified_document_type__name}}" placeholder="Write the New Document Type here" type="text" name="doctype" id="doctype" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
                           {% endif %}
                           {% for type in types_list %}
-                          {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
-                          <li>--</li>
-                          <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
-                          {% endif %}
+                              {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                              <li>--</li>
+                              <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                              {% endif %}
                           {% endfor %}
                           <!--{% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
                           <li>--</li>

@@ -1447,6 +1447,104 @@
                 });
             }
             
+            //
+            //DOCUMENT TYPE2 Menu Config
+                        
+            var doctype2 = $( "#doctype2" );
+            
+    
+            if(doctype2.length)
+            {
+            
+                allFields.add(doctype2);
+                
+                var doc_value2 = doctype2.attr("value");
+                
+                if(doc_value2 != "Actual Document Type")
+                {
+                    if(doc_value2 == "other" || doc_value2 == "uncategorized" || doc_value2 == "Other")
+                    {
+                        
+                        $("#doctypemenu2").addClass("ui-state-custom-error");
+                    }
+                    else
+                    {
+                        $("#doctypemenu2").addClass("ui-state-custom-filled");
+                    }
+                    
+                    $('#doctypelink2').text("Actual Document Type: " + doc_value2);
+                }
+
+                ////////////
+                $( "#doctypemenu2" ).menu({ position: { my: "left top", at: "left top+30" },
+                        select: function( event, ui ) {
+                                                
+                            var first_elem = ui.item.parent().is($( "#doctypemenu2" ));
+                            
+                            if(!first_elem)
+                            {
+                                
+                                var new_text = ui.item.text();
+                                $(".doctypeoption2[value='"+new_text+"']").click();
+                            } 
+                        } 
+                    });
+                    
+                    $('.doctypeoption2').click(function(){
+                    
+                        var new_text = $(this).text();
+                    
+                        $('#doctype2').unbind('copy paste', function (e) {
+                                        
+                        });
+                          
+                          $('#doctypelink2').text("Actual Document Type: " + new_text);
+                          $('#doctype2').attr("value",new_text);
+                          $('#doctype2').val(new_text);
+                          
+                          $("#doctypemenu2").addClass("ui-state-custom-error");
+                            
+                        $('#doctype2').bind('copy paste', function (e) {
+                                e.preventDefault();
+                        });
+                        
+                            $('#doctype2').click();
+                    });
+                    
+                    $('#doctypemenu2').removeClass('ui-menu-divider');
+                    
+                    $('#doctype2').unbind('click').click(function(event) {
+                    event.stopPropagation();
+                    $(this).unbind('focus').focus();
+                    $("#doctypemenu2").unbind('keydown');
+                    $(this).unbind('focusout').focusout(function(event) {
+                                                  
+                            var new_value = event.currentTarget.value;
+                            
+                            $('#doctypelink2').text("Actual Document Type: " + new_value);
+                            $(this).attr("value",new_value);
+                            
+                            if ($("#doctypemenu2").hasClass("ui-state-custom-filled"))
+                            {
+                                $("#doctypemenu2").removeClass("ui-state-custom-filled");
+                            }
+                            
+                            if(new_value.length > 0)
+                            {
+                                $("#doctypemenu2").addClass("ui-state-custom-filled");
+                                                           
+                                
+                                if ($("#doctypemenu2").hasClass("ui-state-custom-error") && new_value != "Other" && new_value != "other" && new_value != "uncategorized" )
+                                {
+                                   
+                                    $("#doctypemenu2").removeClass("ui-state-custom-error");
+                                }
+                            }
+                    
+                        }); 
+                });
+            }
+            
             //ISSUE DATE Menu Config
             
             var issuedate = $( "#issuedate" );
@@ -1722,6 +1820,12 @@
                             {
                                 bValid = bValid && checkLength( doctype, "doctype", 1, 255  );
                                 bValid = bValid && checkRegexp( doctype, /^([0-9a-z_ .,º\/])+$/i, "Document Type must be selected." );
+                            }
+                            
+                            if(doctype2.length)
+                            {
+                                bValid = bValid && checkLength( doctype2, "Actual Document Type", 1, 255  );
+                                bValid = bValid && checkRegexp( doctype2, /^([0-9a-z_ .,º\/])+$/i, "Actual Document Type must be selected." );
                             }
                             
                             if(amount.length)
@@ -2111,13 +2215,13 @@
     {% if sourcepdfs_list %}
     <div id="companyform_container">
             
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 <div id="company-dialog" >
                     <form id="company-form" title="Company Details">
                         <h4 id="fromTemplate_dialog"></h4>
                         <p class="validateTips_Company">Ensure that all fields are correct for the actual document.</p>
                         <fieldset id="company_fieldset">
-                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                            {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                                 {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                                     <label for="companyform_name">Company Name</label>
                                 {% endif %}
@@ -2127,7 +2231,7 @@
                                     <input type="text" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
                                 
                             {% endif %}
-                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                            {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                             <ul class="menuclass" id="companyaddress_menu">
                                 <li>
                                     <a id="companyaddress_link" href="#">Address</a>
@@ -2141,7 +2245,7 @@
                                 </li>  
                             </ul>
                             {% endif %}
-                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                            {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                             <ul class="menuclass" id="companytelephone_menu">
                                 <li>
                                     <a id="companytelephone_link" href="#">Telephone</a>
@@ -2155,10 +2259,10 @@
                                 </li>  
                             </ul>
                             {% endif %}
-                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                            {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                             <ul class="menuclass" id="companycity_menu">
                                 <li>
-                                    {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                                    {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                                     <a id="companycity_link" href="#">City</a>
                                     {% endif %}
                                     {% if document_type = "Expense Claim" %}
@@ -2174,7 +2278,7 @@
                                 </li>  
                             </ul>
                             {% endif %}
-                            {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                            {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                             <ul class="menuclass" id="companycountry_menu">
                                 <li>
                                     <a id="companycountry_link" href="#">Country</a>
@@ -2279,6 +2383,9 @@
                           {% if user_group = "NathanTeam" or user_group = "Enersect_Berlin" %}
                           <li><a href="#">Phone Records</a></li>
                           {% endif %}
+                          {% if user_group = "NathanTeam" or user_group = "Enersect_Berlin" %}
+                          <li><a href="#">Custom Generic Template</a></li>
+                          {% endif %}
                           
                           <li><a href="#">Other</a></li>
                           <li><a href="#">Blank</a></li>
@@ -2288,9 +2395,35 @@
                 
                 <div class="divisor-line"></div>
                 
+                <!-- SECOND DOCUMENT TYPE (IF Custom Generic Template TEMPLATE) -->
+                
+                {% if document_type = "Custom Generic Template" %}
+                
+                <ul class="menuclass" id="doctypemenu2">
+                    <li>
+                         
+                        <a id="doctypelink2" href="#">Actual Document Type: Custom Generic Template</a>
+                       
+                        <ul>
+                          
+                          <li><a href="#"><input value="Custom Generic Template" placeholder="Write the New Document Type here" type="text" name="doctype2" id="doctype2" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          
+                          {% for type in types_list %}
+                              {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "Enersect_Berlin" or user_group = "NathanTeam" %}
+                              <li>--</li>
+                              <li><a class="doctypeoption2" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
+                              {% endif %}
+                          {% endfor %}
+                         
+                        </ul>
+                    </li>
+                </ul>
+                
+                {% endif %}
+                
                 <!-- AMOUNT -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
                 
                 <ul class="menuclass" id="amountmenu">
                     <li>
@@ -2310,7 +2443,7 @@
                 
                 <!-- CURRENCY -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
                 <!--<label for="currency">Currency</label>-->
                 
                 <ul class="menuclass" id="currencymenu">
@@ -2331,7 +2464,7 @@
                 
                 <!-- COMPANY -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 
                 <ul class="menuclass" id="companymenu">
                     <li>
@@ -2382,7 +2515,7 @@
                 
                 <!-- ISSUE DATE -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Journal de Paie" or document_type = "Teletec" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Journal de Paie" or document_type = "Teletec" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" %}
                 <label for="issuedate-day">Issue Date:</label>
                 <input type="text" name="issuedate" id="issuedate" class="invisible"/>
                 <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="" class="date_text text ui-widget-content ui-corner-all" />
@@ -2393,11 +2526,15 @@
                 
                 <!-- DOCUMENT NUMBER -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 
                 <ul class="menuclass" id="docnumbermenu">
                     <li>
+                        {% if document_type = "Custom Generic Template" %}
+                        <a id="docnumberlink" href="#">Document Number:</a>
+                        {% else %}
                         <a id="docnumberlink" href="#">{{document_type}} Number:</a>
+                        {% endif %}
                         <ul>
                           <li><a href="#"><input type="text" value="" placeholder="Write the Document Number here" name="docnumber" id="docnumber" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
                           <li>--</li>
@@ -2412,7 +2549,7 @@
                 
                 <!-- ACCOUNT NUMBER -->
                 
-                {% if document_type = "Cheque" or document_type = "Avis de Credit" or document_type = "Avis de Debit"%}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Avis de Credit" or document_type = "Avis de Debit"%}
                 
                 <ul class="menuclass" id="accountnummenu">
                     <li>
@@ -2432,7 +2569,7 @@
                 
                 <!-- PURCHASE NUMBER -->
                 
-                {% if document_type = "Invoice/Facture" or document_type = "Partial" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Invoice/Facture" or document_type = "Partial" %}
                 
                 <ul class="menuclass" id="purchasenumbermenu">
                     <li>
@@ -2452,7 +2589,7 @@
                 
                 <!-- ARABIC -->
                 
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Cheque Stub" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Cheque Stub" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 <ul class="menuclass" id="arabicmenu">
                     <li>
                         <a id="arabiclink" href="#">Contains Arabic:</a>
@@ -2468,7 +2605,7 @@
                 
                 <!-- PIECE NUMBER -->
                 
-                {% if document_type = "Cheque" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 
                 <ul class="menuclass" id="piecenumbermenu">
                     <li>
@@ -2488,7 +2625,7 @@
                 
                 <!-- PAGE NUMBER -->
                 
-                {% if document_type = "Contract Page X" or document_type = "Journal de Paie" or document_type = "Phone Records"  %}
+                {% if document_type = "Custom Generic Template" or document_type = "Contract Page X" or document_type = "Journal de Paie" or document_type = "Phone Records"  %}
                 
                 <ul class="menuclass" id="pagenumbermenu">
                     <li>
@@ -2511,7 +2648,7 @@
          
                 {% endif %}
                 <!-- MEMO -->
-                {% if document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
                 <label for="memo">Memo</label>
                 <input type="text" name="memo" id="memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
                 {% endif %}
