@@ -1187,6 +1187,7 @@ def dataentryui_savedata(request):
             
 
     doctype_class = SourceDocType.objects.filter(name=doctype)[:1]
+    
     if (len(doctype_class)>0):
         doctype_class=doctype_class[0]
     else:
@@ -1226,6 +1227,10 @@ def dataentryui_savedata(request):
     
     source = SourcePdf.objects.get(filename=file_name)
    
+    if user_group.name == "Enersect_Berlin":
+        
+        source.modified_document_type = doctype_class
+        source.save()
     
     handle = ""
     
