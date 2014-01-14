@@ -82,6 +82,14 @@ class SourcePdf(models.Model):
     multipart_filename = models.CharField('Multipart Filename',max_length=255,default="none")
     corrupt = models.CharField('Corrupt',max_length=255,default="no")
     visitedonce = models.CharField(max_length=255,default="none")
+    Day = models.CharField('Day',max_length=31,default="")
+    Month = models.CharField('Month',max_length=31,default="")
+    Year = models.CharField('Year',max_length=31,default="")
+    FullDate = models.CharField('Year',max_length=31,default="")
+    Currency = models.CharField('Currency',max_length=63,default="")
+    
+    
+    
     assigndata = models.ManyToManyField(SourcePdfToHandle,null=True, blank=True, default=None)
     def __unicode__(self):
         return self.filename

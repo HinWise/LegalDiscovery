@@ -39,10 +39,10 @@
 #Path to the .csv to be entered:
 
 #csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/ChequeLIST.csv"
-csv_filepathname_sourcepdfs="D:\Dropbox\NathanProject\NathanFixtures\SourcePdfs_Input\AmalgamatedDocument.csv"
+csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/albaraka2006.csv"
 # Full path to the directory immediately above your django project directory
 #your_djangoproject_home="/srv/enersectapp/app/ProjectFolder"
-your_djangoproject_home="D:/Dropbox/NathanProject/ProjectFolder"
+your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
 
 
 import sys,os
@@ -69,15 +69,18 @@ counter = 0
 num_files = 20000000
 
 #This is the number of rows that it will jumps before starting to introduce them, in case you introduced some of them before
-num_jump = 2
+num_jump = 1
 
 #If you want to enter all the source pdfs rows from the csv, uncomment this next line
 #num_files = 1000000000
+
+
 
 with transaction.commit_on_success():
     for row in dataReader:
         if row:
             counter = counter+1
+            print counter
             if counter <= num_files and counter > num_jump:
                 #exists = SourcePdf.objects.filter(filename=row[1]).exists()
                 #if exists == False:
@@ -90,6 +93,16 @@ with transaction.commit_on_success():
                 new_sourcepdf.multipart_num_total=row[5]
                 new_sourcepdf.multipart_filename=row[6]
                 new_sourcepdf.document_type=row[7]
+                
+                doctype = SourceDocType.objects.get(name = row[7])
+                new_sourcepdf.modified_document_type = doctype
+                
+                new_sourcepdf.Day=row[8]
+                new_sourcepdf.Month=row[9]
+                new_sourcepdf.Year=row[10]
+                new_sourcepdf.FullDate=row[11]
+                new_sourcepdf.Currency=row[12]
+                
                 new_sourcepdf.save()
                 if(counter % 100 == 0):
                     print counter
