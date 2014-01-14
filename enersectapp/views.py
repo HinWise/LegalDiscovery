@@ -3283,6 +3283,7 @@ def search_tool(request):
         actual_min_num = 0
     
     
+
     if(prev_next_results == ""):
         actual_min_num = 0
     
@@ -3291,8 +3292,17 @@ def search_tool(request):
         
     if(prev_next_results == "Next"):
         actual_min_num += 10
+        
+    if(prev_next_results == "Update"):
+        actual_min_num = actual_min_num
+    
+    if actual_min_num < 0:
+    
+        actual_min_num = 0
+    
     
     max_num = actual_min_num + 10
+    
     
     ###END OF COMMON BLOCK###  
     
@@ -3465,6 +3475,11 @@ def search_tool(request):
         records_list = final_list   
         
         total_records = records_list.count()
+    
+        if max_num > total_records:
+        
+            max_num = total_records
+            actual_min_num = max_num - 10
     
         if records_list:
             
@@ -3676,6 +3691,11 @@ def search_tool(request):
         records_list = final_list  
 
         total_records = records_list.count()
+    
+        if max_num > total_records:
+        
+            max_num = total_records
+            actual_min_num = max_num - 10
     
         if records_list:
             
@@ -3973,6 +3993,11 @@ def search_tool(request):
         records_list = final_list   
         
         total_records = records_list.count()
+    
+        if max_num > total_records:
+        
+            max_num = total_records
+            actual_min_num = max_num - 10
     
         if records_list:
             
