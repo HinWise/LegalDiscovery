@@ -19,7 +19,6 @@ import json,csv
 from django.core import serializers
 import random
 from pyPdf import PdfFileWriter, PdfFileReader
-import reportlab
 from urllib2 import Request, urlopen
 from StringIO import StringIO
 
@@ -4022,11 +4021,11 @@ def search_tool(request):
     #if export_mark == "export_mark":
     
     
-    if export_mark == "export_mark" and corpus_word!="corpus_internal_records"::
+    if export_mark == "export_mark" and corpus_word!="corpus_internal_records":
     
-        if len(merging_records) > 20:
+        if len(merging_records) > 10:
         
-            merging_records = merging_records[:20]
+            merging_records = merging_records[:10]
  
         print len(merging_records)
 
@@ -4034,86 +4033,33 @@ def search_tool(request):
         response['Content-Disposition'] = 'attachment; filename=output_document.pdf'
         output = PdfFileWriter()
         
-        for record in merging_records:
-            print "STARTS!"
-            if corpus_word=="corpus_source_records":
+        with transaction.commit_on_success():
+            for record in merging_records:
+            
+                if corpus_word=="corpus_source_records":
+                    
+                    source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(record.job_directory, record.filename)
+                   
+                if corpus_word=="corpus_ocr_records":
+                    
+                    source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(record.sourcedoc_link.job_directory, record.sourcedoc_link.filename)
+                    
                 
-                source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(record.job_directory, record.filename)
-               
-            if corpus_word=="corpus_ocr_records":
+                #source_url = 'http://54.200.180.182/sourcepdfs/albaraka2006/01-january2006ctd_part1.pdf'
                 
-                source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(record.sourcedoc_link.job_directory, record.sourcedoc_link.filename)
-                
-            
-            #source_url = 'http://54.200.180.182/sourcepdfs/albaraka2006/01-january2006ctd_part1.pdf'
-            
-            remoteFile = urlopen(Request(source_url)).read()
-            memoryFile = StringIO(remoteFile)
-            input_pdf = PdfFileReader(memoryFile)
-            
-            output.addPage(input_pdf.getPage(0))
-            
-            
-        outputStream = StringIO()
-        output.write(outputStream)
-        response.write(outputStream.getvalue())
-        return response
-        
-        
-        '''with transaction.commit_on_success():
-            for record in first_five_records:
-                # following block calls the function that uses reportlab to generate a pdf
-                #source_url = "http:\\54.200.180.182\sourcepdfs\%s\%s" %(record.sourcedoc_link.job_directory, record.sourcedoc_link.filename)
-                source_url = 'http://54.200.180.182/sourcepdfs/albaraka2006/01-january2006ctd_part1.pdf'
-
                 remoteFile = urlopen(Request(source_url)).read()
                 memoryFile = StringIO(remoteFile)
                 input_pdf = PdfFileReader(memoryFile)
                 
                 output.addPage(input_pdf.getPage(0))
-                
-                #input_pdf = PdfFileReader(file( source_url, "rb"))
-                
-                #print "%s has %s pages." % ("01-january2006ctd_part1.pdf",input_pdf.getNumPages())
-                #print input_pdf.getDocumentInfo()
-                #print "title = %s" % (input_pdf.getDocumentInfo().title)
             
-        
-        outputStream = file("Document_Output.pdf", "wb")
-        output.write(outputStream)
-        outputStream.close()'''
-        
-        #"http:\\54.200.180.182\sourcepdfs\{{record.job_directory}}\{{record.filename}}"
-        
+            
+            outputStream = StringIO()
+            output.write(outputStream)
+            response.write(outputStream.getvalue())
+            return response
         
         
-        
-        #Response.ContentType = "application/pdf"
-        #Response.AddHeader("content-disposition", "attachment; filename=file.pdf")
-        #Response.WriteFile("file.pdf")
-        
-        '''response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="progress_report_'+date+'".csv"'
-
-        writer = csv.writer(response)
-        writer.writerow(['               ', 'Total Number Of:', '               '])
-        writer.writerow(['Source Documents', total_source_documents, '               '])
-        writer.writerow(['Documents With an Identified Document Type', total_with_doctype, '               '])
-        writer.writerow(['               ','               ','               '])
-        writer.writerow(['Documents Entries Made', total_pdf_entered, '               '])
-        writer.writerow(['Documents Entries Linked to a Record', total_linked_documents, '               '])
-        writer.writerow(['               ','               ','               '])
-        for item in company_names_and_values_list:
-            writer.writerow(['Entries made by '+item['name'], item['count'], '               '])
-        writer.writerow(['               ','               ','               '])    
-        for item in document_types_names_and_values_list:
-            writer.writerow(['Entries with Document Type '+item['name'], item['count'], '               '])
-        
-        
-        return response'''
-        
-    
-    
     showing_records = records_list.count()
     
     page_counter_end = actual_min_num+showing_records
