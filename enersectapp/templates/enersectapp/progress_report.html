@@ -49,17 +49,23 @@
                 draggable:true,
                 resizable: true,
                 closeOnEscape: false,
-                buttons: {
-                    "Export Report as CSV": function() {
+                buttons: [ 
                         
-                        toggleLoadingScreen();
-                        $('button').attr("disabled", true).addClass("ui-state-disabled");
-                        $('#export_mark').attr("value","export_csv");
-                        $('#fields_form').submit();
+                        {
+                            text:"Export Report as CSV",
+                            "class": "export",
+                            click: function() {
+                            
+                                //toggleLoadingScreen();
+                                $('.export').attr("disabled", true).addClass("ui-state-disabled");
+                                $('#export_mark').attr("value","export_csv");
+                                //$( this ).dialog( "close" );
+                                $('#fields_form').submit();
+                            }    
+                        },
                         
-                    },
-                    
-                },
+                    ],
+                
                 position: {
                     my: "left top", at: "left top", of: $('#fields_container')
                 }

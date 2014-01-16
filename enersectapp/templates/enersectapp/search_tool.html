@@ -191,6 +191,7 @@
             
                 $("#id_assign").attr("value",$element_id);
                 toggleLoadingScreen();
+                
                 $("#search_form").submit();
                     
             }
@@ -594,6 +595,7 @@
         function toggleLoadingScreen(){
         
             $('#LoadingScreen').toggleClass("invisible");
+            $('#export_mark').attr("value", "none");
             
         }
     
@@ -630,41 +632,102 @@
     
         function createListPanel(){
         
-            $( "#listpanel-form" ).dialog({
-                    
-                    width: $('#fields_container').width(),
-                    height: $('#fields_container').height(),
-                    
-                    modal: false,
-                    draggable:false,
-                    resizable: false,
-                    closeOnEscape: false,
-                    show: {
-                    effect: "drop",
-                    direction: "right",
-                    duration: 1000
-                  },
-                  hide: {
-                    effect: "drop",
-                    direction: "right",
-                    duration: 1000
-                  },
-                    buttons: {
-                        "Search": function() {
-                            
-                                toggleLoadingScreen();
-                                $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                //$( this ).dialog( "close" );
-                                $('#search_form').submit();
-                                
-                        },
+            corpus_text = $("#corpus_text").attr("value");
+            if(corpus_text != "corpus_internal_records")
+            {
+        
+                $( "#listpanel-form" ).dialog({
                         
-                    },
-                    position: {
-                        my: "left top", at: "left top", of: $('#fields_container')
-                    }
-                });
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+                        
+                        modal: false,
+                        draggable:false,
+                        resizable: false,
+                        closeOnEscape: false,
+                        show: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 1000
+                      },
+                      hide: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 1000
+                      },
+                        buttons: [ 
+                            {
+                                text: "Search",
+                                click: function() {
+                                
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+                                }   
+                            },
+                            
+                            {
+                                text:"Export New Search to PDF",
+                                "class": "export",
+                                click: function() {
+                                
+                                    
+                                    //toggleLoadingScreen();
+                                    $('.export').attr("disabled", true).addClass("ui-state-disabled");
+                                    $('#export_mark').attr("value", "export_mark");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
 
+                                }    
+                            },
+                            
+                        ],
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+            }
+            else
+            {
+                 $( "#listpanel-form" ).dialog({
+                        
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+                        
+                        modal: false,
+                        draggable:false,
+                        resizable: false,
+                        closeOnEscape: false,
+                        show: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 1000
+                      },
+                      hide: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 1000
+                      },
+                        buttons: [ 
+                            {
+                                text: "Search",
+                                click: function() {
+                                
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+                                }   
+                            },
+                            
+                            
+                        ],
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+            }
         }
         
         function createFieldsForm(){
@@ -881,6 +944,7 @@
                     <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
                     <li>--</li>
                     <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+                    
                 </ul>
             </div>
         </div>
@@ -1367,6 +1431,8 @@
                     <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}"> 
                     
                     <input class="invisible" id="id_assign" type="text" name='id_assign' value="none"> 
+                    
+                    <input class="invisible" id="export_mark" type="text" name='export_mark' value="none"> 
                     
                 </fieldset>
                 </form>
