@@ -144,6 +144,7 @@ class OcrRecord(models.Model):
     Notes = models.CharField('Notes',max_length=255)
     Translation_Notes = models.CharField(max_length=255, default="NoTranslationField")
     Source_Bank_Account = models.CharField('Source Bank Account',max_length=255)
+    Cheque_Number = models.CharField('Cheque Number for Remise de Cheques',max_length=255, default="NoChequeNumberField")
     Blank = models.CharField('Blank',max_length=255)
     Unreadable = models.CharField('Unreadable',max_length=255)
     OcrByCompany = models.ForeignKey(Group)

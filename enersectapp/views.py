@@ -1158,6 +1158,12 @@ def dataentryui_savedata(request):
     except:
         accountnum = "NoAccountNumberField"
         
+    try:
+        chequenum = request.POST['chequenum']
+    except:
+        chequenum = "NoChequeNumberField"
+        
+        
 
     control_rec = Record.objects.get(name="ControlRecord")
     
@@ -1202,11 +1208,11 @@ def dataentryui_savedata(request):
     
     if(doctype == "blank"):
         
-        new_ocr = OcrRecord(Amount="Blank",Currency="Blank",Company="Blank",Address="Blank",City="Blank",Country="Blank",Telephone="Blank",Source_Bank_Account="Blank",Document_Type="Blank",IssueDate="Blank",Day="Blank",Month="Blank",Year="Blank",ContainsArabic="Blank",Blank="Blank",Notes="Blank",Unreadable="Blank",Document_Number="Blank",PurchaseOrder_Number="Blank",Piece_Number="Blank",Page_Number="Blank",Translation_Notes = "Blank")
+        new_ocr = OcrRecord(Amount="Blank",Currency="Blank",Company="Blank",Address="Blank",City="Blank",Country="Blank",Telephone="Blank",Source_Bank_Account="Blank",Document_Type="Blank",IssueDate="Blank",Day="Blank",Month="Blank",Year="Blank",ContainsArabic="Blank",Blank="Blank",Notes="Blank",Unreadable="Blank",Document_Number="Blank",PurchaseOrder_Number="Blank",Piece_Number="Blank",Page_Number="Blank",Translation_Notes = "Blank",Cheque_Number = "Blank")
         company_link = CompanyTemplate.objects.get(companyname_base="ControlCompanyTemplate")
     
     else:
-        new_ocr = OcrRecord(Amount=amount,Currency=currency,Company=company_name,Address=company_address,City=company_city,Country=company_country,Telephone=company_telephone,Source_Bank_Account=accountnum,Document_Type=doctype,IssueDate=issuedate,Day=issuedate_day,Month=issuedate_month,Year=issuedate_year,ContainsArabic=arabic,Blank="none",Document_Number=docnumber,Notes=memo,Unreadable="no",PurchaseOrder_Number=purch_order_num,Piece_Number=piece_number,Page_Number=page_number,Translation_Notes = translation_memo)
+        new_ocr = OcrRecord(Amount=amount,Currency=currency,Company=company_name,Address=company_address,City=company_city,Country=company_country,Telephone=company_telephone,Source_Bank_Account=accountnum,Document_Type=doctype,IssueDate=issuedate,Day=issuedate_day,Month=issuedate_month,Year=issuedate_year,ContainsArabic=arabic,Blank="none",Document_Number=docnumber,Notes=memo,Unreadable="no",PurchaseOrder_Number=purch_order_num,Piece_Number=piece_number,Page_Number=page_number,Translation_Notes = translation_memo,Cheque_Number = chequenum)
         
     
     try:
@@ -3304,7 +3310,7 @@ def search_tool(request):
         actual_min_num = 0
     
     
-    max_num = actual_min_num + 10
+    max_num = actual_min_num + 50
     
     
     ###END OF COMMON BLOCK###  
@@ -4043,10 +4049,7 @@ def search_tool(request):
                 if corpus_word=="corpus_ocr_records":
                     
                     source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(record.sourcedoc_link.job_directory, record.sourcedoc_link.filename)
-                    
-                
-                #source_url = 'http://54.200.180.182/sourcepdfs/albaraka2006/01-january2006ctd_part1.pdf'
-                
+
                 remoteFile = urlopen(Request(source_url)).read()
                 memoryFile = StringIO(remoteFile)
                 input_pdf = PdfFileReader(memoryFile)

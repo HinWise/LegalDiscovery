@@ -1,0 +1,31 @@
+scp -i  LegalRecoveryKey.ppk C:\Dropbox\NathanProject\ProjectFolder\ChequeLIST.csv ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder
+
+scp -i  LegalRecoveryKey.ppk C:\Dropbox\NathanProject\ProjectFolder\enersectapp\templates\enersectapp\dataentryui_spider.html ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/enersectapp/templates/enersectapp
+
+
+scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db D:\Dropbox\NathanProject\ProjectFolder\databases\
+
+scp -i  LegalRecoveryKey.ppk C:\Dropbox\GitHub\LegalDiscovery\databases\nathansqlite3db.zip ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/
+
+scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db.zip C:\Dropbox\GitHub\LegalDiscovery\ProjectFolder\databases\
+
+scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db.zip C:\Dropbox\NathanProject\ProjectFolder\databases\
+
+lzma -c nathansqlite3db > nathansqlite3db.xz (.7zip) to zip
+
+lzma -d -c nathansqlite3db.xz > nathansqlite3db.unzip (.7zip) to unzip
+
+sudo zip -r ProjectFolder.zip ProjectFolder
+
+sudo unzip -o ProjectFolder.zip
+
+Migration, copy database from server to local:
+
+python manage.py dumpdata enersectapp --format=json --natural --indent=4 > enersectapp/fixtures/NotAllSources_7_11_2013.json
+
+python manage.py loaddata NotAllSources_7_11_2013.json
+
+if len(item.internalrecord_link.Day)>1 and item.internalrecord_link.Day != 'NaN' and len(item.internalrecord_link.Month)>1 and item.internalrecord_link.Month != 'NaN' and len(item.internalrecord_link.Year)>3:
+timestring = item.internalrecord_link.Day+'/'+item.internalrecord_link.Month+'/'+item.internalrecord_link.Year
+timetest = datetime.strptime(timestring, '%d/%m/%Y').replace(tzinfo=timezone.utc)
+)
