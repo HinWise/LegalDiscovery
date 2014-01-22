@@ -537,6 +537,7 @@
             $( "#filter_container_doctype" ).buttonset();
             $( "#filter_container_date" ).buttonset();
             $( "#filter_container_modification_author" ).buttonset();
+            $( "#filter_container_auditmark" ).buttonset();
             $( "#filter_container_company" ).buttonset();
         
         
@@ -612,6 +613,21 @@
              
             });
             
+            $('.choice_auditmark').click(function(){
+            
+               modification_auditmark = $(this).attr("choice_value");
+            
+               $('#selected_auditmark').attr("value",modification_auditmark);
+
+               disableButtonsets();
+               savePanelSizes();
+               toggleLoadingScreen();
+               
+               $("#fields_form").submit();
+             
+             
+            });
+            
             $('.choice_company').click(function(){
             
                modification_company_value = $(this).attr("choice_value");
@@ -636,6 +652,7 @@
             $( "#filter_container_doctype" ).buttonset("disable");
             $( "#filter_container_date" ).buttonset("disable");
             $( "#filter_container_modification_author" ).buttonset("disable");
+            $( "#filter_container_auditmark" ).buttonset("disable");
             $( "#filter_container_company" ).buttonset("disable");
         }
         
@@ -691,6 +708,12 @@
             var modification_author = $('#selected_modification_author').attr("value");
         
             $('#filter_pdf_modification_author'+modification_author).attr("checked","checked").button("refresh");
+            
+            //For the Audit Mark Choice
+            
+            var auditmark = $('#selected_auditmark').attr("value");
+        
+            $('#filter_pdf_auditmark'+auditmark).attr("checked","checked").button("refresh");
             
             //For the Company Choice
             
@@ -806,6 +829,15 @@
                             <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_author{{company_name}}" choice_value="{{company_name}}" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_author{{company_name}}">{{company_name}}</label>
                             <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_authorall" choice_value="all" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_authorall">All Editors</label>
                     </div>
+                    
+                    <div class="show-option" id="filter_container_auditmark" title="Filter the Search Results by Audit Mark">
+                            
+                            {% if selected_auditmark %}
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkcorrect" choice_value="correct" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkcorrect">Correct</label>
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkincorrect" choice_value="incorrect" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkincorrect">Incorrect</label>
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkall" choice_value="all" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkall">All Audit Marks</label>
+                            {% endif %}
+                    </div>
             </div>        
         </div>
         
@@ -832,6 +864,7 @@
                 
                 <input class="invisible" type="text" name="save_mark" id="save_mark" value="None" />
                 <input class="invisible" type="text" name="selected_modification_author" id="selected_modification_author" value="{{selected_modification_author}}" />
+                <input class="invisible" type="text" name="selected_auditmark" id="selected_auditmark" value="{{selected_auditmark}}" />
                 <input class="invisible" type="text" name="selected_lot" id="selected_lot" value="{{lot_number}}" />
                 <input class="invisible" type="text" name="selected_user" id="selected_user" value="{{selected_user}}" />
                 <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" />

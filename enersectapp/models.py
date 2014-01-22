@@ -186,6 +186,7 @@ class PdfRecord(models.Model):
     modified_doctype_author = models.ForeignKey(User,null=True,blank=True)
     commentary = models.CharField(max_length=512, default="None")
     audit_mark = models.CharField(max_length=512, default="None")
+    audit_mark_revision = models.CharField(max_length=512, default="None")
     status = models.CharField(max_length=255, default="pdf_unlinked")
     translated = models.CharField(max_length=255, default="no")
     createdbymean = models.CharField(max_length=255, default="none")

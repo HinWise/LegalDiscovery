@@ -1687,6 +1687,11 @@ def randomqa_spider(request):
             selected_date = request.POST['selected_date']
         except (KeyError):
             selected_date =  "all"
+            
+        try:
+            selected_auditmark = request.POST['selected_auditmark']
+        except (KeyError):
+            selected_auditmark =  "all"
         
         try:
             filters_panel_width = request.POST['filters_panel_width']
@@ -1859,14 +1864,22 @@ def randomqa_spider(request):
         
                 if pdf_record_id is not "None":
                     recover_pdf = PdfRecord.objects.filter(id=pdf_record_id)[0]
-                    recover_pdf.audit_mark = save_mark
-                    recover_pdf.modification_author = the_user.username
-                    recover_pdf.save()
-                    memo_report = "Marked PdfRecord PK."+str(recover_pdf.pk)+" as"+save_mark+"."
+                    if selected_auditmark == "all":
+                        recover_pdf.audit_mark = save_mark
+                        recover_pdf.modification_author = the_user.username
+                        recover_pdf.save()
+                        memo_report = "Marked PdfRecord PK."+str(recover_pdf.pk)+" as"+save_mark+"."
+                    else:
+                        recover_pdf.audit_mark_revision = save_mark
+                        recover_pdf.modification_author = the_user.username
+                        recover_pdf.save()
+                        memo_report = "Revised Mark for PdfRecord PK."+str(recover_pdf.pk)+" from "+recover_pdf.audit_mark+" to "+save_mark+"."
+                        
                     report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                     report.save()
         
             elif save_mark == "auditmarked_as_incorrect_reentry":
+                
                 
                 incorrect_list = pdf_records_list.filter(audit_mark="auditmarked_as_incorrect")
                 
@@ -1910,10 +1923,18 @@ def randomqa_spider(request):
         
             show_progress_mark = "show" 
         
-            pdf_total_count = len(pdf_records_list)
             
-            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
-            pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
+            
+            if selected_auditmark == "all":
+                pdf_total_count = len(pdf_records_list)
+                pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
+                pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
+            
+            else:
+                
+                pdf_correct_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_correct"))
+                pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_incorrect"))
+                
             pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
             
             if pdf_correct_count!=0 and pdf_incorrect_count!=0:
@@ -1931,8 +1952,16 @@ def randomqa_spider(request):
             pdf_reentry_count = 0
             error_rate = 0
             show_progress_mark = "no" 
-            
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        
+
+        if selected_auditmark == "all":
+            pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        elif selected_auditmark == "correct":
+            pdf_records_list = pdf_records_list.filter(audit_mark="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect")
+            pdf_total_count = len(pdf_records_list)
+        elif selected_auditmark == "incorrect":
+            pdf_records_list = pdf_records_list.filter(audit_mark="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_correct")
+            pdf_total_count = len(pdf_records_list)
         
         pdf_id_list_to_randomize = []
         
@@ -1979,7 +2008,7 @@ def randomqa_spider(request):
         'pdf_incorrect_count':pdf_incorrect_count,'pdf_reentry_count':pdf_reentry_count,
         'pdf_lot_number_distinct':pdf_lot_number_distinct,'pdf_author_distinct':pdf_author_distinct,
         'selected_user': selected_user,'selected_doctype': selected_doctype,'selected_company': selected_company,
-        'selected_date':selected_date,'selected_modification_author':selected_modification_author,
+        'selected_date':selected_date,'selected_modification_author':selected_modification_author,'selected_auditmark':selected_auditmark,
         'filters_panel_width':filters_panel_width,
         'filters_panel_width':filters_panel_height,'company_name':user_company.name}
         return render(request,'enersectapp/randomqa_spider.html',context)
