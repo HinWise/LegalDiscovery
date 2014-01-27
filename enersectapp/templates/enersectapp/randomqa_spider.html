@@ -798,7 +798,7 @@
                     </div>
                     <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
                             {% for item in pdf_doctype_distinct %}
-                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item.modified_document_type__name}}" choice_value="{{item.modified_document_type__name}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item.modified_document_type__name}}">{{item.modified_document_type__name}}</label>
+                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}" choice_value="{{item.ocrrecord_link__Document_Type}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}">{{item.ocrrecord_link__Document_Type}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctypeall" choice_value="all" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctypeall">All Document Types</label>
                     </div>

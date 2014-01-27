@@ -26,6 +26,19 @@ table {
     
 }
 
+tr {
+
+    padding: 0.25%;
+    font-size: 70%;
+    white-space: nowrap;
+
+}
+
+theader {
+    
+    position:fixed;
+}
+
 .zebra {
 
     /*-webkit-touch-callout: none;
@@ -42,14 +55,14 @@ table {
     border-left: 1px solid #555;
     border-top: 1px solid #555;
     
-    
+    z-index:200;
 }
 
 .zebra th, .zebra th:hover {
     border-left: 1px solid #555;
 	border-bottom: 1px solid #828282;
     border-top: 1px solid #828282;
-    padding: 1%;  
+    padding: 0.25%;  
     background-color:#202020 !important;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#202020), to(#191919)) !important;
     background-image: -webkit-linear-gradient(top, #202020, #191919) !important;
@@ -58,6 +71,9 @@ table {
     background-image:      -o-linear-gradient(top, #202020, #191919) !important;
     background-image:         linear-gradient(top, #202020, #191919) !important;
 	color:#fff !important;
+    
+    
+    z-index:300;
 	
 }
 
@@ -81,6 +97,22 @@ table {
 .zebra tr {
 	background:#404040;
 	color:#fff;
+    
+}
+
+#headers_cover {
+    position:absolute;
+    
+    background-color: grey;
+    
+    width:0;
+    height: 0;
+    
+    display:none;
+    
+    
+    z-index:250;
+    
 }
 
 .down_label {

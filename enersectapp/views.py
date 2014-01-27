@@ -1624,6 +1624,14 @@ def cocoons_new_teamuser(request):
 
 def randomqa_spider(request):
 
+    '''Audit Notes
+    
+        Document Type is selected by what the enterers Chose for a Document Type, not the actual, re-categorised Document Type
+        
+        
+    '''
+
+
     the_user = request.user
 
     if not the_user.is_authenticated():
@@ -1786,7 +1794,7 @@ def randomqa_spider(request):
                     pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
         
         
-        #Making a list of Document Types and selecting the PdfRecords that are of that Document Type
+        #Making a list of Document Types and selecting the PdfRecords that are of that Document Type (From the Doctype entered, not the actual Doctype)
         
         ''' Disabled temporarily, the ability to choose Audit by Document Type, due to speed limitations
         pdf_doctype_distinct = pdf_records_list.order_by().values('modified_document_type__name').distinct()
@@ -1795,14 +1803,19 @@ def randomqa_spider(request):
         '''
         pdf_doctype_distinct = PdfRecord.objects.none()
         
+        #Delete this line to deactivate selection by Entered Document Types
+        
+        pdf_doctype_distinct = pdf_records_list.order_by().values('ocrrecord_link__Document_Type').distinct()
+        
         pdf_doctype_list = []
         
         if selected_doctype != "all":
-            pdf_doctype_list.append(selected_doctype)
+            #pdf_doctype_list.append(selected_doctype)
            
-            for doctype in pdf_doctype_list:
+            '''for doctype in pdf_doctype_list:
                 doctype_class = SourceDocType.objects.filter(name=doctype)[0]
-                pdf_records_list = pdf_records_list.filter(modified_document_type=doctype_class)
+                pdf_records_list = pdf_records_list.filter(modified_document_type=doctype_class)'''
+            pdf_records_list = pdf_records_list.filter(ocrrecord_link__Document_Type__iexact = selected_doctype)
         
         
         #Getting rid of Duplicates
@@ -2107,6 +2120,9 @@ def randomqa_spider(request):
                 for user_name in user_names_list:
                     pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
         
+        
+        #Making a list of Document Types and selecting the PdfRecords that are of that Document Type (From the Doctype entered, not the actual Doctype)
+        
         ''' Disabled temporarily, the ability to choose Audit by Document Type, due to speed limitations
         pdf_doctype_distinct = pdf_records_list.order_by().values('modified_document_type__name').distinct()
         
@@ -2114,14 +2130,19 @@ def randomqa_spider(request):
         '''
         pdf_doctype_distinct = PdfRecord.objects.none()
         
+        #Delete this line to deactivate selection by Entered Document Types
+        
+        #pdf_doctype_distinct = pdf_records_list.order_by().values('ocrrecord_link__Document_Type').distinct()
+        
         pdf_doctype_list = []
         
         if selected_doctype != "all":
-            pdf_doctype_list.append(selected_doctype)
+            #pdf_doctype_list.append(selected_doctype)
            
-            for doctype in pdf_doctype_list:
+            '''for doctype in pdf_doctype_list:
                 doctype_class = SourceDocType.objects.filter(name=doctype)[0]
-                pdf_records_list = pdf_records_list.filter(modified_document_type=doctype_class) 
+                pdf_records_list = pdf_records_list.filter(modified_document_type=doctype_class)'''
+            pdf_records_list = pdf_records_list.filter(ocrrecord_link__Document_Type__iexact = selected_doctype)
         
         
         #Getting rid of Duplicates
