@@ -96,9 +96,8 @@ object {
     position:absolute;
     
     top:0;
-    left:0;
-    
-    width:100%;
+    left: -50%;
+    width: 205%;
     height:100%;
     
     overflow:auto;
@@ -123,43 +122,79 @@ object {
     height: 25%;
 }
 
+#partial_table_container {
+
+    display:none;
 
 
+}
+
+.partial_records_table {
+
+    border-collapse: collapse !important;
+    border: 0 !important;
+    border-bottom: 1px !important;
+}
+    
 .record_tools_container {
 
     position: relative;
-    display:inline-block;
-    float:right;
+    display: inline-block;
+    float: left;
+    height: 80%;
+    width: 95%;
+    font-size: 100%;
+    padding-left: 5%;
+    padding-top: 1%;
     
-    height: 25%;
-    width: 15.5%;
+ 
+}
+
+.partial_table_separator {
+
+    position:relative;
+    width:80%;
+    height:2%;
+    opacity:0.1;
+    background:none;
     
-    font-size:67%;
-    
-    padding-right: 0%;
-    padding-top: 13%;
-    
-    
-    
+
+}
+
+#pdf_view_object {
+
+    z-index:600;
 }
 
 .toggle_pdf_label {
     
-    display:block;
-    float:left;
-    
-    width:80%;
-    height:23%;
-    
-    padding-top: 7%;
-    padding-left:2%;
-  
-    text-align:left;
-    vertical-align:middle;
+    position:relative;
+    display: block;
+    float: left;
+    width: 60%;
+    height: 100%;
+    padding-top: 1%;
+    padding-left: 2%;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 70%;
     
 }
 
+.assign_to_group_button_label {
 
+    /*position:relative;
+    display: block;
+    float: left;
+    width: 60%;
+    height: 100%;
+    padding-top: 1%;
+    padding-left: 2%;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 70%;*/
+
+}
 
 .flag_button_label {
     
@@ -407,6 +442,29 @@ object {
     top: 0;
 }
 
+#show_options_tab {
+
+    position:absolute;
+    
+    width:150%;
+    height:100%;
+    
+    left: 95%;
+    top: 0;
+    background:#7e7783;
+    opacity:0.2;
+    z-index:600;
+    pointer-events:all;
+}
+
+#show_options_tab:hover {
+
+    background-color:#665874;
+    
+    opacity:0.5;
+    
+    cursor:pointer; cursor: hand
+}
 
 #listpanel_container {
 
@@ -428,8 +486,8 @@ object {
         top: 0.6%;
         left: 1%;
         
-       overflow-x:hidden;
-       overflow-y:auto;
+       overflow-x:auto;
+       overflow-y:hidden;
        
        
     }
@@ -476,7 +534,6 @@ object {
     
     height:100%;
     width: 100%;
-    
     
     
 }

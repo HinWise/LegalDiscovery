@@ -8,474 +8,707 @@
 </head>
 {% endblock page_title %}
 
-{% block config_libs %} 
+{% block config_libs %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
 <script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
 <script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/dragtablejs/jquery.dragtable.js' %}"></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-panelsnap/jquery.panelSnap.js' %}"></script>
 
 
 {% endblock config_libs %}
 
-{% block special_libs %} 
+{% block special_libs %}
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/search_tool.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dragtablejs/dragtable.css' %}" />
 {% endblock special_libs %}
 
 {% block jqueryui_setups %}
 
 <script>
     $(document).ready(function () {
+
+        actual_Orientation = "horizontal";
     
-      $( "#pdf_view" ).toggle( "drop", 1000 );
-    
-      $('#accordion').accordion({header: "h3",collapsible: true,active:false,heightStyle: "content" })/*.sortable({
-        axis: "y",
-        handle: "h3",
-        stop: function( event, ui ) {
-          // IE doesn't register the blur when sorting
-          // so trigger focusout handlers to remove .ui-state-focus
-          ui.item.children( "h3" ).triggerHandler( "focusout" );
-        }
-      })*/;
+        initiateSearchTool();
+        initializeListeners();
+
         
-        /*Cleaning the string with all the company names received from Django*/
-    
+        configLoadingScreen();
+        
+        createUserPanel();
+        createListPanel();
+        initialPanelsDisplay();
+        showOrHideListPanel();
+        createFieldsForm();
+        classLocator();
+
+
+    function initiateSearchTool(){
+
+        //Using external library dragtable.js, allows the columns to be organised by the user
+
+        $('#records_table').dragtable({maxMovingRows:30});
+
+        //Start with the PDF View deactivated
+
+        $( "#pdf_view" ).toggle( "drop", 1000 );
+
+
+        /*Cleaning the string with all the company names received from Django, to make the Company List*/
+
         if($('#companiesarray').length)
         {
-    
+
             companyNameList = $('#companiesarray').attr("value");
             companyNameList = companyNameList.replace(/'/g,"");
             companyNameList = companyNameList.replace("]","");
             companyNameList = companyNameList.replace("[","");
             companyNameList = companyNameList.split(", ");
-            
-           
+
+
 
             i = 0;
             while(i < companyNameList.length){
                 companyNameList[i] = companyNameList[i].slice(1);
                 i++;
             }
-        
+
         }
-  
-  
-  
-        classLocator();
-        configLoadingScreen();
-        createUserPanel();
-        createListPanel();
-        createFieldsForm();
+
+    }
+
+
+    function initialPanelsDisplay() {
+
+        //Start with User and List panels closed, and prevent the html from appearing for a moment
+
+        $( "#listpanel-form" ).removeClass("invisible");
+        $( "#user-panel" ).removeClass("invisible");
+
+        //*showOrHideListPanel("hide");
+
+    }
+
+    function showOrHideListPanel(option) {
+
+        if(option =="show")
+        {
+            $('#show_options_tab').animate({left:'-8%'},500, 'easeInOutCubic');
+            $('#show_options_tab').removeClass("hide");
+            $('#show_options_tab').addClass("show");
+            $( "#listpanel-form" ).dialog( "open" );
+        }
+        if(option == "hide")
+        {
+            $('#show_options_tab').animate({left:'95%'},600, 'easeInOutCubic');
+            $('#show_options_tab').removeClass("show");
+            $('#show_options_tab').addClass("hide");
+            $( "#listpanel-form" ).dialog( "close" );
+        }
+
+
+    }
+
+    function togglePanelsDisplay()
+    {
+        if($('#show_options_tab').hasClass("show"))
+        {
+            showOrHideListPanel("hide");
+            $( "#user-panel" ).dialog( "close" );
+        }
+        else
+        {
+            showOrHideListPanel("show");
+            $( "#user-panel" ).dialog( "open" );
+        }
+    }
+
+    //Choose between horizontal (No PDF View, Large table) and Vertical (Pdf View, small table with one element) Views.
+
+    function toggleHorizontalorVerticalVersion(orientation,elementNum)
+    {
+        if(orientation=="vertical")
+        {
+            panelDisplayConfig(orientation,elementNum);
+            bindScrollingMode(orientation);
+        }
+        
+        if(orientation=="horizontal")
+        {
+            panelDisplayConfig(orientation,elementNum);
+            bindScrollingMode(orientation);
+        }
+
+
+    }
+
+    function activateScrollingBinding() {
     
+        $('#accordion_table').scroll(function() {
+
+            if (this.scrollTop <= minScroll || this.scrollTop >= maxScroll)
+            {
+            
+                var individualElementHeight = parseInt($('.partial_records_table').first().css('height'));
+                
+                var numberTables = $('.partial_records_table').length;
+                
+                var numberChosenTable = parseInt(this.scrollTop / individualElementHeight);
+                
+                
+                
+                
+                
+                //Adjustments to fit one table exactly inside the div, plus separation
+                
+                var accordionHeight = $('#accordion_table').height();
+                var numberTotalRows = $('.tr_partial').length;
+                var numberTables = $('.partial_records_table').length;
+                var numberLocalRows = numberTotalRows / numberTables;
+                var rowHeight = accordionHeight/numberLocalRows;
+                var newScrollPosition = (parseInt(this.scrollTop / individualElementHeight) * individualElementHeight) + rowHeight;
+                
+                
+                
+                    _this = this;
+
+                    clearInterval(scrollTimerHandle);
+                    
+                scrollTimerHandle  = setTimeout(function() {
+                   //_this.scrollTop = newScrollPosition ;
+                   $('#accordion_table').stop().animate({scrollTop:newScrollPosition},100);
+                   minScroll = newScrollPosition;
+                   maxScroll = newScrollPosition + individualElementHeight - 20;
+                   
+                    //Procedure to show the PDF of the focused table automatically
+                    $('.toggle_pdf_button').attr('focused','not_focused');
+                    $objective = $('.toggle_pdf_button:eq('+numberChosenTable+')');
+                    $objective.attr('focused','focused');
+                    $objective.click();
+                    $('.toggle_pdf_button').attr('focused','not_focused');
+
+                }, 500);
+                
+                
+                
+            }
+
+            });
+    }
+    
+    function bindScrollingMode(orientation) {
+    
+        if(orientation=="vertical")
+        {
+            
+            $('#accordion_table').unbind('scroll');
+            
+            scrollTimerHandle = "";
+ 
+
+            activateScrollingBinding();
+            
+            $(document).keydown(function(e) {
+            
+            
+                if (e.keyCode == 40) { 
+                
+                   $('#accordion_table').unbind('scroll');
+                
+                   scrollTimerHandle  = setTimeout(function() {
+                
+                        var individualElementHeight = parseInt($('.partial_records_table').first().css('height'));                    
+                        
+                        //$('#accordion_table').scrollTop($('#accordion_table').scrollTop() + individualElementHeight);
+                        $('#accordion_table').stop().animate({scrollTop:$('#accordion_table').scrollTop() + individualElementHeight},11);
+                        
+
+                        
+                    }, 10);
+                    
+                    
+                }
+                
+                if (e.keyCode == 38) { 
+                
+                   $('#accordion_table').unbind('scroll');
+                
+                   scrollTimerHandle  = setTimeout(function() {
+                
+                        var individualElementHeight = parseInt($('.partial_records_table').first().css('height'));
+                    
+                        //$('#accordion_table').scrollTop($('#accordion_table').scrollTop() - individualElementHeight);
+                        $('#accordion_table').stop().animate({scrollTop:$('#accordion_table').scrollTop() - individualElementHeight},1);
+                        
+                    }, 10);
+                    
+                    
+                }
+                
+                
+            });
+            
+            $(document).keyup(function(e) {
+            
+            
+                if (e.keyCode == 40 || e.keyCode == 38) { 
+                
+                    scrollTimerHandle  = setTimeout(function() {
+                
+                        activateScrollingBinding();
+                        
+                        $('#accordion_table').scroll();
+                        
+                        
+                    }, 20);
+
+                    
+                }
+                
+                
+                
+            });
+            
+            
+            
+            
+        }
+        
+        if(orientation=="horizontal")
+        {
+        
+            $('#accordion_table').unbind('scroll');
+            
+            //Fit the header to the right place at the beginning
+            
+            headers_width = $("#records_table").width();
+            headers_height = $(".th_full").first().height();
+
+            $("#headers_cover").css("width",headers_width+"px");
+            $("#headers_cover").css("height",headers_height+"px");
+            $("#headers_cover").css("display","block");
+            $(".th_full").offset({top:originalPositionYHeaderRow});
+            top_position = $(".th_full").css('top');
+            
+            $("#headers_cover").css('top',top_position);
+            
+            
+            $('#accordion_table').scroll(function(){ //when the user is scrolling...
+            
+            headers_width = $("#records_table").width();
+            headers_height = $(".th_full").first().height();
+
+            $("#headers_cover").css("width",headers_width+"px");
+            $("#headers_cover").css("height",headers_height+"px");
+            $("#headers_cover").css("display","block");
+            $(".th_full").offset({top:originalPositionYHeaderRow});
+            top_position = $(".th_full").css('top');
+            
+            $("#headers_cover").css('top',top_position);
+            
+
+        });
+        }
+    
+    }
+    
+    function panelDisplayConfig(orientation,elementNum) {
+        
+        if(actual_Orientation != orientation)
+        {
+        
+            if(orientation == "vertical")
+            {
+                //$('#records_container').animate({left:'80%',width:'47,5%'},1000, 'easeInOutQuart');
+                $('#accordion_table').animate({left:'55%',width:'100%'},1000, 'easeInOutQuart');
+                $('#accordion_table').css('padding-top','1%');
+                
+                //$( "#user-panel" ).dialog( "close" );
+                //$( "#listpanel-form" ).dialog( "close" );
+
+                $('#pdf_view').addClass("opened-pdf",1000);
+                $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
+
+                        
+                $('#partial_table_container').css({display:'block'});
+                $('#full_table_container').css({display:'none'});
+                $('#partial_table_container').animate({opacity:100},1000, 'easeInOutQuart');
+                $('#full_table_container').animate({opacity:0},1000, 'easeInOutQuart');
+                
+                $('#accordion_table').css('padding-top','5px');
+                
+                $('.toggle_pdf_label').css({width:'20%'});
+                $('.assign_to_group_button_label').css({width:'20%'});
+                
+                
+                var accordionHeight = $('#accordion_table').height();
+                var numberTotalRows = $('.tr_partial').length;
+                var numberTables = $('.partial_records_table').length;
+                var numberLocalRows = numberTotalRows / numberTables;
+                $('.tr_partial').height(accordionHeight/numberLocalRows);
+                //$('.partial_table_separator').height(accordionHeight/numberLocalRows/2);
+                
+                actual_Orientation = "vertical";
+                
+                
+                minScroll = 0;
+                maxScroll = 0;
+                
+                var individualElementHeight = parseInt($('.partial_records_table').first().css('height'));
+                
+                var numberChosenTable = elementNum;
+                
+                var accordionHeight = $('#accordion_table').height();
+                var numberTotalRows = $('.tr_partial').length;
+                var numberTables = $('.partial_records_table').length;
+                var numberLocalRows = numberTotalRows / numberTables;
+                var rowHeight = accordionHeight/numberLocalRows;
+                
+                var newScrollPosition = (numberChosenTable * individualElementHeight) + rowHeight;
+                
+                scrollTimerHandle  = setTimeout(function() {
+                   //_this.scrollTop = newScrollPosition ;
+                   $('#accordion_table').stop().animate({scrollTop:newScrollPosition},100);
+                   minScroll = newScrollPosition;
+                   maxScroll = newScrollPosition + individualElementHeight - 20;
+                   
+
+                }, 500);
+                
+                
+                
+            }
+            
+            if(orientation == "horizontal")
+            {
+                $('#accordion_table').animate({left:'-50%',width:'205%'},1000, 'easeInOutQuart');
+                $('#accordion_table').css('padding-top','0%');
+
+                //$( "#user-panel" ).dialog( "open" );
+                //$( "#listpanel-form" ).dialog( "open" );
+
+                $('#pdf_view').removeClass("opened-pdf",1000);
+                $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
+                        
+                $('#partial_table_container').animate({opacity:0},1000, 'easeInOutQuart');
+                $('#full_table_container').animate({opacity:100},1000, 'easeInOutQuart');
+                $('#partial_table_container').css({display:'none'});
+                $('#full_table_container').css({display:'block'});
+                
+                $('.toggle_pdf_label').css({width:'60%'});
+                $('.assign_to_group_button_label').css({width:'60%'});
+                
+                actual_Orientation = "horizontal";
+            }
+        }
+    }
+    
+    function initializeListeners(){
+
+        //Global for original table headers Y position
+
+        originalPositionYHeaderRow = $('#headers_row').offset().top;
+
+        //If the users scrolls in the table, keep the th fields static in the same Y
+
+        $('#accordion_table').scroll(function(){ //when the user is scrolling...
+            
+            headers_width = $("#records_table").width();
+            headers_height = $(".th_full").first().height();
+
+            $("#headers_cover").css("width",headers_width+"px");
+            $("#headers_cover").css("height",headers_height+"px");
+            $("#headers_cover").css("display","block");
+            $(".th_full").offset({top:originalPositionYHeaderRow});
+            top_position = $(".th_full").css('top');
+            
+            $("#headers_cover").css('top',top_position);
+            
+
+        });
+
+
+        //Event handler for the PDF View buttons, and the behaviour of the User and Search/List panels according to it
+
         $(".toggle_pdf_button")
         .button({
             icons: {primary: "ui-icon-document"}
         })
         .click(function () {
-            
+
             var $element_id = $(this).attr("value2");
-            
-            if (this.checked) {
-                
-                
+            var focused = $(this).attr("focused");
+
+            if (this.checked || focused == "focused") {
+
+
                 $('.toggle_pdf_button').each(function(){
-                
+
                     if(this.checked == true) this.checked=false;
                     $(this).button("option", "icons", {primary: "ui-icon-document"});
                     $(this).removeClass("ui-state-active");
                 })
-                
+
                 $('.toggle_pdf_label').each(function(){
-                  
+
                     $(this).removeClass("ui-state-active");
                 })
-                
-                
+
+
                 $("#toggle_pdf_label"+$element_id).addClass("ui-state-active");
-                
-                
+
+
                 this.checked = true;
-                
+
                 $(this).button("option", "icons", {primary: "ui-icon-close"});
-                
-                
+
+
                 if($('#pdf_view_object').length !=0) $('#pdf_view_object').remove();
-              
-                
+
+
                 var link = $(this).attr("value");
-                
+
                 var w=window.innerWidth*0.486;
                 var h=window.innerHeight*0.74;
-               
-                         
+
+
                 var $pdf = $('#pdf_view');
-                
-                $pdf.append(s); 
-               
-                
+
+
+
                 var s ='<object id="pdf_view_object" data='+link+' type="application/pdf" width="'+w+'" height="'+h+'">';
                 s+= 'PDF View not Available in this Browser : ';
                 s+= '<a href='+link+'>Alternative Link</a>';
                 s+= '</object>'
-                
-                $pdf.append(s); 
 
+                $pdf.append(s);
+                
+                var elementNum = $('.toggle_pdf_button').index(this);
+                
                 if($('#pdf_view').hasClass("opened-pdf")==false)
-                {   
-                   
-                    $('#records_container').animate({left:'55%'},1000, 'easeInOutQuart');
+                {
+
+                    toggleHorizontalorVerticalVersion("vertical",elementNum);
                     
-                   
                     
-                    $( "#user-panel" ).dialog( "close" );
-                    $( "#listpanel-form" ).dialog( "close" );
-                
-                    $('#pdf_view').addClass("opened-pdf",1000);
-                    $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
-                   
+                    
                 }
-                            
-                
+
+
             }
-            else {
+            else{
+            
+                
                 $(this).button("option", "icons", {primary: "ui-icon-document"});
+
+                var elementNum = 0;
                 
                 if($('#pdf_view').hasClass("opened-pdf")==true)
-                {            
-                    $('#records_container').animate({left:'0%'},1000, 'easeInOutQuart');
+                {
+                    toggleHorizontalorVerticalVersion("horizontal",elementNum);
                     
                     
-                    $( "#user-panel" ).dialog( "open" );
-                    $( "#listpanel-form" ).dialog( "open" );
-                
-                    $('#pdf_view').removeClass("opened-pdf",1000);
-                    $( "#pdf_view" ).toggle( "drop",{direction:"right"}, 1000 );
                 }
-                
+
             }
-           
-            
-            
+
+
+
         })
         .filter(":checked").button({icons: {primary: "ui-icon-close"}});
-        
-        //Click events and initial set up of Assign to your Group Button//
-        
+
+
+        //Click events and initial set up of "Assign to your Group" Button//
+
         $(".assign_to_group_button")
         .button({
             icons: {primary: "ui-icon-document"}
         })
         .click(function () {
-            
+
             var $element_id = $(this).attr("value");
             var $is_checked = $(this).attr("checked");
-            
+
             if ($is_checked == "checked") {
-                
-                
+
+
                 $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
-                
+
                 alert("DEASSIGNATION IS NOT IMPLEMENTED AT THE MOMENT");
-                            
-                
+
+
             }
             else {
-            
+
                 $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
                 $(this).button("option", "icons", {primary: "ui-icon-close"});
                 $(this).attr("checked","checked");
-            
+
                 $("#id_assign").attr("value",$element_id);
                 toggleLoadingScreen();
-                
+
                 $("#search_form").submit();
-                    
+
             }
-           
+
 
         });
-        
+
         $('.assign_to_group_button').each(function(){
-                
+
                 var $element_id = $(this).attr("value");
                 var $is_checked = $(this).attr("checked");
-                
+
                 if($is_checked == "checked")
                 {
-                    
+
                     $(this).button("option", "icons", {primary: "ui-icon-close"});
                     $("#assign_to_group_button_label"+$element_id).addClass("ui-state-active");
-                    
-                    
+
+
                 }
- 
-        });
-        
-        //ui-state-custom-linked
-        
-        $(".linking_button")
-        .button({
-            icons: {primary: "ui-icon-link"}
-        })
-        .click(function () {
-        
-            var $element_id = $(this).attr("value");
-            toggleLoadingScreen();       
-            $("#linking_form"+$element_id).submit();
-                             
-        });
-        
-        $(".unlinking_button")
-        .button({
-            icons: {primary: "ui-icon-cancel"}
-        })
-        .click(function () {
-        
-            var $element_id = $(this).attr("value");
-            toggleLoadingScreen();
-            $("#unlinking_form"+$element_id).submit();
-              
-        });
-        
-        //ui-state-custom-error
-        
-        $(".flag_button")
-        .button({
-            icons: {primary: "ui-icon-flag"}
-        })
-        .click(function () {
-        
-            var $element_id = $(this).attr("value");
-                           
-            var isChecked = $(this).hasClass("clicked");
-            
-            if(isChecked)
-            {
-                $(this).removeClass("clicked");
-                $("#flag_form").css("display","none"); 
-                  
-            }
-            else
-            {
-                $(this).addClass("clicked");
-                $("#flag_form").css("display","block"); 
-                $("#flag_record_id").attr("value",$element_id);
-             
-            }
-                             
-        });
-        
-        
-        $( "#flag_option_typo" ).button().click(function(){
-        
-            $("#flag_record_category").attr("value","Typo");
-        
-        });
-        
-        $( "#flag_option_category" ).button().click(function(){
-        
-            $("#flag_record_category").attr("value","Wrong Category");
-        
-        });
-        
-        $( "#flag_option_duplicate" ).button().click(function(){
-        
-            $("#flag_record_category").attr("value","Duplicate");
-        
-        });
-        
-        $( "#flag_option_mislinked" ).button().click(function(){
-        
-            $("#flag_record_category").attr("value","Mislinked");
-        
-        });
-        
-        
-        $( "#submit_now" ).button().click(function(){
-            toggleLoadingScreen();                 
-            $("#flag_form").submit();
 
         });
-        
-        /*$('.flag_form_report').button().click(function(){
-          
-           var $element_id = $(this).attr("value");
-           
-         
-        });*/
-        
-        
-        $(".unflag_button")
-        .button({
-            icons: {primary: "ui-icon-check"}
-        })
-        .click(function () {
-        
-            var $element_id = $(this).attr("value");
-        
-            toggleLoadingScreen();
-            $("#unflag_form"+$element_id).submit();
-            
-           
-        });
-        
-               
-        
-        
-        $("#search_button")
-        .button({
-            icons: {primary: "ui-icon-search"}
-        })
-        .click(function () {
-        
-               $("#paginator_text").attr("value","");
-               toggleLoadingScreen();
-               $("#search_form").submit();
-        });    
-       
+
+
+        //Next Page and Previous Page Controllers
+
         $( "#paginator_prev" ).click(function(){
-        
+
             $("#paginator_text").attr("value","Prev");
             toggleLoadingScreen();
             $("#search_form").submit();
-        
+
         });
-        
+
         $( "#paginator_next" ).click(function(){
-        
+
             $("#paginator_text").attr("value","Next");
             toggleLoadingScreen();
             $("#search_form").submit();
-        
+
         });
-        
+
+        //When clicking outside of the input field for choosing what "Page" to start on, it activates
+
         $("#paginator_counter_beginning_chooser").blur(function(){
-        
+
             $actual_min_value = $("#actual_min_num").attr("value");
             $new_min_value = $(this).val();
-            
+
             if($actual_min_value != $new_min_value )
             {
                 $("#actual_min_num").attr("value",$new_min_value);
                 $("#paginator_text").attr("value","Update");
-                
+
                 toggleLoadingScreen();
                 $("#search_form").submit();
             }
-            
+
         });
-        
-        
-        
+
+
+        //Corpus Filters; Lets you choose if you want to search on Source Records, Ocrs, Internal, etc
+
         $( "#corpus_container" ).buttonset();
-        
+
         $('#corpus_source_records').click(function(){
-        
+
            $('#corpus_text').attr("value","corpus_source_records");
            toggleLoadingScreen();
            $("#search_form").submit();
-           
-        
+
+
         });
 
         $('#corpus_ocr_records').click(function(){
-        
+
            $('#corpus_text').attr("value","corpus_ocr_records");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#corpus_internal_records').click(function(){
-        
+
            $('#corpus_text').attr("value","corpus_internal_records");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
-        
+
+        // Filters panel ; It lets you choose if searching between Linked, Unlinked, Error, Assigned, Not Assigned, etc
+
         $( "#filter_container" ).buttonset();
-        
+
         $('#filter_pdf_all').click(function(){
-        
+
            $('#filter_text').attr("value","pdf_all");
            toggleLoadingScreen();
            $("#search_form").submit();
-           
-        
+
+
         });
 
         $('#filter_pdf_linked').click(function(){
-        
+
            $('#filter_text').attr("value","pdf_linked");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#filter_pdf_unlinked').click(function(){
-        
+
            $('#filter_text').attr("value","pdf_unlinked");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#filter_pdf_error').click(function(){
-        
+
            $('#filter_text').attr("value","pdf_error");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#filter_source_all').click(function(){
-        
+
            $('#filter_text').attr("value","source_all");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#filter_source_assigned').click(function(){
-        
+
            $('#filter_text').attr("value","source_assigned");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
+
         });
-        
+
         $('#filter_source_notassigned').click(function(){
-        
+
            $('#filter_text').attr("value","source_notassigned");
            toggleLoadingScreen();
            $("#search_form").submit();
-         
-        });
-        
-        //When click in one field of a table, it copies the contents in the Search button
-        // and updates the search with that in mind
-        
-        /*$('td').dblclick(function(){
-        
-           $('#search_text').attr("value",$(this).text());
-           toggleLoadingScreen();
-           $("#search_form").submit();
-         
-        });*/
 
-        
-        
-        //Cute tooltips
-        
+        });
+
+        //Cute tooltips, configures fade-ins and outs for the Tooltips.
+
         $(function() {
             $( ".show-option" ).tooltip({
-              
+
               show: {
                 effect: "slideDown",
                 delay: 250
@@ -488,159 +721,307 @@
               },tooltipClass: "custom-tooltip"
             });
         });
-    
-    
-        function classLocator()
-        {
+
+
+        $('#show_options_tab').click(function(){
+
+            togglePanelsDisplay();
+
+        });
+
+
+        /*
+        //// Extra buttons that are not available at the moment ; Link, Unlink, Flag, Unflag, Report
+
+        //ui-state-custom-linked
+
+        $(".linking_button")
+        .button({
+            icons: {primary: "ui-icon-link"}
+        })
+        .click(function () {
+
+            var $element_id = $(this).attr("value");
+            toggleLoadingScreen();
+            $("#linking_form"+$element_id).submit();
+
+        });
+
+        $(".unlinking_button")
+        .button({
+            icons: {primary: "ui-icon-cancel"}
+        })
+        .click(function () {
+
+            var $element_id = $(this).attr("value");
+            toggleLoadingScreen();
+            $("#unlinking_form"+$element_id).submit();
+
+        });
+
+        //ui-state-custom-error
+
+        $(".flag_button")
+        .button({
+            icons: {primary: "ui-icon-flag"}
+        })
+        .click(function () {
+
+            var $element_id = $(this).attr("value");
+
+            var isChecked = $(this).hasClass("clicked");
+
+            if(isChecked)
+            {
+                $(this).removeClass("clicked");
+                $("#flag_form").css("display","none");
+
+            }
+            else
+            {
+                $(this).addClass("clicked");
+                $("#flag_form").css("display","block");
+                $("#flag_record_id").attr("value",$element_id);
+
+            }
+
+        });
+
+
+        $( "#flag_option_typo" ).button().click(function(){
+
+            $("#flag_record_category").attr("value","Typo");
+
+        });
+
+        $( "#flag_option_category" ).button().click(function(){
+
+            $("#flag_record_category").attr("value","Wrong Category");
+
+        });
+
+        $( "#flag_option_duplicate" ).button().click(function(){
+
+            $("#flag_record_category").attr("value","Duplicate");
+
+        });
+
+        $( "#flag_option_mislinked" ).button().click(function(){
+
+            $("#flag_record_category").attr("value","Mislinked");
+
+        });
+
+        $('.flag_form_report').button().click(function(){
+
+           var $element_id = $(this).attr("value");
+
+
+        });
+
+
+        $(".unflag_button")
+        .button({
+            icons: {primary: "ui-icon-check"}
+        })
+        .click(function () {
+
+            var $element_id = $(this).attr("value");
+
+            toggleLoadingScreen();
+            $("#unflag_form"+$element_id).submit();
+
+
+        });
+
+        $( "#submit_now" ).button().click(function(){
+            toggleLoadingScreen();
+            $("#flag_form").submit();
+
+        });
+
+        $("#search_button")
+        .button({
+            icons: {primary: "ui-icon-search"}
+        })
+        .click(function () {
+
+               $("#paginator_text").attr("value","");
+               toggleLoadingScreen();
+               $("#search_form").submit();
+        });
+
+        //When click in one field of a table, it copies the contents in the Search button
+        // and updates the search with that in mind
+
+        $('td').dblclick(function(){
+
+           $('#search_text').attr("value",$(this).text());
+           toggleLoadingScreen();
+           $("#search_form").submit();
+
+        });
+
+        */
+
+
+
+    }
+
+
+
+    function classLocator()
+    {
             //Mark the correct corpus filter, from the corpus_container
-        
+
             var corpus_choice = $('#corpus_text').attr("value");
-        
+
             switch(corpus_choice)
             {
                 case "corpus_source_records":
-                    $('#corpus_source_records').attr("checked","checked");
+                    $('#corpus_source_records').attr("checked","checked").button("refresh");
                 break;
-                               
+
                 case "corpus_ocr_records":
-                    $('#corpus_ocr_records').attr("checked","checked");
+                    $('#corpus_ocr_records').attr("checked","checked").button("refresh");
                 break;
-                
+
                 case "corpus_internal_records":
-                    $('#corpus_internal_records').attr("checked","checked");
+                    $('#corpus_internal_records').attr("checked","checked").button("refresh");
                 break;
-                
+
                 default:
-                    $('#corpus_ocr_records').attr("checked","checked");
+                    $('#corpus_ocr_records').attr("checked","checked").button("refresh");
                 break;
             }
-        
+
             //Mark the correct initial filter, from the filter_container
-        
+
             var filter_choice = $('#filter_text').attr("value");
-        
+
             switch(filter_choice)
             {
                 case "pdf_all":
                     $('#filter_pdf_all').attr("checked","checked");
                 break;
-                               
+
                 case "pdf_linked":
                     $('#filter_pdf_linked').attr("checked","checked");
                 break;
-                
+
                 case "pdf_unlinked":
                     $('#filter_pdf_unlinked').attr("checked","checked");
                 break;
-                
+
                 case "pdf_error":
                     $('#filter_pdf_error').attr("checked","checked");
                 break;
-                
+
                 case "source_all":
                     $('#filter_source_all').attr("checked","checked");
                 break;
-                
+
                 case "source_assigned":
                     $('#filter_source_assigned').attr("checked","checked");
                 break;
-                
+
                 case "source_notassigned":
                     $('#filter_source_notassigned').attr("checked","checked");
                 break;
-                
+
                 default:
                     $('#filter_pdf_all').attr("checked","checked");
                 break;
             }
-            
+
             /*var search_options = $('#options_text').attr("value");
-            
-            
+
+
             if(search_options.match('option_name')) {
                 $('#option_name').attr("checked","checked");
             }
-            
+
             if(search_options.match('option_docname')) {
                 $('#option_document_name').attr("checked","checked");
             }
-            
+
             if(search_options.match('option_date')) {
                 $('#option_issue_date').attr("checked","checked");
             }
-            
+
             if(search_options.match('option_amount')) {
                 $('#option_amount').attr("checked","checked");
             } */
-            
-            
+
+
         }
-    
+
         function configLoadingScreen(){
-        
+
             image_width = $('#LoadingSpinner').width();
             image_height = $('#LoadingSpinner').height();
-            
+
             $('#LoadingSpinner').css("margin-left",-image_width/2);
             $('#LoadingSpinner').css("margin-top",-image_height/2);
-            
+
             //text_width = $('#LoadingDescription').width();
             //text_height = $('#LoadingDescription').height();
-        
+
             //$('#LoadingDescription').css("margin-left",-text_width/2);
             //$('#LoadingDescription').css("margin-top",-text_height/2);
 
         }
-        
+
         function toggleLoadingScreen(){
-        
+
             $('#LoadingScreen').toggleClass("invisible");
             $('#export_mark').attr("value", "none");
-            
+
         }
-    
+
         function createUserPanel(){
-        
+
             $( "#user-panel" ).dialog({
-                  
+
+                  autoOpen:false,
                   height: $('#userpanel_container').height(),
                   width: $('#userpanel_container').width(),
                   modal: false,
-                  autoOpen:true,
                   closeOnEscape: false,
                   resizable:true,
                   show: {
                     effect: "drop",
-                    duration: 1000
+                    duration: 500
                   },
                   hide: {
                     effect: "drop",
-                    duration: 1000
+                    duration: 500
                   },
                   position: {
                     my: "left bottom", at: "left bottom", of: $('#userpanel_container')
                     }
-                  
+
                 });
-                
+
                 $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
                     select: function( event, ui ) {
-                        
-                    } 
+
+                    }
                 });
             }
-    
+
         function createListPanel(){
-        
+
             corpus_text = $("#corpus_text").attr("value");
             if(corpus_text != "corpus_internal_records")
             {
-        
+
                 $( "#listpanel-form" ).dialog({
-                        
+
+                        autoOpen:false,
                         width: $('#fields_container').width(),
                         height: $('#fields_container').height(),
-                        
+
                         modal: false,
                         draggable:false,
                         resizable: false,
@@ -648,40 +1029,40 @@
                         show: {
                         effect: "drop",
                         direction: "right",
-                        duration: 1000
+                        duration: 500
                       },
                       hide: {
                         effect: "drop",
                         direction: "right",
-                        duration: 1000
+                        duration: 500
                       },
-                        buttons: [ 
+                        buttons: [
                             {
                                 text: "Search",
                                 click: function() {
-                                
+
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     //$( this ).dialog( "close" );
                                     $('#search_form').submit();
-                                }   
+                                }
                             },
-                            
+
                             {
                                 text:"Export New Search to PDF",
                                 "class": "export",
                                 click: function() {
-                                
-                                    
+
+
                                     //toggleLoadingScreen();
                                     $('.export').attr("disabled", true).addClass("ui-state-disabled");
                                     $('#export_mark').attr("value", "export_mark");
                                     //$( this ).dialog( "close" );
                                     $('#search_form').submit();
 
-                                }    
+                                }
                             },
-                            
+
                         ],
                         position: {
                             my: "left top", at: "left top", of: $('#fields_container')
@@ -690,11 +1071,14 @@
             }
             else
             {
+            
                  $( "#listpanel-form" ).dialog({
-                        
+
+                        autoOpen:false,
+                 
                         width: $('#fields_container').width(),
                         height: $('#fields_container').height(),
-                        
+
                         modal: false,
                         draggable:false,
                         resizable: false,
@@ -702,26 +1086,26 @@
                         show: {
                         effect: "drop",
                         direction: "right",
-                        duration: 1000
+                        duration: 500
                       },
                       hide: {
                         effect: "drop",
                         direction: "right",
-                        duration: 1000
+                        duration: 500
                       },
-                        buttons: [ 
+                        buttons: [
                             {
                                 text: "Search",
                                 click: function() {
-                                
+
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     //$( this ).dialog( "close" );
                                     $('#search_form').submit();
-                                }   
+                                }
                             },
-                            
-                            
+
+
                         ],
                         position: {
                             my: "left top", at: "left top", of: $('#fields_container')
@@ -729,187 +1113,187 @@
                     });
             }
         }
-        
+
         function createFieldsForm(){
-        
+
             //DOCUMENT TYPE Menu Config
-                        
+
             var doctype = $( "#option_text_input_doctype" );
-            
-    
+
+
             if(doctype.length)
             {
-            
+
                 ////////////
                 $( "#doctypemenu" ).menu({ position: { my: "left top", at: "left top+30" },
                         select: function( event, ui ) {
-                                                
+
                             var first_elem = ui.item.parent().is($( "#doctypemenu" ));
-                            
+
                             if(!first_elem)
                             {
-                                
+
                                 var new_text = ui.item.text();
                                 $(".doctypeoption[value='"+new_text+"']").click();
-                            } 
-                        } 
+                            }
+                        }
                     });
-                    
+
                     $('.doctypeoption').click(function(){
-                    
+
                         var new_text = $(this).text();
-                    
+
                         $('#option_text_input_doctype').unbind('copy paste', function (e) {
-                                        
+
                         });
-                          
+
                           $('#doctypelink').text("Document Type: " + new_text);
                           $('#option_text_input_doctype').attr("value",new_text);
                           $('#option_text_input_doctype').val(new_text);
-                          
+
                           //$("#doctypemenu").addClass("ui-state-custom-error");
-                            
+
                         $('#option_text_input_doctype').bind('copy paste', function (e) {
                                 e.preventDefault();
                         });
-                        
+
                             $('#option_text_input_doctype').click();
                     });
-                    
+
                     $('#doctypemenu').removeClass('ui-menu-divider');
-                    
+
                     $('#option_text_input_doctype').unbind('click').click(function(event) {
                     event.stopPropagation();
                     $(this).unbind('focus').focus();
                     $("#doctypemenu").unbind('keydown');
                     $(this).unbind('focusout').focusout(function(event) {
-                                                  
+
                             var new_value = event.currentTarget.value;
-                            
+
                             $('#doctypelink').text("Document Type: " + new_value);
                             /*$(this).attr("value",new_value);
-                            
+
                             if ($("#doctypemenu").hasClass("ui-state-custom-filled"))
                             {
                                 $("#doctypemenu").removeClass("ui-state-custom-filled");
                             }*/
-                            
+
                             /*if(new_value.length > 0)
                             {
                                 $("#doctypemenu").addClass("ui-state-custom-filled");
-                                                           
-                                
+
+
                                 if ($("#doctypemenu").hasClass("ui-state-custom-error") && new_value != "Other" && new_value != "other" && new_value != "uncategorized" )
                                 {
-                                   
+
                                     $("#doctypemenu").removeClass("ui-state-custom-error");
                                 }
                             }*/
-                    
-                        }); 
+
+                        });
                     });
             }
-            
+
             //COMPANY NAME Menu Config
-            
-            
-            
+
+
+
             var companyname = $( "#option_text_input_name" );
-            
-    
+
+
             if(companyname.length)
             {
-            
+
                 ////////////
                 $( "#companynamemenu" ).menu({ position: { my: "left top", at: "left top+30" },
                         select: function( event, ui ) {
-                                                
+
                             var first_elem = ui.item.parent().is($( "#companynamemenu" ));
-                            
+
                             if(!first_elem)
                             {
-                                
+
                                 var new_text = ui.item.text();
                                 $(".companynameoption[value='"+new_text+"']").click();
-                            } 
-                        } 
+                            }
+                        }
                     });
-                    
+
                     $('.companynameoption').click(function(){
-                    
+
                         var new_text = $(this).text();
-                    
+
                         $('#option_text_input_name').unbind('copy paste', function (e) {
-                                        
+
                         });
-                          
+
                           $('#companynamelink').text("Company Name: " + new_text);
                           $('#option_text_input_name').attr("value",new_text);
                           $('#option_text_input_name').val(new_text);
-                          
-                            
+
+
                         $('#option_text_input_name').bind('copy paste', function (e) {
                                 e.preventDefault();
                         });
-                        
+
                             $('#option_text_input_name').click();
                     });
-                    
+
                     $('#companynamemenu').removeClass('ui-menu-divider');
-                    
+
                     $('#option_text_input_name').unbind('click').click(function(event) {
                     event.stopPropagation();
                     $(this).unbind('focus').focus();
                     $("#companynamemenu").unbind('keydown');
                     $("#companyname_search").unbind('keydown');
                     $(this).unbind('focusout').focusout(function(event) {
-                                                  
+
                             var new_value = event.currentTarget.value;
-                            
+
                             $('#companynamelink').text("Company Name: " + new_value);
-                            
-                    
-                        }); 
+
+
+                        });
                     });
-                    
-                    
+
+
                    $('#companymenu').removeClass('ui-menu-divider');
-                
+
                     $('#option_text_input_name').autocomplete({
                       source: companyNameList,
                       appendTo: "#companymenu"
                     });
-                                    
-                    
+
+
                     $('#option_text_input_name').unbind('click').click(function(event) {
                     event.stopPropagation();
                     $(this).unbind('focus').focus();
                     $("#companynamemenu").unbind('keydown');
                     $("#companyname_search").unbind('keydown');
-                    
+
                     $(this).unbind('focusout').focusout(function(event) {
-                                                  
+
                     var new_value = event.currentTarget.value;
                     $('#companynamelink').text("Company Name: " + new_value);
                     $(this).attr("value",new_value);
                     $('#option_text_input_name').attr("value",new_value);
 
-                    }); 
+                    });
                 });
             }
-            
-            
-            
+
+
+
         }
-    
+
     });
-    
-    
-    
-    
+
+
+
+
 </script>
 
-{% endblock jqueryui_setups %}  
+{% endblock jqueryui_setups %}
  <body>
 {% if not is_popup %}
 
@@ -937,334 +1321,634 @@
 {% block content%}
 
     <div id="right_container">
-    
+
         <div id="userpanel_container">
-            <div id="user-panel" title="{{the_user}}">
+            <div id="user-panel" class="invisible" title="{{the_user}}">
                 <ul class="menuclass" id="userpanelmenu">
                     <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
                     <li>--</li>
                     <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
-                    
+
                 </ul>
             </div>
         </div>
-    
+
     </div>
-    
-    
+
+
     <div id="left_container">
         <div id="pdf_view"></div>
-        <div id="records_container">   
-            
+        <div id="records_container">
+
             <div id="accordion_table">
-        
+
                 <div id="accordion">
+ 
                 {% if corpus_word == "corpus_source_records" %}
-                    {% for record in records_list %}
-            
-                        <div id="group{{record.id}}" class="group">
-                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name">
-                            Job Directory:     <span class ="title_text"> {% if record.job_directory %}{{record.job_directory}}{% else %}?{% endif %} </span>
-                            <br>Doc. Name:     <span class ="title_text">{% if record.filename %}{{record.filename}}{% else %}?{% endif %}</span>
-                            <br>Document Type:     <span class ="title_text">{% if record.modified_document_type.pretty_name %}{{record.modified_document_type.pretty_name}}{% else %}?{% endif %}</span></h3>
-                            <!--<br>Multipart:     <span class ="title_text">{% if record.multipart %}{{record.multipart}}{% else %}?{% endif %}</span></h3>-->
-                            <div>
-                                <table class="pdf_zebra zebra">
-                                <thead>
-                                    <tr>
-                                        <th>Id.Filename</th>
-                                        
-                                        <td>{{record.pk}}.{{record.filename}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Multipart</th>
-                                        
-                                        <td>{{record.multipart}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Multipart Total Parts</th>
-                                        
-                                        <td>{{record.multipart_num_total}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Multipart Filename</th>
-                                        
-                                        <td>{{record.multipart_filename}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Times entered</th>
-                                        
-                                        <td>{{record.visitedonce}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Corrupt</th>
-                                        
-                                        <td>{{record.corrupt}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Size</th>
-                                        
-                                        <td>{{record.size}}</td>
-                                        
-                                    </tr>
+                {% if records_list %}
+                        
+                        <div id="partial_table_container" class="group">
+                            {% for record in records_list %}
+                            
+                            <table id="partial_records_table{{record.id}}" class="partial_records_table pdf_zebra zebra">
+                            
+                            <thead>
+                                <tr class="tr_partial partial_table_separator">
                                     
+                                </tr>
+                                        
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Id.Filename</th>
+                                    <td class="td_partial">{{record.pk}}.{{record.filename}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Job Directory</th>
+                                    <td class="td_partial">{% if record.job_directory %}{{record.job_directory}}{% else %}?{% endif %} </td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Document Name</th>
+                                    <td class="td_partial">{% if record.filename %}{{record.filename}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Document Type</th>
+                                    <td class="td_partial">{% if record.modified_document_type.pretty_name %}{{record.modified_document_type.pretty_name}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">    
+                                    <th class="th_partial">Multipart</th>
+                                    <td class="td_partial">{{record.multipart}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Multipart Total Parts</th>
+                                    <td class="td_partial">{{record.multipart_num_total}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Multipart Filename</th>
+                                    <td class="td_partial">{{record.multipart_filename}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Times entered</th>
+                                    <td class="td_partial">{{record.visitedonce}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Corrupt</th>
+                                    <td class="td_partial">{{record.corrupt}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Size</th>
+                                    <td class="td_partial">{{record.size}}</td>
+                                </tr>    
+                               
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Action Buttons</th>
+                                    <td class="td_partial">
+                                        <div class = "record_tools_container">
+                                            <input class="toggle_pdf_button toggle_pdf_button2" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.job_directory}}\{{record.filename}}" value2="{{record.id}}" focused="not_focused"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label toggle_pdf_label2" for="toggle_pdf_button{{record.id}}">PDF</label>
+
+                                            {% if user_type == "superuser" or user_type == "TeamLeader" %}
+
+                                                {% if record.assigndata.count == 0 %}
+                                                    <input class="assign_to_group_button" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" assigned="no" operation="none" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                                {% else%}
+                                                    <input class="assign_to_group_button checked" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" operation="none" checked="checked" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label ui-state-active" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                                {% endif%}
+
+                                            {% endif%}
+                                            
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                
+                            </tbody>
+                            
+                            </table>
+                            {% endfor %}
+                        </div>
+                        <div id="full_table_container" class="group">
+                        <!--<h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
+                        </h3>-->
+                            <div>
+                                <div id="headers_cover"></div>
+                                <table id="records_table" class="pdf_zebra zebra">
+
+                                <thead>
+
+                                    <tr id="headers_row">
+                                    
+                                        <th class="th_full">Id.Filename</th>
+
+                                        <th class="th_full">Job Directory</th>
+
+                                        <th class="th_full">Document Name</th>
+
+                                        <th class="th_full">Document Type</th>
+
+                                        <th class="th_full">Multipart</th>
+
+                                        <th class="th_full">Multipart Total Parts</th>
+
+                                        <th class="th_full">Multipart Filename</th>
+
+                                        <th class="th_full">Times entered</th>
+
+                                        <th class="th_full">Corrupt</th>
+
+                                        <th class="th_full">Size</th>
+
+                                        <th class="th_full">Action Buttons</th>
+
+                                    </tr>
+
+
 
                                 </thead>
+
                                 <tbody>
-                                        
+                                    {% for record in records_list %}
+                                    <tr class="body_row">
+
+
+                                        <td class="td_full">{{record.pk}}.{{record.filename}}</td>
+
+                                        <td class="td_full">{% if record.job_directory %}{{record.job_directory}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.filename %}{{record.filename}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.modified_document_type.pretty_name %}{{record.modified_document_type.pretty_name}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{{record.multipart}}</td>
+
+                                        <td class="td_full">{{record.multipart_num_total}}</td>
+
+                                        <td class="td_full">{{record.multipart_filename}}</td>
+
+                                        <td class="td_full">{{record.visitedonce}}</td>
+
+                                        <td class="td_full">{{record.corrupt}}</td>
+
+                                        <td class="td_full">{{record.size}}</td>
+
+                                        <td class="td_full">
+                                        <div class= "record_tools_container">
+                                            <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}" focused="not_focused"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
+
+                                            {% if user_type == "superuser" or user_type == "TeamLeader" %}
+
+                                                {% if record.assigndata.count == 0 %}
+                                                    <input class="assign_to_group_button" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" assigned="no" operation="none" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                                {% else%}
+                                                    <input class="assign_to_group_button checked" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" operation="none" checked="checked" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label ui-state-active" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
+                                                {% endif%}
+
+                                            {% endif%}
+                                            <!--{% if record.error_style_class = "noerror" %}
+                                            <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+
+                                            {% else %}
+                                            <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                            {% csrf_token %}
+                                                <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                            </form>
+                                            {% endif %}-->
+                                        </div>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
                                 </tbody>
-               
+
                                 </table>
-                                
-                                <div class= "record_tools_container">          
-                                    <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.job_directory}}\{{record.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
-                                    
-                                    
-                                    {% if user_type == "superuser" or user_type == "TeamLeader" %}
-                                    
-                                        {% if record.assigndata.count == 0 %}    
-                                            <input class="assign_to_group_button" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" assigned="no" operation="none" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
-                                        {% else%}
-                                            <input class="assign_to_group_button checked" type="checkbox" id="assign_to_group_button{{record.id}}" value="{{record.id}}" operation="none" checked="checked" ><label id="assign_to_group_button_label{{record.id}}" class="assign_to_group_button_label ui-state-active" for="assign_to_group_button{{record.id}}">ASSIGN TO YOUR GROUP</label>
-                                        {% endif%}
-                
-                                    {% endif%}
-                                    <!--{% if record.error_style_class = "noerror" %}
-                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
-                                    
-                                    {% else %}
-                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
-                                    {% csrf_token %}    
-                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
-                                    </form>
-                                    {% endif %}-->
-                                </div>
+
+
                             </div>
                         </div>
-                        {% empty %}
+                        {% else %}
                         <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
-                        {% endfor %}
-                
+                        {% endif%}
+
                 {% endif%}
+                
+
                 {% if corpus_word == "corpus_ocr_records" %}
-                    {% for record in records_list %}
-            
-                        <div id="group{{record.id}}" class="group">
-                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
-                            Amount:     <span class ="title_text"> {% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</span>
-                            <br>Company Name:     <span class ="title_text">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</span>
-                            <br>Issue Date:     <span class ="title_text">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</span></h3>
+                {% if records_list %}
+                        
+                        <div id="partial_table_container" class="group">
+                            {% for record in records_list %}
+                            
+                            <table id="partial_records_table{{record.id}}" class="partial_records_table pdf_zebra zebra">
+                            
+                            <thead>
+                                <tr class="tr_partial partial_table_separator">
+                                    
+                                </tr>
+                                        
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Id</th>
+                                    <td class="td_partial">{{record.pk}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Amount</th>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Company Name</th>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">    
+                                    <th class="th_partial">Issue Date</th>
+                                    <td class="td_partial">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Document Type</th>
+                                    <td class="td_partial">{{record.modified_document_type.pretty_name}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Piece Number</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Piece_Number}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Document Name</th>
+                                    <td class="td_partial">{{record.sourcedoc_link.filename}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Address</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Address}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Telephone</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Telephone}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">City</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.City}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Country</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Country}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Bank Account Number</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Source_Bank_Account}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Document Number</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Document_Number}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Purchase Order Number</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                </tr>
+                                    <!--<tr class="tr_partial">
+                                        <th class="th_full">Contains Arabic</th>
+                                        <td class="td_partial"></td>
+                                    </tr>-->
+                                
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Memo</th>
+                                    <td class="td_partial">{{record.ocrrecord_link.Notes}}</td>
+                                </tr>   
+                                    <!--<tr class="tr_partial"> 
+                                        <th class="th_full">Error Reports</th>
+                                    </tr>-->
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Action Buttons</th>
+                                    <td class="td_partial">
+                                        <div class = "record_tools_container">
+                                            <input class="toggle_pdf_button toggle_pdf_button2" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}" focused="not_focused"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label toggle_pdf_label2" for="toggle_pdf_button{{record.id}}">PDF</label>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                
+                            </tbody>
+                            
+                            </table>
+                            {% endfor %}
+                        </div>
+                        <div id="full_table_container" class="group">
+                        <!--<h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
+                        </h3>-->
                             <div>
-                                <table class="pdf_zebra zebra">
+                                <div id="headers_cover"></div>
+                                <table id="records_table" class="pdf_zebra zebra">
+
                                 <thead>
-                                    <tr>
-                                        <th>Id.Filename</th>
-                                        
-                                        <td>{{record.pk}}.{{record.sourcedoc_link.filename}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Document Type</th>
-                                        
-                                        <td>{{record.modified_document_type.pretty_name}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Piece Number</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Piece_Number}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Document Name</th>
-                                        
-                                        <td>{{record.sourcedoc_link.filename}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Address</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Address}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Telephone</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Telephone}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>City</th>
-                                        
-                                        <td>{{record.ocrrecord_link.City}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Country</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Country}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Bank Account Number</th>
-                                       
-                                        <td>{{record.ocrrecord_link.Source_Bank_Account}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Document Number</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Document_Number}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Purchase Order Number</th>
-                                        
-                                        <td>{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Contains Arabic</th>
-                                        
-                                        <td>{{record.ocrrecord_link.ContainsArabic}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Source Bank Account</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Source_Bank_Account}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Memo</th>
-                                        
-                                        <td>{{record.ocrrecord_link.Notes}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Error Reports</th>
-                                        
-                                        <td>{{record.commentary}}</td>
-                                        
+
+                                    <tr id="headers_row">
+                                        <th class="th_full">Id</th>
+
+                                        <th class="th_full">Amount</th>
+
+                                        <th class="th_full">Company Name</th>
+
+                                        <th class="th_full">Issue Date</th>
+
+                                        <th class="th_full">Document Type</th>
+
+                                        <th class="th_full">Piece Number</th>
+
+                                        <th class="th_full">Document Name</th>
+
+                                        <th class="th_full">Address</th>
+
+                                        <th class="th_full">Telephone</th>
+
+                                        <th class="th_full">City</th>
+
+                                        <th class="th_full">Country</th>
+
+                                        <th class="th_full">Bank Account Number</th>
+
+                                        <th class="th_full">Document Number</th>
+
+                                        <th class="th_full">Purchase Order Number</th>
+
+                                    <!--
+                                        <th class="th_full">Contains Arabic</th>
+                                        -->
+
+                                        <th class="th_full">Memo</th>
+
+                                    <!--
+                                        <th class="th_full">Error Reports</th>
+                                        -->
+
+                                        <th class="th_full">Action Buttons</th>
+
                                     </tr>
 
+
+
                                 </thead>
+
                                 <tbody>
-                                        
+                                    {% for record in records_list %}
+                                    <tr class="body_row">
+
+
+                                        <td class="td_full">{{record.pk}}</td>
+
+                                        <td class="td_full">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
+
+                                        <td class="td_full">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{{record.modified_document_type.pretty_name}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Piece_Number}}</td>
+
+                                        <td class="td_full">{{record.sourcedoc_link.filename}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Address}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Telephone}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.City}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Country}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Source_Bank_Account}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Document_Number}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
+
+                                        <td class="td_full">{{record.ocrrecord_link.Notes}}</td>
+
+                                        <td class="td_full">
+                                        <div class= "record_tools_container">
+                                            <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}" focused="not_focused"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
+
+                                            <!--{% if record.error_style_class = "noerror" %}
+                                            <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+
+                                            {% else %}
+                                            <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                            {% csrf_token %}
+                                                <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                            </form>
+                                            {% endif %}-->
+                                        </div>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
                                 </tbody>
-               
+
                                 </table>
-                                
-                                <div class= "record_tools_container">          
-                                    <input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>
-                                    
-                                    <!--{% if record.error_style_class = "noerror" %}
-                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
-                                    
-                                    {% else %}
-                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
-                                    {% csrf_token %}    
-                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
-                                    </form>
-                                    {% endif %}-->
-                                </div>
+
+
                             </div>
                         </div>
-                        {% empty %}
+                        {% else %}
                         <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
-                        {% endfor %}
-                
+                        {% endif%}
+
                 {% endif%}
+
+                
                 {% if corpus_word == "corpus_internal_records" %}
-                    {% for record in records_list %}
-            
-                        <div id="group{{record.id}}" class="group">
-                        <h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
-                            Amount Credit | Debit:     <span class ="title_text"> {% if record.internalrecord_link.Credit or record.internalrecord_link.Debit  %}{{record.internalrecord_link.Credit}} | {{record.internalrecord_link.Debit}}{% else %}?{% endif %} </span>
-                            <br>Company Name:     <span class ="title_text">{% if record.internalrecord_link.Company %}{{record.internalrecord_link.Company}}{% else %}?{% endif %}</span>
-                            <br>Transaction Date:     <span class ="title_text">{% if record.internalrecord_link.Day %}{{record.internalrecord_link.Day}}{% else %}?{% endif %}/{% if record.internalrecord_link.Month %}{{record.internalrecord_link.Month}}{% else %}?{% endif %}/{% if record.internalrecord_link.Year %}{{record.internalrecord_link.Year}}{% else %}?{% endif %}</span></h3>
+                    {% if records_list %}
+                        
+                        <div id="partial_table_container" class="group">
+                            {% for record in records_list %}
+                            
+                            <table id="partial_records_table{{record.id}}" class="partial_records_table pdf_zebra zebra">
+                            
+                            <thead>
+                                <tr class="tr_partial partial_table_separator">
+                                    
+                                </tr>
+                                
+                                        
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Id</th>
+                                    <td class="td_partial">{{record.pk}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Amount Credit</th>
+                                    <td class="td_partial">{% if record.internalrecord_link.Credit%}{{record.internalrecord_link.Credit}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Amount Debit</th>
+                                    <td class="td_partial">{% if record.internalrecord_link.Debit  %}{{record.internalrecord_link.Debit}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">    
+                                    <th class="th_partial">Company Name</th>
+                                    <td class="td_partial">{% if record.internalrecord_link.Company %}{{record.internalrecord_link.Company}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Transaction Date</th>
+                                    <td class="td_partial">{% if record.internalrecord_link.Day %}{{record.internalrecord_link.Day}}{% else %}?{% endif %}/{% if record.internalrecord_link.Month %}{{record.internalrecord_link.Month}}{% else %}?{% endif %}/{% if record.internalrecord_link.Year %}{{record.internalrecord_link.Year}}{% else %}?{% endif %}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Account Number</th>
+                                    <td class="td_partial">{{record.internalrecord_link.AccountNum}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Number of Movement</th>
+                                    <td class="td_partial">{{record.internalrecord_link.NoMvt}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Journal</th>
+                                    <td class="td_partial">{{record.internalrecord_link.Journal}}</td>
+                                </tr>
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Ledger Year</th>
+                                    <td class="td_partial">{{record.internalrecord_link.LedgerYear}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Piece Number</th>
+                                    <td class="td_partial">{{record.internalrecord_link.NoPiece}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Lett</th>
+                                    <td class="td_partial">{{record.internalrecord_link.Lett}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">S</th>
+                                    <td class="td_partial">{{record.internalrecord_link.S}}</td>
+                                </tr>    
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Memo</th>
+                                    <td class="td_partial">{{record.internalrecord_link.Memo}}</td>
+                                </tr>
+                                
+                                <tr class="tr_partial">
+                                    <th class="th_partial">Action Buttons</th>
+                                    <td class="td_partial">
+                                        <div class = "record_tools_container">
+                                            
+                                        </div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                
+                            </tbody>
+                            
+                            </table>
+                            {% endfor %}
+                        </div>
+                        <div id="full_table_container" class="group">
+                        <!--<h3 id="pdf_table_name{{record.id}}" class="pdf_table_name {{record.linked_style_class}} {{record.error_style_class}}">
+                        </h3>-->
                             <div>
-                                <table class="pdf_zebra zebra">
+                                <div id="headers_cover"></div>
+                                <table id="records_table" class="pdf_zebra zebra">
+
                                 <thead>
-                                    <tr>
-                                        <th>Id</th>
-                                        
-                                        <td>{{record.pk}}</td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <th>Account Number</th>
-                                        <td>{{record.internalrecord_link.AccountNum}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Number of Movement</th>
-                                        <td>{{record.internalrecord_link.NoMvt}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Journal</th>
-                                        <td>{{record.internalrecord_link.Journal}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Ledger Year</th>
-                                        <td>{{record.internalrecord_link.LedgerYear}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Piece Number</th>
-                                        <td>{{record.internalrecord_link.NoPiece}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Lett</th>
-                                        <td>{{record.internalrecord_link.Lett}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>S</th>
-                                        <td>{{record.internalrecord_link.S}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Memo Field</th>
-                                        <td>{{record.internalrecord_link.Memo}}</td>
+
+                                    <tr id="headers_row">
+                                    
+                                        <th class="th_full">Id</th>
+                                    
+                                        <th class="th_full">Amount Credit</th>
+
+                                        <th class="th_full">Amount  Debit</th>
+
+                                        <th class="th_full">Company Name</th>
+
+                                        <th class="th_full">Transaction Date</th>
+
+                                        <th class="th_full">Account Number</th>
+
+                                        <th class="th_full">Number of Movement</th>
+
+                                        <th class="th_full">Journal</th>
+
+                                        <th class="th_full">Ledger Year</th>
+
+                                        <th class="th_full">Piece Number</th>
+
+                                        <th class="th_full">Lett</th>
+
+                                        <th class="th_full">S</th>
+
+                                        <th class="th_full">Memo</th>
+
+                                        <th class="th_full">Action Buttons</th>
+
                                     </tr>
 
+
                                 </thead>
+
                                 <tbody>
-                                        
+                                    {% for record in records_list %}
+                                    <tr class="body_row">
+
+
+                                        <td class="td_full">{{record.pk}}</td>
+
+                                        <td class="td_full">{% if record.internalrecord_link.Credit%}{{record.internalrecord_link.Credit}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.internalrecord_link.Debit  %}{{record.internalrecord_link.Debit}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.internalrecord_link.Company %}{{record.internalrecord_link.Company}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{% if record.internalrecord_link.Day %}{{record.internalrecord_link.Day}}{% else %}?{% endif %}/{% if record.internalrecord_link.Month %}{{record.internalrecord_link.Month}}{% else %}?{% endif %}/{% if record.internalrecord_link.Year %}{{record.internalrecord_link.Year}}{% else %}?{% endif %}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.AccountNum}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.NoMvt}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.Journal}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.LedgerYear}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.NoPiece}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.Lett}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.S}}</td>
+
+                                        <td class="td_full">{{record.internalrecord_link.Memo}}</td>
+
+                                        <td class="td_full">
+                                        <div class= "record_tools_container">
+
+                                            <!--{% if record.error_style_class = "noerror" %}
+                                            <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
+
+                                            {% else %}
+                                            <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
+                                            {% csrf_token %}
+                                                <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
+                                            </form>
+                                            {% endif %}-->
+                                        </div>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
                                 </tbody>
-               
+
                                 </table>
-                                
-                                <div class= "record_tools_container">          
-                                    <!--<input class="toggle_pdf_button" type="checkbox" id="toggle_pdf_button{{record.id}}" value="http:\\54.200.180.182\sourcepdfs\{{record.sourcedoc_link.job_directory}}\{{record.sourcedoc_link.filename}}" value2="{{record.id}}"><label id="toggle_pdf_label{{record.id}}" class="toggle_pdf_label" for="toggle_pdf_button{{record.id}}">PDF</label>-->
-                                    
-                                    <!--{% if record.error_style_class = "noerror" %}
-                                    <input class="flag_button" type="checkbox" id="flag_button{{record.id}}" value="{{record.id}}"><label class="flag_button_label" for="flag_button{{record.id}}">FLAG</label>
-                                    
-                                    {% else %}
-                                    <form class="unflag_form" id="unflag_form{{record.id}}" action="{% url 'enersectapp:linkui_unflag' record.id %}" method="post">
-                                    {% csrf_token %}    
-                                        <input class="unflag_button" type="checkbox" id="unflag_button{{record.id}}" value="{{record.id}}"><label class="unflag_button_label ui-state-active" for="unflag_button{{record.id}}">UNFLAG</label>
-                                    </form>
-                                    {% endif %}-->
-                                </div>
+
+
                             </div>
                         </div>
-                        {% empty %}
+                        {% else %}
                         <div id="pdf_table_title">No Search Results found.<br>Please try searching for different terms.<br><br><br>(Leaving blank Searching Fields makes the search more flexible, while filling them gives you more specific results)</div>
-                        {% endfor %}
-                
+                        {% endif%}
+
                 {% endif%}
+                
                 </div>
-        
-            
+
+
             </div>
                 <!--<form class="flag_form" id="flag_form" action="{% url 'enersectapp:linkui_flag'%}" method="post">
                             {% csrf_token %}
-                                
+
                                 <div class="flag_form_report" id="flag_form_report">
                                     <h3 id="flag_form_line1">Error Report</h3>
                                     <h4 id="flag_form_line2">Step 1. Choose a Category for the Error.<br>If it isn't one of the main Categories, procede to Step 2.</h4>
@@ -1275,222 +1959,223 @@
                                         <input type="radio" class="flag_option" id="flag_option_mislinked" name="radio2" /><label id="flag_option_label_custom" class="flag_option_label" for="flag_option_mislinked">Mislinked</label>
                                     </div>
                                     <h4 id="flag_form_line3">Step 2. Write additional details to identify and solve the Error.<br>Example: " In Field "Address" "</h4>
-                                    <input id="flag_form_text" type="text" name='flag_form_text' value=""> 
-                                    <button id="submit_now" type="button"><label id="submit_now_label" for="#submit_now">Submit Now</label></button> 
+                                    <input id="flag_form_text" type="text" name='flag_form_text' value="">
+                                    <button id="submit_now" type="button"><label id="submit_now_label" for="#submit_now">Submit Now</label></button>
                                     <input class="invisible" name='flag_form_record_id' id="flag_record_id" type="text" value="">
-                                    <input class="invisible" name='flag_form_category' id="flag_record_category" type="text" value="">                                     
+                                    <input class="invisible" name='flag_form_category' id="flag_record_category" type="text" value="">
                                 </div>
-                                 
+
                 </form>-->
-                
+
         </div>
     </div>
-    
+
 
     <div id="listpanel_container">
-    
+        <div id="show_options_tab"></div>
         <div id="fields_container">
-        
-            <div id="listpanel-form" title="Search Options">
+
+            <div id="listpanel-form" class="invisible" title="Search Options">
                 <form id="search_form" action="{% url 'enersectapp:search_tool' %}" method="post">
-                {% csrf_token %}           
+                {% csrf_token %}
                 <fieldset id="fieldset_fields">
-                    
+
                     {% if corpus_word == "corpus_source_records" %}
                         <label for="option_text_input_job_directory">Job Directory</label>
                         <input type="text" name="search_job_directory" id="option_text_input_job_directory" value="{{word_job_directory}}" class="text ui-widget-content ui-corner-all" />
-     
+
                         <label for="option_text_input_docname">Doc. Name</label>
                         <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <ul class="menuclass" id="doctypemenu">
-                            
+
                             <li>
-                            
+
                                 <a id="doctypelink" href="#">Document Type: {{word_doctype}}</a>
                                 <ul>
                                     <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
-                                
+
                                 {% for type in types_list %}
                                   <li>--</li>
                                   <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
-                                  
+
                                  {% endfor %}
                                  </ul>
-                            </li>  
-                              
+                            </li>
+
                         </ul>
-                        
+
                         <label for="option_text_input_multipart_filename">Multipart Filename</label>
                         <input type="text" name="search_word_multipart_filename" id="option_text_input_multipart_filename" value="{{word_multipart_filename}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_id_docname">Id.Filename</label>
                         <input type="text" name="search_word_id_docname" id="option_text_input_id_docname" value="{{word_id_docname}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                     {% endif %}
                     {% if corpus_word == "corpus_ocr_records" %}
                         <label for="option_text_input_amount">Amount</label>
                         <input type="text" name="search_word_amount" id="option_text_input_amount" value="{{word_amount}}" class="text ui-widget-content ui-corner-all" />
-     
+
                         <ul class="menuclass" id="companynamemenu">
-                            
+
                             <li>
-                            
+
                                 <a id="companynamelink" href="#">Company Name: {{word_companyname}}</a>
                                 <ul>
                                     <li><a href="#"><input type="text" name="search_word_companyname" id="option_text_input_name" value="{{word_companyname}}" class="text ui-widget-content ui-corner-all" /></a></li>
-                                
+
                                  </ul>
-                            </li>  
-                              
+                            </li>
+
                         </ul>
-                        
+
                         <label for="option_text_input_date">Issue Date</label>
                         <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
-                        
-                        
+
+
                         <ul class="menuclass" id="doctypemenu">
-                            
+
                             <li>
-                            
+
                                 <a id="doctypelink" href="#">Document Type: {{word_doctype}}</a>
                                 <ul>
                                     <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
-                                
+
                                 {% for type in types_list %}
                                   <li>--</li>
                                   <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
-                                  
+
                                  {% endfor %}
                                  </ul>
-                            </li>  
-                              
+                            </li>
+
                         </ul>
-                        
+
                         <label for="option_text_input_piecenumber">Piece Number</label>
                         <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_docname">Doc. Name</label>
                         <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_id_docname">Id.Filename</label>
                         <input type="text" name="search_word_id_docname" id="option_text_input_id_docname" value="{{word_id_docname}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                     {% endif %}
                     {% if corpus_word == "corpus_internal_records" %}
                         <label for="option_text_input_amount_credit">Amount Credit</label>
                         <input type="text" name="search_word_amount_credit" id="option_text_input_amount_credit" value="{{word_amount_credit}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_amount_credit">Amount Debit</label>
                         <input type="text" name="search_word_amount_debit" id="option_text_input_amount_debit" value="{{word_amount_debit}}" class="text ui-widget-content ui-corner-all" />
-     
+
                         <ul class="menuclass" id="companynamemenu">
-                            
+
                             <li>
-                            
+
                                 <a id="companynamelink" href="#">Company Name: {{word_companyname}}</a>
                                 <ul>
                                     <li><a href="#"><input type="text" name="search_word_companyname" id="option_text_input_name" value="{{word_companyname}}" class="text ui-widget-content ui-corner-all" /></a></li>
-                                
+
                                  </ul>
-                            </li>  
-                              
+                            </li>
+
                         </ul>
-                        
+
                         <label for="option_text_input_date">Transaction Date</label>
                         <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
-                        
-                        
+
+
                         <label for="option_text_input_piecenumber">Piece Number</label>
                         <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_accountnumber">Account Number</label>
                         <input type="text" name="search_word_accountnumber" id="option_text_input_accountnumber" value="{{word_accountnumber}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_movnumber">Movement Number</label>
                         <input type="text" name="search_word_movnumber" id="option_text_input_movnumber" value="{{word_movnumber}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_journal">Journal</label>
                         <input type="text" name="search_word_journal" id="option_text_input_journal" value="{{word_journal}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_s">S Field</label>
                         <input type="text" name="search_word_s" id="option_text_input_s" value="{{word_s}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_lett">Lett</label>
                         <input type="text" name="search_word_lett" id="option_text_input_lett" value="{{word_lett}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                         <label for="option_text_input_id_docname">Id</label>
                         <input type="text" name="search_word_id" id="option_text_input_id" value="{{word_id}}" class="text ui-widget-content ui-corner-all" />
-                        
+
                     {% endif %}
-                    
+
                     <input class="invisible" type="text" name='prev_next_results' value="" id="paginator_text"/>
                     <input class="invisible" type="text" name='actual_min_num' value="{{page_counter_beginning}}" id="actual_min_num"/>
-                    
-                    <input class="invisible" id="corpus_text" type="text" name='corpus_word' value="{{corpus_word}}"> 
-                    <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}"> 
-                    
-                    <input class="invisible" id="id_assign" type="text" name='id_assign' value="none"> 
-                    
-                    <input class="invisible" id="export_mark" type="text" name='export_mark' value="none"> 
-                    
+
+                    <input class="invisible" id="corpus_text" type="text" name='corpus_word' value="{{corpus_word}}">
+                    <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}">
+
+                    <input class="invisible" id="id_assign" type="text" name='id_assign' value="none">
+
+                    <input class="invisible" id="export_mark" type="text" name='export_mark' value="none">
+
                 </fieldset>
                 </form>
-            </div>    
+            </div>
+
         </div>
-    
+
     </div>
-    
+
     <input type="text" name="companiesarray" id="companiesarray" value="{{ companyname_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
-    
+
     <div id="search_container">
-        
-        
+
+
         <input class="show-option" id="search_text" type="text" name='search_word' title="Want to search faster? Double click on any table's element!" value="{{searchword_filterword.pdf_searchword}}" placeholder="Search candidates">
-            
-            
-            
+
+
+
         <div id="paginator">
             <h6 id="paginator_informer"> You are seeing Candidates <input type="text" value="{{page_counter_beginning}}" id="paginator_counter_beginning_chooser"/> through {{page_counter_end}} from a Total of {{total_records}}.</h6>
-            {% if page_counter_beginning >= 10 %} 
+            {% if page_counter_beginning >= 10 %}
             <h5 id="paginator_prev"> Prev. </h5>
             {% endif %}
-            
-            {% if plus_limit >= page_counter_beginning %} 
+
+            {% if plus_limit >= page_counter_beginning %}
             <h5 id="paginator_next"> .Next </h5>
             {% endif %}
-            
+
         </div>
-        
+
         <div class="show-option" id="corpus_container" title="Filter the Search Results by one Corpus of Documents">
-        
+
             <input type="radio" class="corpus_choice" id="corpus_source_records" name="radio2" /><label class="corpus_choice_label" for="corpus_source_records">Source Pdfs</label>
-            <input type="radio" class="corpus_choice" id="corpus_ocr_records" name="radio2" checked="checked"/><label class="corpus_choice_label" for="corpus_ocr_records">Ocr/Icr Records</label>
+            <input type="radio" class="corpus_choice" id="corpus_ocr_records" name="radio2" /><label class="corpus_choice_label" for="corpus_ocr_records">Ocr/Icr Records</label>
             <input type="radio" class="corpus_choice" id="corpus_internal_records" name="radio2" /><label class="corpus_choice_label" for="corpus_internal_records">Grande Livre</label>
-        
+
         </div>
-        
+
         <div class="show-option" id="filter_container" title="Filter the Search Results by one Category">
-        
+
                 {% if corpus_word == "corpus_ocr_records" or corpus_word == "corpus_internal_records" %}
                 <input type="radio" class="filter_choice" id="filter_pdf_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_pdf_all">All</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_linked" name="radio" /><label class="filter_choice_label" for="filter_pdf_linked">Linked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_unlinked" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_pdf_unlinked">Unlinked</label>
                 <input type="radio" class="filter_choice" id="filter_pdf_error" name="radio" /><label class="filter_choice_label" for="filter_pdf_error">Error</label>
                 {% endif %}
-                
+
                 {% if corpus_word == "corpus_source_records" %}
-                
+
                 <input type="radio" class="filter_choice" id="filter_source_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_source_all">All</label>
                 <input type="radio" class="filter_choice" id="filter_source_assigned" name="radio" /><label class="filter_choice_label" for="filter_source_assigned">Assigned</label>
                 <input type="radio" class="filter_choice" id="filter_source_notassigned" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_source_notassigned">Not Assigned</label>
-                
+
                 {% endif %}
         </div>
-        
+
     </div>
-    
-    
+
+
 {% endblock content%}
 
 
