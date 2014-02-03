@@ -196,6 +196,37 @@ object {
 
 }
 
+
+.category_order_by {
+
+    
+    width:20%;
+    height:5%;
+    display:inline-block;
+
+
+}
+
+.order_tab {
+
+    width: 20%;
+    height: 50%;
+    font-size: 80% !important;
+
+}
+
+.order_tab .ui-button-text {
+
+    padding: 0 !important;
+
+}
+
+.order_tab .ui-icon {
+
+    left: -20% !important;
+
+}
+
 .flag_button_label {
     
     display:block;
@@ -494,7 +525,7 @@ object {
     
     
     
-    #listpanel-form label, #listpanel-form  input { margin-left:4%; display:block; }
+    #listpanel-form label, #listpanel-form  input { margin-left:4%; display:inline-block; }
     #listpanel-form input.text { margin-bottom:2%; width:95%; padding: 2%; }
     #fieldset_fields { padding:0; border:0; margin-top:12%; overflow:hidden;}
     #fieldset_fields ul{ width:95%; margin-left: 3%; margin-top:8%; margin-bottom:8%; overflow:hidden}

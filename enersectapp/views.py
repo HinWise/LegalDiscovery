@@ -3292,7 +3292,16 @@ def search_tool(request):
     except (KeyError):
         
         id_assign = "none"
-    
+
+        
+    try:
+        category_fields_order_list = request.POST['category_fields_order_list']
+        category_fields_order_list = str(category_fields_order_list)
+        
+    except (KeyError):
+        
+        category_fields_order_list = ""
+            
     
     #word = str(word)
     word_amount= str(word_amount).encode("utf8")
@@ -3542,8 +3551,30 @@ def search_tool(request):
     
         if records_list:
             
+            #Sort by Categories depending on the user's input in the Search Tool:
+            
+            
+            category_fields_order_list = category_fields_order_list.split(',')
+            
+            category_temp_list = filter(bool, category_fields_order_list)
+            
+            
+            if len(category_temp_list):
+            
+                for item in category_temp_list:
+                    if len(item):
+                        
+                        records_list = records_list.order_by(item)
+            
+            
+            else:
+                records_list = records_list.order_by('pk')
+            
+            
+            category_fields_order_list = ",".join(category_temp_list)
+            
             merging_records = records_list
-            records_list = records_list.order_by('job_directory').order_by('filename')[actual_min_num:max_num]
+            records_list = records_list[actual_min_num:max_num]
     
     elif corpus_word=="corpus_ocr_records":
     
@@ -3759,8 +3790,30 @@ def search_tool(request):
     
         if records_list:
             
+            #Sort by Categories depending on the user's input in the Search Tool:
+            
+            
+            category_fields_order_list = category_fields_order_list.split(',')
+            
+            category_temp_list = filter(bool, category_fields_order_list)
+            
+            
+            if len(category_temp_list):
+            
+                for item in category_temp_list:
+                    if len(item):
+                        
+                        records_list = records_list.order_by(item)
+            
+            
+            else:
+                records_list = records_list.order_by('pk')
+            
+            
+            category_fields_order_list = ",".join(category_temp_list)
+            
             merging_records = records_list
-            records_list = records_list.order_by('commentary').order_by('-status')[actual_min_num:max_num]
+            records_list = records_list[actual_min_num:max_num]
                 
         
     elif corpus_word=="corpus_internal_records":
@@ -4062,12 +4115,36 @@ def search_tool(request):
     
         if records_list:
             
+            #Sort by Categories depending on the user's input in the Search Tool:
+            
+            
+            category_fields_order_list = category_fields_order_list.split(',')
+            
+            category_temp_list = filter(bool, category_fields_order_list)
+            
+            
+            if len(category_temp_list):
+            
+                for item in category_temp_list:
+                    if len(item):
+                        
+                        records_list = records_list.order_by(item)
+            
+            
+            else:
+                records_list = records_list.order_by('pk')
+            
+            
+            category_fields_order_list = ",".join(category_temp_list)
+            
+            
             merging_records = records_list
-            records_list = records_list.order_by('commentary').order_by('-status')[actual_min_num:max_num]
+            records_list = records_list[actual_min_num:max_num]
     
     ##### COMMON BLOCK ####
     
-
+    
+    
     try:
         export_mark = request.POST['export_mark']
     except (KeyError):
@@ -4128,7 +4205,8 @@ def search_tool(request):
     'word_movnumber':word_movnumber,'word_journal':word_journal,'word_s':word_s,'word_lett':word_lett,'word_id':word_id,
     'word_job_directory':word_job_directory,'word_multipart_filename':word_multipart_filename,
     'word_docname':word_docname,'word_id_docname':word_id_docname,'total_records':total_records,
-    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,'the_user':the_user}
+    'page_counter_beginning':actual_min_num,'page_counter_end':page_counter_end,'plus_limit':plus_limit,
+    'category_fields_order_list':category_fields_order_list,'the_user':the_user}
     
     return render(request,'enersectapp/search_tool.html',context)
 

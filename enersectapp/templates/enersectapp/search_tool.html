@@ -620,6 +620,7 @@
 
         $('#corpus_source_records').click(function(){
 
+           $("#category_fields_order_list").attr("value","");
            $('#corpus_text').attr("value","corpus_source_records");
            toggleLoadingScreen();
            $("#search_form").submit();
@@ -629,6 +630,7 @@
 
         $('#corpus_ocr_records').click(function(){
 
+           $("#category_fields_order_list").attr("value","");
            $('#corpus_text').attr("value","corpus_ocr_records");
            toggleLoadingScreen();
            $("#search_form").submit();
@@ -637,6 +639,7 @@
 
         $('#corpus_internal_records').click(function(){
 
+           $("#category_fields_order_list").attr("value","");
            $('#corpus_text').attr("value","corpus_internal_records");
            toggleLoadingScreen();
            $("#search_form").submit();
@@ -934,6 +937,33 @@
                 break;
             }
 
+            //Mark the correct Sort/Order By buttons checked
+
+            var original_fieldnames_string = $("#category_fields_order_list").attr("value");
+                
+            helper_list = original_fieldnames_string.split(",");
+            
+            for (var i=0;i<helper_list.length;i++)
+            {
+                field_value = helper_list[i];
+                field_value_clean = field_value.replace("-","");
+                
+                if(field_value == field_value_clean)
+                {
+                    
+                    $(".order_down[fieldname="+field_value_clean+"]").attr("checked","checked").button("refresh");
+                
+                }
+                else
+                {
+                    
+                    $(".order_up[fieldname="+field_value_clean+"]").attr("checked","checked").button("refresh");
+                    
+                }
+            }
+            
+
+            
             /*var search_options = $('#options_text').attr("value");
 
 
@@ -1112,6 +1142,111 @@
                         }
                     });
             }
+            
+            $(".category_order_by").buttonset();
+            
+            $(".order_none").button( { icons: {primary:'ui-icon-carat-2-n-s'} } ).click(function(){
+
+                var this_fieldname = $(this).attr("fieldname");
+                var original_fieldnames_string = $("#category_fields_order_list").attr("value");
+                
+                var number_times_string = original_fieldnames_string.indexOf(this_fieldname) + 1;
+                
+                if(number_times_string > 0)
+                {
+                    
+                    new_fieldnames_string = original_fieldnames_string.replace("-"+this_fieldname,"");
+                    new_fieldnames_string = new_fieldnames_string.replace(this_fieldname,"");
+                    
+                    $("#category_fields_order_list").attr("value",new_fieldnames_string);
+                    
+                    toggleLoadingScreen();
+                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                    //$( this ).dialog( "close" );
+                    $('#search_form').submit();
+                    
+                }
+                /*else
+                {
+                    new_value = original_fieldnames_string.replace(original_fieldnames_string,"");
+                }*/
+                
+
+
+            });
+            $(".order_up").button( { icons: {primary:'ui-icon-triangle-1-n'} } ).click(function(){
+
+                var this_fieldname = $(this).attr("fieldname");
+                var original_fieldnames_string = $("#category_fields_order_list").attr("value");
+                
+                var number_times_string = original_fieldnames_string.indexOf(this_fieldname) + 1;
+                
+                if(number_times_string > 0)
+                {
+                    
+                    new_fieldnames_string = original_fieldnames_string.replace("-"+this_fieldname,this_fieldname);
+                    new_fieldnames_string = new_fieldnames_string.replace(this_fieldname,"-"+this_fieldname);
+                    
+                    $("#category_fields_order_list").attr("value",new_fieldnames_string);
+                    
+                    toggleLoadingScreen();
+                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                    //$( this ).dialog( "close" );
+                    $('#search_form').submit();
+                    
+                }
+                else
+                {
+                    new_fieldnames_string = "-"+this_fieldname+"," + original_fieldnames_string;
+                    
+                    $("#category_fields_order_list").attr("value",new_fieldnames_string);
+                    
+                    toggleLoadingScreen();
+                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                    //$( this ).dialog( "close" );
+                    $('#search_form').submit();
+                }
+                
+            });
+            $(".order_down").button( { icons: {primary:'ui-icon-triangle-1-s'} } ).click(function(){
+
+                var this_fieldname = $(this).attr("fieldname");
+                var original_fieldnames_string = $("#category_fields_order_list").attr("value");
+                
+                var number_times_string = original_fieldnames_string.indexOf(this_fieldname) + 1;
+                
+                if(number_times_string > 0)
+                {
+                    
+                    new_fieldnames_string = original_fieldnames_string.replace("-"+this_fieldname,this_fieldname);
+                    
+                    $("#category_fields_order_list").attr("value",new_fieldnames_string);
+                    
+                    toggleLoadingScreen();
+                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                    //$( this ).dialog( "close" );
+                    $('#search_form').submit();
+                    
+                }
+                else
+                {
+                    new_fieldnames_string = this_fieldname+"," + original_fieldnames_string;
+                    
+                    $("#category_fields_order_list").attr("value",new_fieldnames_string);
+                    
+                    toggleLoadingScreen();
+                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                    //$( this ).dialog( "close" );
+                    $('#search_form').submit();
+                }
+                
+            });
+            
+            
+            
+            
+            
+            
         }
 
         function createFieldsForm(){
@@ -1981,12 +2116,36 @@
                 <fieldset id="fieldset_fields">
 
                     {% if corpus_word == "corpus_source_records" %}
-                        <label for="option_text_input_job_directory">Job Directory</label>
+                        <label for="option_text_input_job_directory">Job Directory 
+                            
+                        </label>
+
+                        <div id="category_order_by_job_directory" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_job_directory" name="order_job_directory" fieldname="job_directory" checked="checked"><label class="order_tab" for="order_none_job_directory"></label>
+                                <input type="radio" class="order_down" id="order_down_job_directory" name="order_job_directory" fieldname="job_directory"><label class="order_tab" for="order_down_job_directory"></label>
+                                <input type="radio" class="order_up" id="order_up_job_directory" name="order_job_directory" fieldname="job_directory"><label class="order_tab" for="order_up_job_directory"></label>
+                        </div>
+                        
                         <input type="text" name="search_job_directory" id="option_text_input_job_directory" value="{{word_job_directory}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_docname">Doc. Name</label>
+                        
+                        <div id="category_order_by_docname" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_docname" name="order_docname" fieldname="filename" checked="checked"><label class="order_tab" for="order_none_docname"></label>
+                                <input type="radio" class="order_down" id="order_down_docname" name="order_docname" fieldname="filename"><label class="order_tab" for="order_down_docname"></label>
+                                <input type="radio" class="order_up" id="order_up_docname" name="order_docname" fieldname="filename"><label class="order_tab" for="order_up_docname"></label>
+                        </div>
+
                         <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
 
+                        <label for="option_text_input_doctype">Document Type</label>
+                        
+                        <div id="category_order_by_doctype" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name" checked="checked"><label class="order_tab" for="order_none_doctype"></label>
+                                <input type="radio" class="order_down" id="order_down_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_down_doctype"></label>
+                                <input type="radio" class="order_up" id="order_up_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_up_doctype"></label>
+                        </div>
+                        
                         <ul class="menuclass" id="doctypemenu">
 
                             <li>
@@ -2006,6 +2165,13 @@
                         </ul>
 
                         <label for="option_text_input_multipart_filename">Multipart Filename</label>
+                        
+                        <div id="category_order_by_multipart_filename" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_multipart_filename" name="order_multipart_filename" fieldname="multipart_filename" checked="checked"><label class="order_tab" for="order_none_multipart_filename"></label>
+                                <input type="radio" class="order_down" id="order_down_multipart_filename" name="order_multipart_filename" fieldname="multipart_filename"><label class="order_tab" for="order_down_multipart_filename"></label>
+                                <input type="radio" class="order_up" id="order_up_multipart_filename" name="order_multipart_filename" fieldname="multipart_filename"><label class="order_tab" for="order_up_multipart_filename"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_multipart_filename" id="option_text_input_multipart_filename" value="{{word_multipart_filename}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_id_docname">Id.Filename</label>
@@ -2014,8 +2180,23 @@
                     {% endif %}
                     {% if corpus_word == "corpus_ocr_records" %}
                         <label for="option_text_input_amount">Amount</label>
+                        
+                        <div id="category_order_by_amount" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_amount" name="order_amount" fieldname="ocrrecord_link__Amount" checked="checked"><label class="order_tab" for="order_none_amount"></label>
+                                <input type="radio" class="order_down" id="order_down_amount" name="order_amount" fieldname="ocrrecord_link__Amount"><label class="order_tab" for="order_down_amount"></label>
+                                <input type="radio" class="order_up" id="order_up_amount" name="order_amount" fieldname="ocrrecord_link__Amount"><label class="order_tab" for="order_up_amount"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_amount" id="option_text_input_amount" value="{{word_amount}}" class="text ui-widget-content ui-corner-all" />
 
+                        <label for="option_text_input_companyname">Company Name</label>
+                        
+                        <div id="category_order_by_companyname" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_companyname" name="order_companyname" fieldname="ocrrecord_link__Company" checked="checked"><label class="order_tab" for="order_none_companyname"></label>
+                                <input type="radio" class="order_down" id="order_down_companyname" name="order_companyname" fieldname="ocrrecord_link__Company"><label class="order_tab" for="order_down_companyname"></label>
+                                <input type="radio" class="order_up" id="order_up_companyname" name="order_companyname" fieldname="ocrrecord_link__Company"><label class="order_tab" for="order_up_companyname"></label>
+                        </div>
+                        
                         <ul class="menuclass" id="companynamemenu">
 
                             <li>
@@ -2030,9 +2211,23 @@
                         </ul>
 
                         <label for="option_text_input_date">Issue Date</label>
+                        
+                        <div id="category_order_by_date" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_date" name="order_date" fieldname="ocrrecord_link__IssueDate" checked="checked"><label class="order_tab" for="order_none_date"></label>
+                                <input type="radio" class="order_down" id="order_down_date" name="order_date" fieldname="ocrrecord_link__IssueDate"><label class="order_tab" for="order_down_date"></label>
+                                <input type="radio" class="order_up" id="order_up_date" name="order_date" fieldname="ocrrecord_link__IssueDate"><label class="order_tab" for="order_up_date"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
 
-
+                        <label for="option_text_input_doctype">Document Type</label>
+                        
+                        <div id="category_order_by_doctype" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name" checked="checked"><label class="order_tab" for="order_none_doctype"></label>
+                                <input type="radio" class="order_down" id="order_down_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_down_doctype"></label>
+                                <input type="radio" class="order_up" id="order_up_doctype" name="order_doctype" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_up_doctype"></label>
+                        </div>
+                        
                         <ul class="menuclass" id="doctypemenu">
 
                             <li>
@@ -2052,9 +2247,23 @@
                         </ul>
 
                         <label for="option_text_input_piecenumber">Piece Number</label>
+                        
+                        <div id="category_order_by_piecenumber" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_piecenumber" name="order_piecenumber" fieldname="ocrrecord_link_Piece_Number" checked="checked"><label class="order_tab" for="order_none_piecenumber"></label>
+                                <input type="radio" class="order_down" id="order_down_piecenumber" name="order_piecenumber" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_down_piecenumber"></label>
+                                <input type="radio" class="order_up" id="order_up_piecenumber" name="order_piecenumber" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_up_piecenumber"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_docname">Doc. Name</label>
+                        
+                        <div id="category_order_by_docname" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_docname" name="order_docname" fieldname="sourcedoc_link__filename" checked="checked"><label class="order_tab" for="order_none_docname"></label>
+                                <input type="radio" class="order_down" id="order_down_docname" name="order_docname" fieldname="sourcedoc_link__filename"><label class="order_tab" for="order_down_docname"></label>
+                                <input type="radio" class="order_up" id="order_up_docname" name="order_docname" fieldname="sourcedoc_link__filename"><label class="order_tab" for="order_up_docname"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_docname" id="option_text_input_docname" value="{{word_docname}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_id_docname">Id.Filename</label>
@@ -2063,11 +2272,33 @@
                     {% endif %}
                     {% if corpus_word == "corpus_internal_records" %}
                         <label for="option_text_input_amount_credit">Amount Credit</label>
+                        
+                        <div id="category_order_by_amount" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_amount" name="order_amount" fieldname="Credit" checked="checked"><label class="order_tab" for="order_none_amount"></label>
+                                <input type="radio" class="order_down" id="order_down_amount" name="order_amount" fieldname="Credit"><label class="order_tab" for="order_down_amount"></label>
+                                <input type="radio" class="order_up" id="order_up_amount" name="order_amount" fieldname="Credit"><label class="order_tab" for="order_up_amount"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_amount_credit" id="option_text_input_amount_credit" value="{{word_amount_credit}}" class="text ui-widget-content ui-corner-all" />
 
-                        <label for="option_text_input_amount_credit">Amount Debit</label>
+                        <label for="option_text_input_amount_debit">Amount Debit</label>
+                        
+                        <div id="category_order_by_amount_debit" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_amount_debit" name="order_amount_debit" fieldname="Debit" checked="checked"><label class="order_tab" for="order_none_amount_debit"></label>
+                                <input type="radio" class="order_down" id="order_down_amount_debit" name="order_amount_debit" fieldname="Debit"><label class="order_tab" for="order_down_amount_debit"></label>
+                                <input type="radio" class="order_up" id="order_up_amount_debit" name="order_amount_debit" fieldname="Debit"><label class="order_tab" for="order_up_amount_debit"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_amount_debit" id="option_text_input_amount_debit" value="{{word_amount_debit}}" class="text ui-widget-content ui-corner-all" />
 
+                        <label for="option_text_input_amount_debit">Company Name</label>
+                        
+                        <div id="category_order_by_companyname" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_companyname" name="order_companyname" fieldname="Company" checked="checked"><label class="order_tab" for="order_none_companyname"></label>
+                                <input type="radio" class="order_down" id="order_down_companyname" name="order_companyname" fieldname="Company"><label class="order_tab" for="order_down_companyname"></label>
+                                <input type="radio" class="order_up" id="order_up_companyname" name="order_companyname" fieldname="Company"><label class="order_tab" for="order_up_companyname"></label>
+                        </div>
+                        
                         <ul class="menuclass" id="companynamemenu">
 
                             <li>
@@ -2082,28 +2313,84 @@
                         </ul>
 
                         <label for="option_text_input_date">Transaction Date</label>
+                        
+                        <div id="category_order_by_date" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_date" name="order_date" fieldname="Day,Month,Year" checked="checked"><label class="order_tab" for="order_none_date"></label>
+                                <input type="radio" class="order_down" id="order_down_date" name="order_date" fieldname="Day,Month,Year"><label class="order_tab" for="order_down_date"></label>
+                                <input type="radio" class="order_up" id="order_up_date" name="order_date" fieldname="Day,Month,Year"><label class="order_tab" for="order_up_date"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_date" id="option_text_input_date" value="{{word_date}}" class="text ui-widget-content ui-corner-all" />
 
 
                         <label for="option_text_input_piecenumber">Piece Number</label>
+                        
+                        <div id="category_order_by_piecenumber" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_piecenumber" name="order_piecenumber" fieldname="ocrrecord_link_Piece_Number" checked="checked"><label class="order_tab" for="order_none_piecenumber"></label>
+                                <input type="radio" class="order_down" id="order_down_piecenumber" name="order_piecenumber" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_down_piecenumber"></label>
+                                <input type="radio" class="order_up" id="order_up_piecenumber" name="order_piecenumber" fieldname="modified_document_type__pretty_name"><label class="order_tab" for="order_up_piecenumber"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_piecenumber" id="option_text_input_piecenumber" value="{{word_piecenumber}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_accountnumber">Account Number</label>
+                        
+                        <div id="category_order_by_accountnumber" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_accountnumber" name="order_accountnumber" fieldname="AccountNum" checked="checked"><label class="order_tab" for="order_none_accountnumber"></label>
+                                <input type="radio" class="order_down" id="order_down_accountnumber" name="order_accountnumber" fieldname="AccountNum"><label class="order_tab" for="order_down_accountnumber"></label>
+                                <input type="radio" class="order_up" id="order_up_accountnumber" name="order_accountnumber" fieldname="AccountNum"><label class="order_tab" for="order_up_accountnumber"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_accountnumber" id="option_text_input_accountnumber" value="{{word_accountnumber}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_movnumber">Movement Number</label>
+                        
+                        <div id="category_order_by_movnumber" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_movnumber" name="order_movnumber" fieldname="NoMvt" checked="checked"><label class="order_tab" for="order_none_movnumber"></label>
+                                <input type="radio" class="order_down" id="order_down_movnumber" name="order_movnumber" fieldname="NoMvt"><label class="order_tab" for="order_down_movnumber"></label>
+                                <input type="radio" class="order_up" id="order_up_movnumber" name="order_movnumber" fieldname="NoMvt"><label class="order_tab" for="order_up_movnumber"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_movnumber" id="option_text_input_movnumber" value="{{word_movnumber}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_journal">Journal</label>
+                        
+                        <div id="category_order_by_journal" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_journal" name="order_journal" fieldname="Journal" checked="checked"><label class="order_tab" for="order_none_journal"></label>
+                                <input type="radio" class="order_down" id="order_down_journal" name="order_journal" fieldname="Journal"><label class="order_tab" for="order_down_journal"></label>
+                                <input type="radio" class="order_up" id="order_up_journal" name="order_journal" fieldname="Journal"><label class="order_tab" for="order_up_journal"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_journal" id="option_text_input_journal" value="{{word_journal}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_s">S Field</label>
+                        
+                        <div id="category_order_by_s" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_s" name="order_s" fieldname="S" checked="checked"><label class="order_tab" for="order_none_s"></label>
+                                <input type="radio" class="order_down" id="order_down_s" name="order_s" fieldname="S"><label class="order_tab" for="order_down_s"></label>
+                                <input type="radio" class="order_up" id="order_up_s" name="order_s" fieldname="S"><label class="order_tab" for="order_up_s"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_s" id="option_text_input_s" value="{{word_s}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_lett">Lett</label>
+                        
+                        <div id="category_order_by_lett" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_lett" name="order_lett" fieldname="Lett" checked="checked"><label class="order_tab" for="order_none_lett"></label>
+                                <input type="radio" class="order_down" id="order_down_lett" name="order_lett" fieldname="Lett"><label class="order_tab" for="order_down_lett"></label>
+                                <input type="radio" class="order_up" id="order_up_lett" name="order_lett" fieldname="Lett"><label class="order_tab" for="order_up_lett"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_lett" id="option_text_input_lett" value="{{word_lett}}" class="text ui-widget-content ui-corner-all" />
 
                         <label for="option_text_input_id_docname">Id</label>
+                        
+                        <div id="category_order_by_id" class="category_order_by">
+                                <input type="radio" class="order_none" id="order_none_id" name="order_id" fieldname="pk" checked="checked"><label class="order_tab" for="order_none_id"></label>
+                                <input type="radio" class="order_down" id="order_down_id" name="order_id" fieldname="pk"><label class="order_tab" for="order_down_id"></label>
+                                <input type="radio" class="order_up" id="order_up_id" name="order_id" fieldname="pk"><label class="order_tab" for="order_up_id"></label>
+                        </div>
+                        
                         <input type="text" name="search_word_id" id="option_text_input_id" value="{{word_id}}" class="text ui-widget-content ui-corner-all" />
 
                     {% endif %}
@@ -2117,6 +2404,11 @@
                     <input class="invisible" id="id_assign" type="text" name='id_assign' value="none">
 
                     <input class="invisible" id="export_mark" type="text" name='export_mark' value="none">
+                    
+                    
+                    <input class="invisible" id="category_fields_order_list" type="text" name='category_fields_order_list' value="{{category_fields_order_list}}">
+                    
+                    
 
                 </fieldset>
                 </form>
