@@ -9,7 +9,7 @@ scp -i  LegalRecoveryKey.ppk C:\Dropbox\GitHub\LegalDiscovery\databases\nathansq
 
 scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db.zip C:\Dropbox\GitHub\LegalDiscovery\ProjectFolder\databases\
 
-scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db3.zip C:\Dropbox\NathanProject\ProjectFolder\databases\
+scp -i  LegalRecoveryKey.ppk ec2-user@ec2-54-200-180-182.us-west-2.compute.amazonaws.com:/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db.zip C:\Dropbox\NathanProject\ProjectFolder\databases\
 
 lzma -c nathansqlite3db > nathansqlite3db.xz (.7zip) to zip
 

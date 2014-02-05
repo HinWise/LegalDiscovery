@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+#left_container {
+
+    position:absolute;
+    
+    width:35%;
+    height:100%;
+    
+    left: 70%;
+    top: 0%;
+    
+    overflow:visible;
+    
+}
+
+    #filters_panel {
+    
+        position: absolute;
+        width: 97%;
+        height: 19%;
+        
+        top: 0.5%;
+        left: -12%;
+        
+        z-index:10;
+    }
+    
+        .show-option {
+            
+            position: relative;
+            
+            margin-left:1%;
+            margin-top:1%;
+            
+            width: 98%;
+            height: 20%;
+            
+            overflow:auto;
+            
+        }
+        
+        #filter_container_date {
+        
+            position:relative;
+            
+            margin-top:7% !important;
+        }
+        
+        .filter_choice{
+
+            
+        }
+   
+    #fields_container {
+        position: absolute;
+        width: 96%;
+        height: 80%;
+        
+        top: 20.6%;
+        left: 1%;
+        
+       overflow-x:visible;
+       overflow-y:auto;
+    }
+    
+    
+
+#right_container {
+
+    position:absolute;
+    
+    width:77%;
+    height:100%;
+    
+    left:0.2%;
+    top:0;
+    
+
+
+}
+
+.chosen_cell {
+
+    background-color: lightgreen;
+    color: darkblue;
+
+}
+

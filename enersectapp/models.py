@@ -186,6 +186,7 @@ class PdfRecord(models.Model):
     modified_doctype_author = models.ForeignKey(User,null=True,blank=True)
     commentary = models.CharField(max_length=512, default="None")
     audit_mark = models.CharField(max_length=512, default="None")
+    audit_mark_saved = models.CharField(max_length=512, default="None")
     audit_mark_revision = models.CharField(max_length=512, default="None")
     status = models.CharField(max_length=255, default="pdf_unlinked")
     translated = models.CharField(max_length=255, default="no")
@@ -227,6 +228,9 @@ class UserProfile(models.Model):
     modifiedsourcepdfs_blank_or_not_tool = models.ManyToManyField(SourcePdf,related_name='sourcepdfs_modified_blank_or_not_blank_tool', null=True, blank=True, default=None)
     modifiedpdfs_categorization_tool = models.ManyToManyField(PdfRecord,related_name='pdfs_modified_categorization_tool', null=True, blank=True, default=None)
     modifiedpdfs_translated_arabic = models.ManyToManyField(PdfRecord,related_name='pdfs_translated_arabic', null=True, blank=True, default=None)
+    modifiedpdfs_audit_marked = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_marked', null=True, blank=True, default=None)
+    modifiedpdfs_audit_saved = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_saved', null=True, blank=True, default=None)
+    modifiedpdfs_audit_revision = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_revisioned', null=True, blank=True, default=None)
     #other fields here
 
     def __str__(self):  

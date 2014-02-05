@@ -197,6 +197,15 @@ urlpatterns = patterns('',
         
         url(r'^auditui/randomqa_spider/$', views.randomqa_spider, name='randomqa_spider'), 
         
+        
+        
+    # QA Pair Spider Random Audit Interface
+        # Interface to check if the data entry of random files from a lot was made correctly. It audits pairs when available,
+        # and has tools for building a third entry.
+        
+        url(r'^auditui/pair_randomqa_spider/$', views.pair_randomqa_spider, name='pair_randomqa_spider'), 
+     
+     
     # Categorization Tool Interface
     # Interface to check if the data entry of random files from a lot was made correctly
         
