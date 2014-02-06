@@ -2122,20 +2122,62 @@
                   }
                 },
               close: function() {
-                             
-                    var temp_name = $("#companyform_name").val();
-                    var temp_telephone = $("#companyform_telephone").val();
-                    var temp_address = $("#companyform_address").val();
-                    var temp_city = $("#companyform_city").val();
-                    var temp_country = $("#companyform_country").val();
                     
-                    $("#company_name").attr("value",temp_name);
-                    $("#company_telephone").attr("value",temp_telephone);
-                    $("#company_address").attr("value",temp_address);
-                    $("#company_city").attr("value",temp_city);
-                    $("#company_country").attr("value",temp_country);
-                               
-                    if(temp_name.length && temp_telephone.length && temp_address.length && temp_city.length && temp_country.length)
+                    var company_name = $( "#companyform_name" );
+                    var company_address = $( "#companyform_address" );
+                    var company_telephone = $( "#companyform_telephone" );
+                    var company_city = $( "#companyform_city" );
+                    var company_country = $( "#companyform_country" );
+
+                    var cValid = true;
+                    
+                    if(company_name.length)
+                    {
+                        var temp_name = $("#companyform_name").val();
+                        
+                        if(temp_name.length == 0) cValid = false;
+                        
+                        else $("#company_name").attr("value",temp_name);
+                    }
+                    
+                    if(company_address.length)
+                    {
+                        var temp_address = $("#companyform_address").val();
+                        
+                        if(temp_address.length == 0) cValid = false;
+                        
+                        else $("#company_address").attr("value",temp_address);
+                    }
+                    
+                    if(company_telephone.length)
+                    {
+                        var temp_telephone = $("#companyform_telephone").val();
+                        
+                        if(temp_telephone.length == 0) cValid = false;
+                        
+                        else $("#company_telephone").attr("value",temp_telephone);
+                    }
+                    
+                    if(company_city.length)
+                    {
+                        var temp_city = $("#companyform_city").val();
+                        
+                        if(temp_city.length == 0) cValid = false;
+                        
+                        else $("#company_city").attr("value",temp_city);
+                    }
+                    
+                    if(company_country.length)
+                    {
+                        var temp_country = $("#companyform_country").val();
+                        
+                        if(temp_telephone.length == 0) cValid = false;
+                        
+                        else $("#company_country").attr("value",temp_country);
+                    }
+
+                    
+                    if(cValid)
                     {
                         if(temp_name=="MISSING NAME" || temp_name=="UNREADABLE NAME")
                         {

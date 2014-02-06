@@ -8,6 +8,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
+from django.views import generic
+from django.utils import timezone
+from datetime import timedelta
+import datetime
 
 def save_new_data_entry(doctype,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,

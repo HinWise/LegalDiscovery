@@ -37,7 +37,21 @@
 
     $(document).ready(function () {
     
-
+    
+    
+        
+        //For the Countries, Cities, Document Type and Companies
+        
+        var companyNameList = "";
+        var countryList = "";
+        var currencies = "";
+        var doctypesNameList = "";
+        
+        setUpDataLists();
+    
+        createAutocompleteFields();
+        //
+    
         createPdf_View();
         //createUserPanel();
         createFilters();
@@ -45,7 +59,275 @@
         createFieldsForm();
         configLoadingScreen();
         createEventListeners();
+        
+        
+        function setUpDataLists()
+        {
+        
+            countryList = new Array("Afghanistan", "Albania", "Algeria", "American Samoa", "Angola", "Anguilla", "Antartica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Ashmore and Cartier Island", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burma", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Clipperton Island", "Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo, Democratic Republic of the", "Congo, Republic of the", "Cook Islands", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czeck Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Europa Island", "Falkland Islands (Islas Malvinas)", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern and Antarctic Lands", "Gabon", "Gambia, The", "Gaza Strip", "Georgia", "Germany", "Ghana", "Gibraltar", "Glorioso Islands", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See (Vatican City)", "Honduras", "Hong Kong", "Howland Island", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Ireland, Northern", "Israel", "Italy", "Jamaica", "Jan Mayen", "Japan", "Jarvis Island", "Jersey", "Johnston Atoll", "Jordan", "Juan de Nova Island", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia, Former Yugoslav Republic of", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Man, Isle of", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia, Federated States of", "Midway Islands", "Moldova", "Monaco", "Mongolia", "Montserrat", "Morocco", "Mozambique", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcaim Islands", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Scotland", "Senegal", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and South Sandwich Islands", "Spain", "Spratly Islands", "Sri Lanka", "Sudan", "Suriname", "Svalbard", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Tobago", "Toga", "Tokelau", "Tonga", "Trinidad", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "United States (USA)", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Virgin Islands", "Wales", "Wallis and Futuna", "West Bank", "Western Sahara", "Yemen", "Yugoslavia", "Zambia", "Zimbabwe");
+            currencies = new Array(
+            'Afghan afghani (AFN)',
+            'Albanian lek (ALL)' ,
+            'Algerian dinar (DZD)' ,
+            'European euro (EUR)' ,
+            'Angolan kwanza (AOA)' ,
+            'East Caribbean dollar (XCD)' ,
+            'Argentine peso (ARS)' ,
+            'Armenian dram (AMD)' ,
+            'Aruban florin (AWG)' ,
+            'Australian dollar (AUD)' ,
+            'Azerbaijani manat (AZN)' ,
+            'Bahamian dollar (BSD)' ,
+            'Bahraini dinar (BHD)' ,
+            'Bangladeshi taka (BDT)' ,
+            'Barbadian dollar (BBD)' ,
+            'Belarusian ruble (BYR)' ,
+            'Belize dollar (BZD)' ,
+            'West African CFA franc (XOF)' ,
+            'Bhutanese ngultrum (BTN)' ,
+            'Bolivian boliviano (BOB)' ,
+            'Bosnia-Herzegovina konvertibilna marka (BAM)' ,
+            'Botswana pula (BWP)' ,
+            'Brazilian real (BRL)' ,
+            'Brunei dollar (BND)' ,
+            'Bulgarian lev (BGN)' ,
+            'Burundi franc (BIF)' ,
+            'Cambodian riel (KHR)' ,
+            'Central African CFA franc (XAF)' ,
+            'Canadian dollar (CAD)' ,
+            'Cape Verdean escudo (CVE)' ,
+            'Cayman Islands dollar (KYD)' ,
+            'Chilean peso (CLP)' ,
+            'Chinese renminbi (CNY)' ,
+            'Colombian peso (COP)' ,
+            'Comorian franc (KMF)' ,
+            'Congolese franc (CDF)' ,
+            'Costa Rican colon (CRC)' ,
+            'Croatian kuna (HRK)' ,
+            'Cuban peso (CUC)' ,
+            'Czech koruna (CZK)' ,
+            'Danish krone (DKK)' ,
+            'Djiboutian franc (DJF)' ,
+            'Dominican peso (DOP)' ,
+            'Egyptian pound (EGP)' ,
+            'Central African CFA franc (GQE)' ,
+            'Eritrean nakfa (ERN)' ,
+            'Estonian kroon (EEK)' ,
+            'Ethiopian birr (ETB)' ,
+            'Falkland Islands pound (FKP)' ,
+            'Fijian dollar (FJD)' ,
+            'CFP franc (XPF)' ,
+            'Gambian dalasi (GMD)' ,
+            'Georgian lari (GEL)' ,
+            'Ghanaian cedi (GHS)' ,
+            'Gibraltar pound (GIP)' ,
+            'Guatemalan quetzal (GTQ)' ,
+            'Guinean franc (GNF)' ,
+            'Guyanese dollar (GYD)' ,
+            'Haitian gourde (HTG)' ,
+            'Honduran lempira (HNL)' ,
+            'Hong Kong dollar (HKD)' ,
+            'Hungarian forint (HUF)' ,
+            'Icelandic krona (ISK)' ,
+            'Indian rupee (INR)' ,
+            'Indonesian rupiah (IDR)' ,
+            'Iranian rial (IRR)' ,
+            'Iraqi dinar (IQD)' ,
+            'Israeli new sheqel (ILS)' ,
+            'Jamaican dollar (JMD)' ,
+            'Japanese yen (JPY)' ,
+            'Jordanian dinar (JOD)' ,
+            'Kazakhstani tenge (KZT)' ,
+            'Kenyan shilling (KES)' ,
+            'North Korean won (KPW)' ,
+            'South Korean won (KRW)' ,
+            'Kuwaiti dinar (KWD)' ,
+            'Kyrgyzstani som (KGS)' ,
+            'Lao kip (LAK)' ,
+            'Latvian lats (LVL)' ,
+            'Lebanese lira (LBP)' ,
+            'Lesotho loti (LSL)' ,
+            'Liberian dollar (LRD)' ,
+            'Libyan dinar (LYD)' ,
+            'Lithuanian litas (LTL)' ,
+            'Macanese pataca (MOP)' ,
+            'Macedonian denar (MKD)' ,
+            'Malagasy ariary (MGA)' ,
+            'Malawian kwacha (MWK)' ,
+            'Malaysian ringgit (MYR)' ,
+            'Maldivian rufiyaa (MVR)' ,
+            'Mauritanian ouguiya (MRO)' ,
+            'Mauritian rupee (MUR)' ,
+            'Mexican peso (MXN)' ,
+            'Moldovan leu (MDL)' ,
+            'Mongolian tugrik (MNT)' ,
+            'Moroccan dirham (MAD)' ,
+            'Mozambican metical (MZM)' ,
+            'Myanma kyat (MMK)' ,
+            'Namibian dollar (NAD)' ,
+            'Nepalese rupee (NPR)' ,
+            'Netherlands Antillean gulden (ANG)' ,
+            'New Zealand dollar (NZD)' ,
+            'Nicaraguan cordoba (NIO)' ,
+            'Nigerian naira (NGN)' ,
+            'Norwegian krone (NOK)' ,
+            'Omani rial (OMR)' ,
+            'Pakistani rupee (PKR)',
+            'Panamanian balboa (PAB)' ,
+            'Papua New Guinean kina (PGK)' ,
+            'Paraguayan guarani (PYG)' ,
+            'Peruvian nuevo sol (PEN)' ,
+            'Philippine peso (PHP)' ,
+            'Polish zloty (PLN)' ,
+            'Qatari riyal (QAR)' ,
+            'Romanian leu (RON)' ,
+            'Russian ruble (RUB)' ,
+            'Rwandan franc (RWF)' ,
+            'Saint Helena pound (SHP)' ,
+            'Samoan tala (WST)' ,
+            'Sao Tome and Principe dobra (STD)' ,
+            'Saudi riyal (SAR)' ,
+            'Serbian dinar (RSD)' ,
+            'Seychellois rupee (SCR)' ,
+            'Sierra Leonean leone (SLL)' ,
+            'Singapore dollar (SGD)' ,
+            'Slovak koruna (SKK)' ,
+            'Solomon Islands dollar (SBD)' ,
+            'Somali shilling (SOS)' ,
+            'South African rand (ZAR)' ,
+            'Sudanese pound (SDG)' ,
+            'Sri Lankan rupee (LKR)' ,
+            'Sudanese pound (SDG)' ,
+            'Surinamese dollar (SRD)' ,
+            'Swazi lilangeni (SZL)' ,
+            'Swedish krona (SEK)' ,
+            'Swiss franc (CHF)' ,
+            'Syrian pound (SYP)' ,
+            'New Taiwan dollar (TWD)' ,
+            'Tajikistani somoni (TJS)' ,
+            'Tanzanian shilling (TZS)' ,
+            'Thai baht (THB)' ,
+            'Paanga (TOP9' ,
+            'Trinidad and Tobago dollar (TTD)' ,
+            'Tunisian dinar (TND)' ,
+            'Turkish new lira (TRY)' ,
+            'Turkmen manat (TMM)' ,
+            'Ugandan shilling (UGX)' ,
+            'Ukrainian hryvnia (UAH)' ,
+            'United Arab Emirates dirham (AED)' ,
+            'British pound (GBP)' ,
+            'United States dollar (USD)' ,
+            'Uruguayan peso (UYU)' ,
+            'Uzbekistani som (UZS)' ,
+            'Vanuatu vatu (VUV)' ,
+            'Venezuelan bolivar (VEB)' ,
+            'Vietnamese dong (VND)' ,
+            'Yemeni rial (YER)' ,
+            'Zambian kwacha (ZMK)' ,
+            'Zimbabwean dollar (ZWD)'
+          );
+        
+            if($('#companiesarray').length)
+            {
+        
+                companyNameList = $('#companiesarray').attr("value");
+                companyNameList = companyNameList.replace(/'/g,"");
+                companyNameList = companyNameList.replace("]","");
+                companyNameList = companyNameList.replace("[","");
+                companyNameList = companyNameList.split(", ");
                 
+               
+
+                i = 0;
+                while(i < companyNameList.length){
+                    companyNameList[i] = companyNameList[i].slice(1);
+                    i++;
+                }
+            
+            }
+            
+            if($('#doctypesarray').length)
+            {
+        
+                doctypesNameList = $('#doctypesarray').attr("value");
+                doctypesNameList = doctypesNameList.replace(/'/g,"");
+                doctypesNameList = doctypesNameList.replace("]","");
+                doctypesNameList = doctypesNameList.replace("[","");
+                doctypesNameList = doctypesNameList.split(", ");
+                
+               
+
+                i = 0;
+                while(i < doctypesNameList.length){
+                    doctypesNameList[i] = doctypesNameList[i].slice(1);
+                    i++;
+                }
+            
+            }
+           
+        }
+        
+        function createAutocompleteFields(){
+        
+            $('#selected_fieldtype_companyname').autocomplete({
+                source: companyNameList,
+                appendTo: "#table_div"
+            });
+        
+            $('#selected_fieldtype_doctype').autocomplete({
+                source: doctypesNameList,
+                appendTo: "#table_div"
+            });
+            
+            $('#selected_fieldtype_country').autocomplete({
+                source: countryList,
+                appendTo: "#table_div"
+            });
+            
+            $('#selected_fieldtype_currency').autocomplete({
+                source: currencies,
+                appendTo: "#table_div"
+            });
+            
+            
+            //$( "#select_doctype" ).menu();
+            
+            
+            /*$('#selected_fieldtype_city').autocomplete({
+                  source: function( request, response ) {
+                    $.ajax({
+                      url: "http://ws.geonames.org/searchJSON",
+                      dataType: "jsonp",
+                      data: {
+                        featureClass: "P",
+                        style: "full",
+                        maxRows: 6,
+                        name_startsWith: request.term
+                      },
+                      success: function( data ) {
+                        response( $.map( data.geonames, function( item ) {
+                          return {
+                            label: item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
+                            value: item.name + (item.adminName1 ? ", " + item.adminName1 : ""),
+                            countryValue : item.countryName
+                          }
+                        }));
+                      }
+                    });
+                  },
+                  select: function( event, ui ) {
+                    var countryValue = ui.item.countryValue;
+                    
+                    if(countryValue) { $('#selected_fieldtype_country').attr("value",countryValue); }
+                    
+                  },
+                  appendTo: "#table_div"
+                });*/
+            
+        
+        
+        }
+        
         function createPdf_View(){
                 var $pdf = $('#pdf_view');
             
@@ -863,6 +1145,8 @@
                 <input class="invisible" type="text" name="show_progress_mark" id="show_progress_mark" value="no" />
                 <input class="invisible" type="text" name="save_filename" id="save_filename" value="{{pdf_random_item.sourcedoc_link.filename}}" />
                 
+                <input type="text" name="companiesarray" id="companiesarray" value="{{ companyname_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
+                <input type="text" name="doctypesarray" id="doctypesarray" value="{{ document_type_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
      
                 {% if pdf_item_list %}
         
@@ -898,9 +1182,28 @@
                                 <tr>
                                     <th>Document Type</th>
                                     {% for pdf_item in pdf_item_list %}
-                                    <td fieldtype="doctype" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Document_Type}}</td>
+                                    <td fieldtype="doctype" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Document_Type}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_doctype" id="selected_fieldtype_doctype" value="" /></td>
+                                    <td>
+                                        <select class="select_menu" name="selected_fieldtype_doctype" id="selected_fieldtype_doctype" value="">
+                                            {% for item in document_type_list %}
+                                                <option value="{{item}}">{{item}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        
+                                    
+                                    <!--<ul id="select_doctype">
+                                      <li>
+                                        <a href="#">Select DocType</a>
+                                        <ul>
+                                        {% for item in document_type_list %}
+                                        <li><a href="#">{{item}}</a></li>
+                                        {% endfor %}
+                                        </ul>
+                                      </li>
+                                      
+                                    </ul>-->
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Amount</th>

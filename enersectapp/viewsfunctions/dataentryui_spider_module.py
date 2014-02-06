@@ -138,25 +138,40 @@ def dataentryui_savedata(request):
         company_address = request.POST['company_address']
     except:
         company_address = "NoCompanyAddressField"
-        
+    
+    if len(company_address) == 0:
+        company_address = "NoCompanyAddressField"
+    
     try:
         company_telephone = request.POST['company_telephone']
     except:
         company_telephone = "NoCompanyTelephoneField"
-        
+    
+    if len(company_telephone) == 0:
+        company_telephone = "NoCompanyTelephoneField"
+    
     try:
         company_city = request.POST['company_city']
     except:
         company_city = "NoCompanyCityField"
-        
+     
+    if len(company_city) == 0:
+        company_city = "NoCompanyCityField"
+    
     try:
         company_country = request.POST['company_country']
     except:
         company_country = "NoCompanyCountryField"
-        
+    
+    if len(company_country) == 0:
+        company_country = "NoCompanyCountryField"
+    
     try:
         company_template = request.POST['company_template']
     except:
+        company_template = "NoCompanyTemplateField"
+    
+    if len(company_template) == 0:
         company_template = "NoCompanyTemplateField"
     
     try:

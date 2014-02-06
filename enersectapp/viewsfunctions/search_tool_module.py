@@ -17,6 +17,12 @@ from urllib2 import Request, urlopen
 from StringIO import StringIO
 
 
+from django.views import generic
+from django.utils import timezone
+from datetime import timedelta
+import datetime
+
+
 import random
 
 def search_tool(request):

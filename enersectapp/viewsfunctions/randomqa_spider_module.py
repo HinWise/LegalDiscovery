@@ -11,6 +11,11 @@ from django.shortcuts import get_object_or_404, render, redirect,render_to_respo
 
 import random
 
+from django.views import generic
+from django.utils import timezone
+from datetime import timedelta
+import datetime
+
 
 def randomqa_spider(request):
 

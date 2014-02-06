@@ -9,6 +9,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
+from django.views import generic
+from django.utils import timezone
+from datetime import timedelta
+import datetime
+
 import random
 from django.db.models import Count
 
@@ -585,6 +590,11 @@ def pair_randomqa_spider(request):
         if len(pdf_item_list)>1:
             pdf_item_list = pdf_item_list.order_by('-modification_date')
        
+       
+        companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
+       
+        document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
+       
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
         'error_rate':error_rate,'show_progress_mark':show_progress_mark,
@@ -595,7 +605,7 @@ def pair_randomqa_spider(request):
         'selected_user': selected_user,'selected_doctype': selected_doctype,'selected_company': selected_company,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,'selected_auditmark':selected_auditmark,
         'filters_panel_width':filters_panel_width,
-        'filters_panel_width':filters_panel_height,'company_name':user_company.name}
+        'filters_panel_width':filters_panel_height,'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list}
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
    
@@ -1124,6 +1134,9 @@ def pair_randomqa_spider(request):
         error_rate = 50
         pdf_doctype_distinct = {}'''
         
+        companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
+       
+        document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,'show_progress_mark':show_progress_mark,
@@ -1134,7 +1147,7 @@ def pair_randomqa_spider(request):
         'selected_user': selected_user,'selected_doctype': selected_doctype,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,
         'filters_panel_width':filters_panel_width,
-        'filters_panel_width':filters_panel_height,'company_name':user_company.name}
+        'filters_panel_width':filters_panel_height,'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list}
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
     else:
