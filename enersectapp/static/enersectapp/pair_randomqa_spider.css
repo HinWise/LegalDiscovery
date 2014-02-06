@@ -87,6 +87,12 @@
 
 }
 
+.wrong_cell {
+
+    background-color: tomato;
+
+}
+
 .select_menu {
 
     width:100%;

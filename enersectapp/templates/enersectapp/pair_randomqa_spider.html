@@ -467,12 +467,8 @@
                                 },
                                 "Save Audited Entry": function() {
                                     
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    disableButtonsets();
-                                    savePanelSizes();
-                                    $('#save_mark').attr("value","save_audited_entry");
-                                    $('#fields_form').submit();
+                                    
+                                    checkMarkOrSubmit();
                                     
                                     
                                 },
@@ -512,12 +508,8 @@
                                 },
                                 "Save Audited Entry": function() {
                                     
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    disableButtonsets();
-                                    savePanelSizes();
-                                    $('#save_mark').attr("value","save_audited_entry");
-                                    $('#fields_form').submit();
+                                    
+                                    checkMarkOrSubmit();
                                     
                                     
                                 },
@@ -951,6 +943,59 @@
             
         }
         
+        
+        function checkMarkOrSubmit()
+        {
+        
+            var submitValid = true;
+            
+            $('.extract_item').each(function(){
+            
+            
+                selected_fieldtype_date
+                
+                the_item = $(this)
+            
+                the_value = the_item.val();
+                
+                if(the_item.hasClass("wrong_cell")) the_item.removeClass("wrong_cell");
+                
+                if(the_value.length == 0 || the_value == "NoDocTypeField" || the_value == "no_type")
+                {
+                    the_item.addClass("wrong_cell");
+                    
+                    submitValid = false;
+                }
+                
+                
+                the_fieldtype = the_item.attr("id");
+                
+                if(the_fieldtype=="selected_fieldtype_date")
+                {
+                    //the_item.addClass("wrong_cell");
+                    
+                    //submitValid = false;
+                }
+                
+                
+            });
+            
+            if(submitValid == true) 
+            {
+                
+                toggleLoadingScreen();
+                $('button').attr("disabled", true).addClass("ui-state-disabled");
+                disableButtonsets();
+                savePanelSizes();
+                $('#save_mark').attr("value","save_audited_entry");
+                
+                $('#fields_form').submit();
+            }
+            
+
+        }
+        
+        
         function createEventListeners()
         {
         
@@ -1116,13 +1161,30 @@
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:pair_randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
-                {% if show_progress_mark == "show" %}
-                <div id="statistics_panel">
+                {% if pdf_audited %}
+                
                     
-                    <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
-                    <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
-                </div>
+                    <div id="statistics_panel">
+                        
+                        <h5>There are <span style="color:limegreen"> {{pdf_audited}} </span> Entries Completely Audited and <span style="color:wheat;">{{pdf_left_to_audit}}</span> awaiting for Audit in the Current Selection of <span style="color:lightgrey;">{{pdf_total_count}}</span> Documents. </h5>
+                        
+                    </div>
+                    
+                
+                
+                {% else %}
+                
+                    {% if show_progress_mark == "show" %}
+                    <div id="statistics_panel">
+                        
+                        <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
+                        <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
+                    </div>
+                    {% endif %}
+                
+                
                 {% endif %}
+                
                 
                 <fieldset id="fieldset_fields">
                
@@ -1185,7 +1247,7 @@
                                     <td fieldtype="doctype" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Document_Type}}</td>
                                     {% endfor %}
                                     <td>
-                                        <select class="select_menu" name="selected_fieldtype_doctype" id="selected_fieldtype_doctype" value="">
+                                        <select class="select_menu extract_item" name="selected_fieldtype_doctype" id="selected_fieldtype_doctype" value="">
                                             {% for item in document_type_list %}
                                                 <option value="{{item}}">{{item}}</option>
                                             {% endfor %}
@@ -1210,91 +1272,91 @@
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="amount" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Amount}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_amount" id="selected_fieldtype_amount" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_amount" id="selected_fieldtype_amount" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Currency</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="currency" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Currency}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_currency" id="selected_fieldtype_currency" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_currency" id="selected_fieldtype_currency" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Company Name</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="companyname" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Company}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_companyname" id="selected_fieldtype_companyname" value="" /></td>
+                                    <td><input type="text" class="extract_item"name="selected_fieldtype_companyname" id="selected_fieldtype_companyname" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Issue Date</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="date" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.IssueDate}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_date" id="selected_fieldtype_date" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_date" id="selected_fieldtype_date" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Address</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="address" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Address}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_address" id="selected_fieldtype_address" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_address" id="selected_fieldtype_address" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Telephone</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="telephone" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Telephone}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_telephone" id="selected_fieldtype_telephone" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_telephone" id="selected_fieldtype_telephone" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>City</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="city" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.City}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_city" id="selected_fieldtype_city" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_city" id="selected_fieldtype_city" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Country</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="country" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Country}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_country" id="selected_fieldtype_country" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_country" id="selected_fieldtype_country" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Source Bank Account</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="accountnum" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Source_Bank_Account}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_accountnum" id="selected_fieldtype_accountnum" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_accountnum" id="selected_fieldtype_accountnum" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Document Number</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="docnum" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Document_Number}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_docnum" id="selected_fieldtype_docnum" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_docnum" id="selected_fieldtype_docnum" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Purchase Order Number</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="purchaseorder" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.PurchaseOrder_Number}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_purchaseorder" id="selected_fieldtype_purchaseorder" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_purchaseorder" id="selected_fieldtype_purchaseorder" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Piece Number</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="piecenum" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Piece_Number}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_piecenum" id="selected_fieldtype_piecenum" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_piecenum" id="selected_fieldtype_piecenum" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Contains Arabic</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="arabic" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.ContainsArabic}}</td>
                                     {% endfor %}
-                                    <td><input type="text" name="selected_fieldtype_arabic" id="selected_fieldtype_arabic" value="" /></td>
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_arabic" id="selected_fieldtype_arabic" value="" /></td>
                                 </tr>
                                 <tr>
                                     <th>Memo</th>

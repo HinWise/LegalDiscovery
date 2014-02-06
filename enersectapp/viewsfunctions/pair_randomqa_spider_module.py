@@ -1057,35 +1057,48 @@ def pair_randomqa_spider(request):
                 
         
         
-        if show_progress_mark == "show_progress_mark":
+        #if show_progress_mark == "show_progress_mark":
+        if show_progress_mark:
         
             show_progress_mark = "show" 
         
             pdf_total_count = len(pdf_records_list)
             
-            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
+            '''pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
             pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
             pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
+            
             
             if pdf_correct_count!=0 and pdf_incorrect_count!=0:
                 correct = float(pdf_correct_count)
                 incorrect = float(pdf_incorrect_count)
                 error_rate = incorrect/(correct + incorrect)*100
-                error_rate = int(error_rate)
+                error_rate = int(error_rate)'''
                 
+                
+            #pdf_left_to_audit = len(pdf_records_list.exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark = "auditmarked_as_correct"))
+            #pdf_audited = pdf_total_count - pdf_left_to_audit
+            
+           
             
         else:
 
             pdf_total_count = 0
-            pdf_correct_count = 0
+            '''pdf_correct_count = 0
             pdf_incorrect_count = 0
             pdf_reentry_count = 0
-            error_rate = 0
+            error_rate = 0'''
             show_progress_mark = "no" 
+            pdf_left_to_audit = 0
+            pdf_audited=0
             
         
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct")
+        '''.exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")'''
         
+        
+        pdf_left_to_audit = len(pdf_records_list)
+        pdf_audited = pdf_total_count - pdf_left_to_audit
         
         pdf_id_list_to_randomize = []
         
@@ -1104,14 +1117,18 @@ def pair_randomqa_spider(request):
             
             
             
-            duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
+            #duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
             
             
-            pdf_random_duplicate = random.choice(duplicates_in_list)
+            #pdf_random_duplicate = random.choice(duplicates_in_list)
+            
+            
+            #pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
             ##
-           
-            pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
             
+            
+            pdf_random_item = random.choice(pdf_records_list)
+           
             
             pdf_item_list = PdfRecord.objects.filter(sourcedoc_link=pdf_random_item.sourcedoc_link,ocrrecord_link__OcrByCompany = user_company).distinct()
             
@@ -1139,10 +1156,9 @@ def pair_randomqa_spider(request):
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
-        'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'error_rate':error_rate,'show_progress_mark':show_progress_mark,
+        'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
-        'pdf_total_count':pdf_total_count,'pdf_correct_count':pdf_correct_count,
-        'pdf_incorrect_count':pdf_incorrect_count,'pdf_reentry_count':pdf_reentry_count,
+        'pdf_total_count':pdf_total_count,'pdf_left_to_audit':pdf_left_to_audit,'pdf_audited':pdf_audited,
         'pdf_lot_number_distinct':pdf_lot_number_distinct,'pdf_author_distinct':pdf_author_distinct,
         'selected_user': selected_user,'selected_doctype': selected_doctype,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,
