@@ -1899,13 +1899,13 @@
                             if(doctype.length)
                             {
                                 bValid = bValid && checkLength( doctype, "doctype", 1, 255  );
-                                bValid = bValid && checkRegexp( doctype, /^([0-9a-z_ .,º\/])+$/i, "Document Type must be selected." );
+                                bValid = bValid && checkRegexp( doctype, /^([0-9a-z_ .,º'\/])+$/i, "Document Type must be selected." );
                             }
                             
                             if(doctype2.length)
                             {
                                 bValid = bValid && checkLength( doctype2, "Actual Document Type", 1, 255  );
-                                bValid = bValid && checkRegexp( doctype2, /^([0-9a-z_ .,º\/])+$/i, "Actual Document Type must be selected." );
+                                bValid = bValid && checkRegexp( doctype2, /^([0-9a-z_ .,º'\/])+$/i, "Actual Document Type must be selected." );
                             }
                             
                             if(amount.length)
@@ -2530,6 +2530,9 @@
                           <li><a href="#">Contract Page X</a></li>
                           {% endif %}-->
                           <li>--</li>
+                          {% if user_group = "NathanTeam" or user_group = "Enersect_Berlin" %}
+                          <li><a href="#">Custom Generic Template</a></li>
+                          {% endif %}
                           <li><a href="#">Other</a></li>
                           <li><a href="#">Blank</a></li>
                         </ul>

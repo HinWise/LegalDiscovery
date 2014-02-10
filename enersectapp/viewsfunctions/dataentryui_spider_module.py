@@ -120,6 +120,11 @@ def dataentryui_savedata(request):
         doctype = "NoDocTypeField"
    
     try:
+        doctype2 = request.POST['doctype2']
+    except:
+        doctype2 = "NoDocType2Field"
+   
+    try:
         currency = request.POST['currency']
     except:
         currency = "NoCurrencyField"
@@ -259,7 +264,7 @@ def dataentryui_savedata(request):
         chequenum = "NoChequeNumberField"
         
     
-    common_functions_module.save_new_data_entry(doctype,currency,amount,company_name,company_address,company_telephone,
+    common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
     memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
     the_user)

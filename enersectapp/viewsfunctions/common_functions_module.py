@@ -13,7 +13,7 @@ from django.utils import timezone
 from datetime import timedelta
 import datetime
 
-def save_new_data_entry(doctype,currency,amount,company_name,company_address,company_telephone,
+def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
     memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
     the_user):
@@ -43,10 +43,40 @@ def save_new_data_entry(doctype,currency,amount,company_name,company_address,com
         if doctype == "arabic":
             
             translation_type = "arabic translation"
-            
+    
+    
 
+    if(doctype2!="NoDocType2Field"):
+    
+        doctype2 = doctype2.lower()
+        
+        if doctype2 == "invoice/facture":
+            doctype2 = "invoice"
+            
+        if doctype2 == "receipt/recu":
+            doctype2 = "receipt"
+            
+        if doctype2 == "contract page 1":
+            doctype2 = "contract page 1"
+            
+        if doctype2 == "contract page X":
+            doctype2 = "contract page X"
+        
+        if doctype2 == "purchase order/bon de commande":
+            doctype2 = "purchase order"
+        
+        if doctype2 == "arabic":
+            
+            translation_type = "arabic translation"
+        
+        doctype2_class = SourceDocType.objects.get(name="custom generic template")
+    
+        doctype = doctype2
+        
+    
     doctype_class = SourceDocType.objects.filter(name=doctype)[:1]
     
+
     if (len(doctype_class)>0):
         doctype_class=doctype_class[0]
     else:
@@ -55,6 +85,8 @@ def save_new_data_entry(doctype,currency,amount,company_name,company_address,com
         doctype_class.pretty_name = doctype
         doctype_class.save()
     
+    if doctype2=="NoDocType2Field":
+        doctype2_class = doctype_class
     
     if(doctype == "blank"):
         
@@ -135,7 +167,7 @@ def save_new_data_entry(doctype,currency,amount,company_name,company_address,com
     if not doctype_class:
         print "ATTENTION!DOC TYPE CLASS NOT SELECTED, views.py Line 1181!"
     
-    new_pdf = PdfRecord(modified_doctype_from=doctype,original_document_type=doctype_class,modified_document_type=doctype_class,record_link=control_rec,ocrrecord_link=new_ocr,sourcedoc_link=source,companytemplate_link=company_link,commentary="No modifications",skip_counter='0',audit_mark="None",modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc),modification_author=the_user.username,translated=translation_type)
+    new_pdf = PdfRecord(modified_doctype_from=doctype,original_document_type=doctype2_class,modified_document_type=doctype_class,record_link=control_rec,ocrrecord_link=new_ocr,sourcedoc_link=source,companytemplate_link=company_link,commentary="No modifications",skip_counter='0',audit_mark="None",modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc),modification_author=the_user.username,translated=translation_type)
     
     new_pdf.save()
     

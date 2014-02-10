@@ -664,6 +664,11 @@ def pair_randomqa_spider(request):
             doctype = request.POST['selected_fieldtype_doctype']
         except:
             doctype = "NoDocTypeField"
+            
+        try:
+            doctype2 = request.POST['selected_fieldtype_doctype2']
+        except:
+            doctype2 = "NoDocType2Field"
        
         try:
             currency = request.POST['selected_fieldtype_currency']
@@ -1013,7 +1018,7 @@ def pair_randomqa_spider(request):
             elif save_mark == "save_audited_entry":
             
 
-                new_pdf = common_functions_module.save_new_data_entry(doctype,currency,amount,company_name,company_address,company_telephone,
+                new_pdf = common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
                 company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
                 memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
                 the_user)
@@ -1137,18 +1142,23 @@ def pair_randomqa_spider(request):
             print "THIS IS ALL UNTOUCHED --->" + str(total_untouched)'''
             
             #duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
+            duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
             
+            
+            #print "DUPLICATES -->"+str(len(duplicates_in_list))
             #print "DUPLICATES -->"+str(len(duplicates_in_list))
             
             
             #pdf_random_duplicate = random.choice(duplicates_in_list)
+            pdf_random_duplicate = random.choice(duplicates_in_list)
             
             
             #pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
+            pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
             ##
             
             
-            pdf_random_item = random.choice(pdf_records_list)
+            #pdf_random_item = random.choice(pdf_records_list)
            
             
             pdf_item_list = PdfRecord.objects.filter(sourcedoc_link=pdf_random_item.sourcedoc_link,ocrrecord_link__OcrByCompany = user_company).distinct()
