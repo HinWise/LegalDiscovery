@@ -413,32 +413,25 @@
 
         //Global for original table headers Y position
 
-        if($('#headers_row').length)
-        {
-            originalPositionYHeaderRow = $('#headers_row').offset().top;
+        originalPositionYHeaderRow = $('#headers_row').offset().top;
 
-            //If the users scrolls in the table, keep the th fields static in the same Y
+        //If the users scrolls in the table, keep the th fields static in the same Y
 
-            $('#accordion_table').scroll(function(){ //when the user is scrolling...
-                
-                headers_width = $("#records_table").width();
-                headers_height = $(".th_full").first().height();
+        $('#accordion_table').scroll(function(){ //when the user is scrolling...
+            
+            headers_width = $("#records_table").width();
+            headers_height = $(".th_full").first().height();
 
-                $("#headers_cover").css("width",headers_width+"px");
-                $("#headers_cover").css("height",headers_height+"px");
-                $("#headers_cover").css("display","block");
-                $(".th_full").offset({top:originalPositionYHeaderRow});
-                top_position = $(".th_full").css('top');
-                
-                $("#headers_cover").css('top',top_position);
-                
+            $("#headers_cover").css("width",headers_width+"px");
+            $("#headers_cover").css("height",headers_height+"px");
+            $("#headers_cover").css("display","block");
+            $(".th_full").offset({top:originalPositionYHeaderRow});
+            top_position = $(".th_full").css('top');
+            
+            $("#headers_cover").css('top',top_position);
+            
 
-            });
-        
-        
-        }
-        
-        
+        });
 
 
         //Event handler for the PDF View buttons, and the behaviour of the User and Search/List panels according to it
@@ -912,35 +905,35 @@
             switch(filter_choice)
             {
                 case "pdf_all":
-                    $('#filter_pdf_all').attr("checked","checked").button("refresh");
+                    $('#filter_pdf_all').attr("checked","checked");
                 break;
 
                 case "pdf_linked":
-                    $('#filter_pdf_linked').attr("checked","checked").button("refresh");
+                    $('#filter_pdf_linked').attr("checked","checked");
                 break;
 
                 case "pdf_unlinked":
-                    $('#filter_pdf_unlinked').attr("checked","checked").button("refresh");
+                    $('#filter_pdf_unlinked').attr("checked","checked");
                 break;
 
                 case "pdf_error":
-                    $('#filter_pdf_error').attr("checked","checked").button("refresh");
+                    $('#filter_pdf_error').attr("checked","checked");
                 break;
 
                 case "source_all":
-                    $('#filter_source_all').attr("checked","checked").button("refresh");
+                    $('#filter_source_all').attr("checked","checked");
                 break;
 
                 case "source_assigned":
-                    $('#filter_source_assigned').attr("checked","checked").button("refresh");
+                    $('#filter_source_assigned').attr("checked","checked");
                 break;
 
                 case "source_notassigned":
-                    $('#filter_source_notassigned').attr("checked","checked").button("refresh");
+                    $('#filter_source_notassigned').attr("checked","checked");
                 break;
 
                 default:
-                    $('#filter_pdf_all').attr("checked","checked").button("refresh");
+                    $('#filter_pdf_all').attr("checked","checked");
                 break;
             }
 

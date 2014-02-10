@@ -1007,8 +1007,6 @@ def pair_randomqa_spider(request):
                         memo_report = "Pressed the Execute Re-Entry Button, "+str(len(reentry_list))+" elements reassigned. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
                         report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
-                        
-            
         
             elif save_mark == "save_audited_entry":
             
@@ -1117,28 +1115,9 @@ def pair_randomqa_spider(request):
         
             ##Next two lines added as a Test for Pair Audit
             
-            '''total_untouched = 0
-            total_touched = 0
             
-            for item in pdf_records_list:
-            
-                is_untouched = PdfRecord.objects.filter(sourcedoc_link=item.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company).exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct")
-                if len(is_untouched) > 1:
-                    
-                    total_touched += 1
-                    
-                else:
-                
-                    total_untouched += 1
-                    
-            
-            print "THIS IS TOTAL --->" + str(len(pdf_records_list))
-            print "THIS IS ALL TOUCHED --->" + str(total_touched)
-            print "THIS IS ALL UNTOUCHED --->" + str(total_untouched)'''
             
             #duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
-            
-            #print "DUPLICATES -->"+str(len(duplicates_in_list))
             
             
             #pdf_random_duplicate = random.choice(duplicates_in_list)

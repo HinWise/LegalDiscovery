@@ -237,7 +237,7 @@ def search_tool(request):
     
     companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
     
-    actual_min_num = 1
+    actual_min_num = 0
     
     try:
         prev_next_results = request.POST['prev_next_results']
@@ -251,7 +251,7 @@ def search_tool(request):
         actual_min_num = int(actual_min_num)
     except (KeyError):
         
-        actual_min_num = 1
+        actual_min_num = 0
     
     
 
@@ -259,17 +259,17 @@ def search_tool(request):
         actual_min_num = 0
     
     if(prev_next_results == "Prev"):
-        actual_min_num -= 50
+        actual_min_num -= 10
         
     if(prev_next_results == "Next"):
-        actual_min_num += 50
+        actual_min_num += 10
         
     if(prev_next_results == "Update"):
         actual_min_num = actual_min_num
     
-    if actual_min_num < 1:
+    if actual_min_num < 0:
     
-        actual_min_num = 1
+        actual_min_num = 0
     
     
     max_num = actual_min_num + 50
@@ -450,10 +450,7 @@ def search_tool(request):
         if max_num > total_records:
         
             max_num = total_records
-    
-            if actual_min_num > max_num and max_num != 0:
-            
-                actual_min_num = max_num
+            actual_min_num = max_num - 10
     
         if records_list:
             
@@ -480,7 +477,7 @@ def search_tool(request):
             category_fields_order_list = ",".join(category_temp_list)
             
             merging_records = records_list
-            records_list = records_list[actual_min_num-1:max_num]
+            records_list = records_list[actual_min_num:max_num]
     
     elif corpus_word=="corpus_ocr_records":
     
@@ -692,10 +689,7 @@ def search_tool(request):
         if max_num > total_records:
         
             max_num = total_records
-    
-            if actual_min_num > max_num and max_num != 0:
-            
-                actual_min_num = max_num
+            actual_min_num = max_num - 10
     
         if records_list:
             
@@ -722,7 +716,7 @@ def search_tool(request):
             category_fields_order_list = ",".join(category_temp_list)
             
             merging_records = records_list
-            records_list = records_list[actual_min_num-1:max_num]
+            records_list = records_list[actual_min_num:max_num]
                 
         
     elif corpus_word=="corpus_internal_records":
@@ -1020,10 +1014,7 @@ def search_tool(request):
         if max_num > total_records:
         
             max_num = total_records
-    
-            if actual_min_num > max_num and max_num != 0:
-            
-                actual_min_num = max_num
+            actual_min_num = max_num - 10
     
         if records_list:
             
@@ -1051,7 +1042,7 @@ def search_tool(request):
             
             
             merging_records = records_list
-            records_list = records_list[actual_min_num-1:max_num]
+            records_list = records_list[actual_min_num:max_num]
     
     ##### COMMON BLOCK ####
     
@@ -1104,16 +1095,9 @@ def search_tool(request):
         
     showing_records = records_list.count()
     
-
-    page_counter_end = actual_min_num + showing_records - 1
+    page_counter_end = actual_min_num+showing_records
     
-    plus_limit = total_records-50
-    
-    if showing_records == 0:
-    
-        actual_min_num = 0
-        max_num = 0  
-        page_counter_end = 0
+    plus_limit = total_records-10
      
     
     

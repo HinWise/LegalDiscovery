@@ -735,9 +735,7 @@ def randomqa_spider(request):
            
             pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item.id)[:1]
             
-        
-
-        
+         
         
         else:
         
