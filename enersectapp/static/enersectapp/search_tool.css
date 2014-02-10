@@ -20,7 +20,7 @@
     height:100%;
 	margin:0 auto;
     
-    z-index:500;
+    z-index:100;
     pointer-events:all;
 }
 
@@ -742,7 +742,7 @@ object {
     left: 15%;
     height: 40%;
     width: 50%;
-    z-index: 20;
+    z-index: 700;
     text-align: center;
     
     pointer-events:all;
