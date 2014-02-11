@@ -1100,7 +1100,7 @@ def pair_randomqa_spider(request):
             pdf_audited=0
             
         
-        pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct")
+        pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment")
         '''.exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")'''
         
         
@@ -1122,27 +1122,56 @@ def pair_randomqa_spider(request):
         
             ##Next two lines added as a Test for Pair Audit
             
-            '''total_untouched = 0
-            total_touched = 0
+            #total_untouched = 0
+            #total_touched = 0
+            
+            
+            
+            '''number_reps = 5
+            
+            
+            for n in range(0,number_reps):
+                
+                pdf_random_record = random.choice(pdf_records_list)
+                
+                is_untouched = PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="auditmarked_confirmed_reassignment") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="auditmark_as_correct") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="duplicatemarked_reentered") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark_saved="save_audited_entry")
+                
+                print "THIS IS LENGTH -->"+str(len(is_untouched))
+                
+                if len(is_untouched) == 0:
+                
+                    to_reassign_handles = pdf_random_record.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+                        
+                    for handle in to_reassign_handles:
+                        
+                        handle.checked = "unchecked"
+                        handle.save()
+                        
+                    
+                    memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(pdf_random_record.pk)+".Previous mark was:"+pdf_random_record.audit_mark
+                    pdf_random_record.audit_mark = "auditmarked_confirmed_reassignment"
+                    pdf_random_record.save()
+                    report = Report(report_type="Audit",report_subtype="pair_audit_auto_reassign",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                    report.save()
             
             for item in pdf_records_list:
             
-                is_untouched = PdfRecord.objects.filter(sourcedoc_link=item.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company).exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct")
+                is_untouched = PdfRecord.objects.filter(sourcedoc_link=item.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company).exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment")
                 if len(is_untouched) > 1:
                     
                     total_touched += 1
                     
                 else:
                 
-                    total_untouched += 1
+                    total_untouched += 1'''
                     
             
-            print "THIS IS TOTAL --->" + str(len(pdf_records_list))
-            print "THIS IS ALL TOUCHED --->" + str(total_touched)
-            print "THIS IS ALL UNTOUCHED --->" + str(total_untouched)'''
+            #print "THIS IS TOTAL --->" + str(len(pdf_records_list))
+            #print "THIS IS ALL TOUCHED --->" + str(total_touched)
+            #print "THIS IS ALL UNTOUCHED --->" + str(total_untouched)'''
             
             #duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
-            duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
+            #duplicates_in_list = pdf_records_list.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
             
             
             #print "DUPLICATES -->"+str(len(duplicates_in_list))
@@ -1150,15 +1179,15 @@ def pair_randomqa_spider(request):
             
             
             #pdf_random_duplicate = random.choice(duplicates_in_list)
-            pdf_random_duplicate = random.choice(duplicates_in_list)
+            #pdf_random_duplicate = random.choice(duplicates_in_list)
             
             
             #pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
-            pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
+            #pdf_random_item = pdf_records_list.filter(sourcedoc_link=pdf_random_duplicate['sourcedoc_link'])[0]
             ##
             
             
-            #pdf_random_item = random.choice(pdf_records_list)
+            pdf_random_item = random.choice(pdf_records_list)
            
             
             pdf_item_list = PdfRecord.objects.filter(sourcedoc_link=pdf_random_item.sourcedoc_link,ocrrecord_link__OcrByCompany = user_company).distinct()

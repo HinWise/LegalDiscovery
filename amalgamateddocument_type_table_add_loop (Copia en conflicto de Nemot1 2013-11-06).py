@@ -154,3 +154,48 @@ else:
     #print SourcePdf.objects.filter(filename__in=[item['filename'] for item in duplicates])
 
 
+####Get not Audited records for Re-Entry
+
+user_company = Group.objects.get(name="FlatWorld")
+
+all_flatworld = PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company)
+the_user = User.objects.get(username="nemot")
+
+count = 0
+untouched_count = 0
+touched_count = 0
+            
+with transaction.commit_on_success():
+
+    for item in all_flatworld:
+    
+        if count < 200000:
+            latest_entry = all_flatworld.filter(sourcedoc_link__assigndata__assignedcompany = user_company,sourcedoc_link = item.sourcedoc_link).latest('modification_date')
+            
+            if latest_entry:
+            
+                if latest_entry.audit_mark == "auditmarked_as_correct" or latest_entry.audit_mark == "duplicatemarked_reentered" or latest_entry.audit_mark_saved == "save_audited_entry" or latest_entry.audit_mark=="auditmarked_as_correct" or latest_entry.audit_mark == "auditmarked_confirmed_reassignment":
+                    touched_count += 1
+                    print "TOUCHED"
+                else:
+                    untouched_count += 1
+                    print "UNTOUCHED"
+                    
+                    to_reassign_handles = latest_entry.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+                            
+                    for handle in to_reassign_handles:
+                            
+                        handle.checked = "unchecked"
+                        handle.save()
+                            
+                        
+                    memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(latest_entry.pk)+".Previous mark was:"+latest_entry.audit_mark
+                    latest_entry.audit_mark = "auditmarked_confirmed_reassignment"
+                    latest_entry.save()
+                    report = Report(report_type="Audit",report_subtype="pair_audit_auto_reassign",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                    report.save()
+                    
+            count += 1
+            print count
+            
+            
