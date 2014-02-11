@@ -502,11 +502,11 @@ def search_tool(request):
                     with transaction.commit_on_success():
                         for source in merging_records:
                             
-                            already_assigned = source.assigndata.filter(assignedcompany = user_group)
+                            already_assigned = source.assigndata.all()
                             
                             if len(already_assigned) == 0:
                             
-                                memo_report = "Pressed Assign To Group from Search Results in Search Tool. Assigned to Group: "+user_group.name+".  This being PK."+str(source.pk)+". It was previously unassigned."
+                                memo_report = "Pressed Assign To Group from Search Results in Search Tool. Assigned to Group: "+user_group.name+".  This being PK."+str(source.pk)+". It was previously unassigned. Type was: "+source.modified_document_type.name
                                 
                                 report = Report(report_type="Search Tool",report_subtype="search_tool_assign_search_results",report_author=the_user,report_company=user_group,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                                 report.save()
