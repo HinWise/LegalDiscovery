@@ -196,6 +196,13 @@ def search_tool(request):
         
         id_assign = "none"
 
+    try:
+        assign_search_results = request.POST['assign_search_results']
+    except (KeyError):
+        
+        assign_search_results = "none"
+        
+    
         
     try:
         category_fields_order_list = request.POST['category_fields_order_list']
@@ -286,7 +293,7 @@ def search_tool(request):
         
         if (user_type == "superuser" or user_type == "TeamLeader") and id_assign !="none":
         
-            print id_assign
+            
             id_assign = int(id_assign)
         
             source = SourcePdf.objects.filter(pk = id_assign)
@@ -301,7 +308,6 @@ def search_tool(request):
                 tohandle.save()
                 source.assigndata.add(tohandle)
                 source.save()
-        
         
         
         #Filters block
@@ -481,6 +487,37 @@ def search_tool(request):
             
             merging_records = records_list
             records_list = records_list[actual_min_num-1:max_num]
+            
+            # If button "Assign To Group from Search Results" is pressed by the superuser or TeamLeader, there is access to this block,
+            # which creates a SourcePdfToHandle for the SourcePdf that resulted from the Search, and assigns it to the company of that user.
+            
+            if (user_type == "superuser" or user_type == "TeamLeader") and assign_search_results !="none":
+            
+
+                user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
+                none_user = User.objects.get(username="None")
+            
+                if len(merging_records):
+                    
+                    with transaction.commit_on_success():
+                        for source in merging_records:
+                            
+                            already_assigned = source.assigndata.filter(assignedcompany = user_group)
+                            
+                            if len(already_assigned) == 0:
+                            
+                                memo_report = "Pressed Assign To Group from Search Results in Search Tool. Assigned to Group: "+user_group.name+".  This being PK."+str(source.pk)+". It was previously unassigned."
+                                
+                                report = Report(report_type="Search Tool",report_subtype="search_tool_assign_search_results",report_author=the_user,report_company=user_group,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                                report.save()
+                                
+                                tohandle = SourcePdfToHandle(assignedcompany=user_group,assigneduser=none_user,lot_number=-1)
+                                tohandle.save()
+                                source.assigndata.add(tohandle)
+                                source.save()
+    
+ 
+                    
     
     elif corpus_word=="corpus_ocr_records":
     

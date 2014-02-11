@@ -1050,9 +1050,123 @@
         function createListPanel(){
 
             corpus_text = $("#corpus_text").attr("value");
-            if(corpus_text != "corpus_internal_records")
+            user_type = $("#user_type").attr("value");
+            
+            
+            if(corpus_text == "corpus_internal_records")
             {
+                $( "#listpanel-form" ).dialog({
 
+                        autoOpen:false,
+                 
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+
+                        modal: false,
+                        draggable:false,
+                        resizable: false,
+                        closeOnEscape: false,
+                        show: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 500
+                      },
+                      hide: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 500
+                      },
+                        buttons: [
+                            {
+                                text: "Search",
+                                click: function() {
+
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+                                }
+                            },
+
+
+                        ],
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+
+                
+            }
+            else if ((user_type == "superuser" || user_type == "TeamLeader") && corpus_text == "corpus_source_records" )
+            {
+                $( "#listpanel-form" ).dialog({
+
+                        autoOpen:false,
+                        width: $('#fields_container').width(),
+                        height: $('#fields_container').height(),
+
+                        modal: false,
+                        draggable:false,
+                        resizable: false,
+                        closeOnEscape: false,
+                        show: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 500
+                      },
+                      hide: {
+                        effect: "drop",
+                        direction: "right",
+                        duration: 500
+                      },
+                        buttons: [
+                            {
+                                text: "Search",
+                                click: function() {
+
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+                                }
+                            },
+
+                            {
+                                text:"Export New Search to PDF",
+                                "class": "export",
+                                click: function() {
+
+
+                                    //toggleLoadingScreen();
+                                    $('.export').attr("disabled", true).addClass("ui-state-disabled");
+                                    $('#export_mark').attr("value", "export_mark");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+
+                                }
+                            },
+                            
+                            {
+                                text: "Assign To Group from Search Results",
+                                click: function() {
+
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    $('#assign_search_results').attr("value", "assign_search_results");
+                                    //$( this ).dialog( "close" );
+                                    $('#search_form').submit();
+                                }
+                            },
+
+                        ],
+                        position: {
+                            my: "left top", at: "left top", of: $('#fields_container')
+                        }
+                    });
+                 
+            }
+            else
+            {
                 $( "#listpanel-form" ).dialog({
 
                         autoOpen:false,
@@ -1105,49 +1219,7 @@
                             my: "left top", at: "left top", of: $('#fields_container')
                         }
                     });
-            }
-            else
-            {
             
-                 $( "#listpanel-form" ).dialog({
-
-                        autoOpen:false,
-                 
-                        width: $('#fields_container').width(),
-                        height: $('#fields_container').height(),
-
-                        modal: false,
-                        draggable:false,
-                        resizable: false,
-                        closeOnEscape: false,
-                        show: {
-                        effect: "drop",
-                        direction: "right",
-                        duration: 500
-                      },
-                      hide: {
-                        effect: "drop",
-                        direction: "right",
-                        duration: 500
-                      },
-                        buttons: [
-                            {
-                                text: "Search",
-                                click: function() {
-
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    //$( this ).dialog( "close" );
-                                    $('#search_form').submit();
-                                }
-                            },
-
-
-                        ],
-                        position: {
-                            my: "left top", at: "left top", of: $('#fields_container')
-                        }
-                    });
             }
             
             $(".category_order_by").buttonset();
@@ -2409,9 +2481,11 @@
                     <input class="invisible" id="filter_text" type="text" name='filter_word' value="{{filter_word}}">
 
                     <input class="invisible" id="id_assign" type="text" name='id_assign' value="none">
+                     <input class="invisible" id="assign_search_results" type="text" name='assign_search_results' value="none">
 
                     <input class="invisible" id="export_mark" type="text" name='export_mark' value="none">
                     
+                    <input class="invisible" id="user_type" type="text" name='user_type' value="{{user_type}}">
                     
                     <input class="invisible" id="category_fields_order_list" type="text" name='category_fields_order_list' value="{{category_fields_order_list}}">
                     

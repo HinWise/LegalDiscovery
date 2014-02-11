@@ -189,7 +189,7 @@ with transaction.commit_on_success():
                         handle.save()
                             
                         
-                    memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(latest_entry.pk)+".Previous mark was:"+latest_entry.audit_mark
+                    memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(latest_entry.pk)+".Previous mark was:"+latest_entry.audit_mark +". Previous Audit_Save_Mark was: " + latest_entry.audit_mark_saved
                     latest_entry.audit_mark = "auditmarked_confirmed_reassignment"
                     latest_entry.save()
                     report = Report(report_type="Audit",report_subtype="pair_audit_auto_reassign",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
@@ -198,4 +198,11 @@ with transaction.commit_on_success():
             count += 1
             print count
             
-            
+#Then select all the None ones turn them into save_audited:
+
+all_none = PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company, audit_mark = "None",audit_mark_saved = "None")
+
+with transaction.commit_on_success():
+    for item in all_none:
+        item.audit_mark_saved = "save_audited_entry"
+        item.save()
