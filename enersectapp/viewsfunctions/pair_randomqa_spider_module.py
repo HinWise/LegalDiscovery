@@ -857,14 +857,16 @@ def pair_randomqa_spider(request):
             
             #Selecting All PdfRecords that have the Lots and Users in their fields in SourcePdfsToHandle
             for lot_num in lot_number_list:
-                pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company ,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
+                #pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company ,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
+                pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company ,sourcedoc_link__assigndata__lot_number = lot_num)
                 
         else:
             user_names_list.append(selected_user)
         
             for lot_num in lot_number_list:
                 for user_name in user_names_list:
-                    pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
+                    #pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
+                    pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num)
         
         
         #Making a list of Document Types and selecting the PdfRecords that are of that Document Type (From the Doctype entered, not the actual Doctype)
@@ -1161,10 +1163,8 @@ def pair_randomqa_spider(request):
         
         pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
         
-        
         pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
         
-
         pdf_left_to_audit = len(pdf_records_list)
         
         pdf_total_count = pdf_left_to_audit + pdf_audited + pdf_needs_reentry_confirmation + pdf_being_reentered
