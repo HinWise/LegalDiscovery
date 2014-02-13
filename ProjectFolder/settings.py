@@ -169,9 +169,9 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
         'django.contrib.sites',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'django_extensions',
         'enersectapp',
         'south',
+        'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
