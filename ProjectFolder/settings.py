@@ -190,6 +190,7 @@ else:
         'django.contrib.staticfiles',
         'enersectapp',
         'maintenance',
+        'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
