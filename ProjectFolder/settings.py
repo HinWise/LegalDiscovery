@@ -32,7 +32,7 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
 else:
     DEBUG = TEMPLATE_DEBUG = False
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -171,7 +171,7 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
         'django.contrib.staticfiles',
         'enersectapp',
         'south',
-        'django_extensions',
+	'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
@@ -190,7 +190,7 @@ else:
         'django.contrib.staticfiles',
         'enersectapp',
         'maintenance',
-        'django_extensions',
+	'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
@@ -230,7 +230,7 @@ DEFAULT_FROM_EMAIL = 'Developers <enersect.developers@gmail.com>'
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 
-if DEBUG == False:
+if DEBUG == False or DEBUG == True:
 
     LOGGING = {
         'version': 1,
@@ -247,20 +247,20 @@ if DEBUG == False:
                 'class': 'django.utils.log.AdminEmailHandler'
             },
             'logfile': {
-                'class': 'logging.handlers.WatchedFileHandler',
+                'class': 'logging.FileHandler',
                 'filename': '/srv/enersectapp/logs/django/error.log'
             },
         },
         'loggers': {
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
+#            'django.request': {
+#                'handlers': ['mail_admins'],
+#                'level': 'ERROR',
+#                'propagate': True,
+#            },
             'django': {
                 'handlers': ['logfile'],
-                'level': 'ERROR',
-                'propagate': False,
+                'level': 'INFO',
+                'propagate': True,
             },
         }
     }
