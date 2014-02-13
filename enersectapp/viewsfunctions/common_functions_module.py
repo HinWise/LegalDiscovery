@@ -150,6 +150,9 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
 
     new_ocr.save()
     
+    
+    audit_mark_saved = "None"
+    
     #If it is duplicated (Was entered before), mark previous Entries as "Revised"
     
     is_duplicated_list = PdfRecord.objects.filter(sourcedoc_link = source,ocrrecord_link__OcrByCompany = user_group)
@@ -161,13 +164,20 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
                 item.audit_mark = "duplicatemarked_reentered"
                 item.save()
     
+        audit_mark_saved = "awaiting_audit"
+    
+    else:
+
+        audit_mark_saved = "needs_reentry_confirmation"
+    
+    
     translation_type = "no"
 
     
     if not doctype_class:
         print "ATTENTION!DOC TYPE CLASS NOT SELECTED, views.py Line 1181!"
     
-    new_pdf = PdfRecord(modified_doctype_from=doctype,original_document_type=doctype2_class,modified_document_type=doctype_class,record_link=control_rec,ocrrecord_link=new_ocr,sourcedoc_link=source,companytemplate_link=company_link,commentary="No modifications",skip_counter='0',audit_mark="None",modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc),modification_author=the_user.username,translated=translation_type)
+    new_pdf = PdfRecord(modified_doctype_from=doctype,original_document_type=doctype2_class,modified_document_type=doctype_class,record_link=control_rec,ocrrecord_link=new_ocr,sourcedoc_link=source,companytemplate_link=company_link,commentary="No modifications",skip_counter='0',audit_mark="None",audit_mark_saved = audit_mark_saved,modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc),modification_author=the_user.username,translated=translation_type)
     
     new_pdf.save()
     

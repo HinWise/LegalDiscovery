@@ -206,3 +206,50 @@ with transaction.commit_on_success():
     for item in all_none:
         item.audit_mark_saved = "save_audited_entry"
         item.save()
+        
+        
+        
+        
+        
+#####
+
+#### Get all duplicates in all Groups, mark them as duplicatemarked_reentered, and mark the newest as "None"
+
+groups_name_list = Group.objects.all().values_list('name',flat=True).distinct()
+
+count = 0
+
+with transaction.commit_on_success():
+
+    for groupo in groups_name_list:
+        user_group = Group.objects.get(name = groupo)
+        
+        all_records_group = PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_group)
+        
+        duplicates = all_records_group.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1)
+        
+        print "DUPLICATES -->" + str(len(duplicates))
+        
+        for item in duplicates:
+        
+            all_matches = all_records_group.filter(sourcedoc_link = item['sourcedoc_link'])
+            latest = all_matches.latest('modification_date')
+            
+            for objec in all_matches:
+                
+                objec.audit_mark = "duplicatemarked_reentered"
+                objec.save()
+            
+            latest.audit_mark = "None"
+            latest.save()
+            
+            count += 1
+            if count % 10 == 0:
+                print count
+            
+        
+            
+    
+    
+
+

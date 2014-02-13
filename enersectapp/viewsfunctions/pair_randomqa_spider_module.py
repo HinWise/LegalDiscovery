@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
+from django.db import transaction
 from django.views import generic
 from django.utils import timezone
 from datetime import timedelta
@@ -1023,9 +1024,21 @@ def pair_randomqa_spider(request):
                 memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
                 the_user)
                 
+
+                is_duplicated_list = PdfRecord.objects.filter(sourcedoc_link = new_pdf.sourcedoc_link,ocrrecord_link__OcrByCompany = user_company)
+                
+                if len(is_duplicated_list) > 0:
+                    
+                    with transaction.commit_on_success():
+                        for item in is_duplicated_list:
+                            item.audit_mark_saved = "no_need_audit"
+                            item.save()
+                 
+                 
                 new_pdf.audit_mark_saved = "save_audited_entry"
                 new_pdf.save()
                 
+    
                 memo_report = "Pressed the Save Audited Entry Button for PK."+str(new_pdf.id)+" PdfRecord."
                 report = Report(report_type="Audit",report_subtype="save_audited_entry",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                 report.save()
@@ -1069,9 +1082,9 @@ def pair_randomqa_spider(request):
         
             show_progress_mark = "show" 
         
-            pdf_total_count = len(pdf_records_list)
+            '''pdf_total_count = len(pdf_records_list)
             
-            '''pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
+            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
             pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
             pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
             
@@ -1100,14 +1113,64 @@ def pair_randomqa_spider(request):
             pdf_audited=0
             
         
-        pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment")
+        #pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment").distinct()
+        
+        #user_group = Group.objects.get(name = "FlatWorld")
+        #all_flat = PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_group,audit_mark="duplicatemarked_reentered") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_group,audit_mark="auditmarked_as_correct") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_group,audit_mark="auditmarked_confirmed_reassignment") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_group,audit_mark_saved = "save_audited_entry")
+        #all_flat = all_flat.distinct()
         '''.exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")'''
         
         
+        
+        ##Re-Entry Confirmation button behaviour. Changes records with audit_mark_saved = "needs_reentry_confirmation" to "being_reentered"
+        
+        pdf_needs_reentry_confirmation = pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct()
+        
+        
+        if save_mark == "button_reentry_confirmation":
+        
+            maximum_sample = 2500
+        
+            sample_to_change = pdf_needs_reentry_confirmation[:2500]
+            
+            sample_size = len(sample_to_change)
+        
+            with transaction.commit_on_success():
+                for pdf in sample_to_change:
+                    
+                    to_reassign_handles = pdf.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+                        
+                    for handle in to_reassign_handles:
+                        
+                        handle.checked = "unchecked"
+                        handle.save()
+                    
+                    memo_report = "Pressed the Re-Entry Confirmation button in Audit Tool, "+str(sample_size)+" elements changed. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
+                    pdf.audit_mark_saved = "being_reentered"
+                    pdf.save()
+
+                    report = Report(report_type="Audit",report_subtype="audit_reentry_confirmation",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                    report.save()
+                
+        
+        
+
+        pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
+        
+        pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
+        
+        pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
+        
+        
+        pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
+        
+
         pdf_left_to_audit = len(pdf_records_list)
-        pdf_audited = pdf_total_count - pdf_left_to_audit
+        
+        pdf_total_count = pdf_left_to_audit + pdf_audited + pdf_needs_reentry_confirmation + pdf_being_reentered
         
         pdf_id_list_to_randomize = []
+        
         
         if len(pdf_records_list) > 0:
         
@@ -1120,51 +1183,50 @@ def pair_randomqa_spider(request):
             pdf_item_list = PdfRecord.objects.filter(id=random_id)[:1]'''
         
         
-            ##Next two lines added as a Test for Pair Audit
+            ##Next  group of lines added as a Test for Pair Audit
             
             #total_untouched = 0
             #total_touched = 0
             
+            number_reps = 5
             
+            '''all_untouched = PdfRecord.objects.filter(audit_mark="None",audit_mark_saved="None",sourcedoc_link__assigndata__assignedcompany = user_company)
             
-            '''number_reps = 5
+            if number_reps > len(all_untouched):
+                number_reps = len(all_untouched)
             
-            
-            for n in range(0,number_reps):
-                
-                pdf_random_record = random.choice(pdf_records_list)
-                
-                is_untouched = PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="auditmarked_confirmed_reassignment") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="auditmark_as_correct") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark="duplicatemarked_reentered") | PdfRecord.objects.filter(sourcedoc_link=pdf_random_record.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company,audit_mark_saved="save_audited_entry")
-                
-                print "THIS IS LENGTH -->"+str(len(is_untouched))
-                
-                if len(is_untouched) == 0:
-                
-                    to_reassign_handles = pdf_random_record.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+            if number_reps > 0:
+                with transaction.commit_on_success():
+                    for n in range(0,number_reps):
+                    
+                        pdf_random_untouched = random.choice(all_untouched)
+                        is_untouched = PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company,sourcedoc_link = pdf_random_untouched.sourcedoc_link,audit_mark = "duplicatemarked_reentered") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company,sourcedoc_link = pdf_random_untouched.sourcedoc_link,audit_mark = "auditmarked_confirmed_reassignment") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company,sourcedoc_link = pdf_random_untouched.sourcedoc_link,audit_mark = "auditmarked_as_correct") | PdfRecord.objects.filter(sourcedoc_link__assigndata__assignedcompany = user_company,sourcedoc_link = pdf_random_untouched.sourcedoc_link,audit_mark_saved = "save_audited_entry")
                         
-                    for handle in to_reassign_handles:
-                        
-                        handle.checked = "unchecked"
-                        handle.save()
-                        
-                    
-                    memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(pdf_random_record.pk)+".Previous mark was:"+pdf_random_record.audit_mark
-                    pdf_random_record.audit_mark = "auditmarked_confirmed_reassignment"
-                    pdf_random_record.save()
-                    report = Report(report_type="Audit",report_subtype="pair_audit_auto_reassign",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
-                    report.save()
-            
-            for item in pdf_records_list:
-            
-                is_untouched = PdfRecord.objects.filter(sourcedoc_link=item.sourcedoc_link,sourcedoc_link__assigndata__assignedcompany = user_company).exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment")
-                if len(is_untouched) > 1:
-                    
-                    total_touched += 1
-                    
-                else:
-                
-                    total_untouched += 1'''
-                    
+                        if len(is_untouched) == 0:
+                            print "UNTOUCHEEEED!"
+                            
+                            to_reassign_handles = pdf_random_untouched.sourcedoc_link.assigndata.filter(assignedcompany=user_company)
+                            
+                            for handle in to_reassign_handles:
+                                    
+                                handle.checked = "unchecked"
+                                handle.save()
+                                    
+                                
+                            memo_report = "Automatically re-assign by intelligent process in Pair Audit for being an untouched record. This being PK."+str(pdf_random_untouched.pk)+".Previous mark was:"+pdf_random_untouched.audit_mark +". Previous Audit_Save_Mark was: " + pdf_random_untouched.audit_mark_saved
+                            pdf_random_untouched.audit_mark = "auditmarked_confirmed_reassignment"
+                            pdf_random_untouched.save()
+                            report = Report(report_type="Audit",report_subtype="pair_audit_auto_reassign",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                            report.save()
+                        else:
+                            print "TOUCHED!"
+                            
+                            memo_report = "Automatically changed audit_mark to awaiting_audit by intelligent process in Pair Audit for being a touched record. This being PK."+str(pdf_random_untouched.pk)+".Previous mark was:"+pdf_random_untouched.audit_mark +". Previous Audit_Save_Mark was: " + pdf_random_untouched.audit_mark_saved
+                            pdf_random_untouched.audit_mark = "awaiting_audit"
+                            pdf_random_untouched.save()
+                            report = Report(report_type="Audit",report_subtype="pair_audit_auto_awaiting_audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                            report.save()
+                            
             
             #print "THIS IS TOTAL --->" + str(len(pdf_records_list))
             #print "THIS IS ALL TOUCHED --->" + str(total_touched)
@@ -1218,8 +1280,8 @@ def pair_randomqa_spider(request):
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
-        'pdf_total_count':pdf_total_count,'pdf_left_to_audit':pdf_left_to_audit,'pdf_audited':pdf_audited,
-        'pdf_lot_number_distinct':pdf_lot_number_distinct,'pdf_author_distinct':pdf_author_distinct,
+        'pdf_total_count':pdf_total_count,'pdf_left_to_audit':pdf_left_to_audit,'pdf_audited':pdf_audited,'pdf_needs_reentry_confirmation':pdf_needs_reentry_confirmation,
+        'pdf_being_reentered':pdf_being_reentered,'pdf_lot_number_distinct':pdf_lot_number_distinct,'pdf_author_distinct':pdf_author_distinct,
         'selected_user': selected_user,'selected_doctype': selected_doctype,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,
         'filters_panel_width':filters_panel_width,

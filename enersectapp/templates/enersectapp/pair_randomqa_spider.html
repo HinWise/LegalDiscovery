@@ -396,38 +396,18 @@
                                     
                                     
                         },
-                        "Send Incorrect Entries from Selection to Re-Entry": function() {
+                        "Re-Entry Confirmation (up to 2500 at a time)": function() {
+                                    
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     disableButtonsets();
                                     savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_incorrect_reentry");
+                                    $('#save_mark').attr("value","button_reentry_confirmation");
+                                    
                                     $('#fields_form').submit();
                                     
                                     
-                        },
-                        "Send Entire Lot/User Selection to Re-Entry": function() {
-                                    
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    disableButtonsets();
-                                    savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reentry");
-                                    $('#fields_form').submit();
-                                    
-                                    
-                        }, 
-                        "Execute Re-Entry": function() {
-                            
-                            toggleLoadingScreen();
-                            $('button').attr("disabled", true).addClass("ui-state-disabled");
-                            disableButtonsets();
-                            savePanelSizes();
-                            $('#save_mark').attr("value","auditmarked_confirmed_reassignment");
-                            $('#fields_form').submit();
-                            
-                            
                         },
                         
                         
@@ -472,7 +452,19 @@
                                     
                                     
                                 },
-                                
+                                "Re-Entry Confirmation (up to 2500 at a time)": function() {
+                                    
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#save_mark').attr("value","button_reentry_confirmation");
+                                    
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                },
                                 
                             },
                             position: {
@@ -1229,7 +1221,7 @@
                     
                     <div id="statistics_panel">
                         
-                        <h5>There are <span style="color:limegreen"> {{pdf_audited}} </span> Entries Completely Audited and <span style="color:wheat;">{{pdf_left_to_audit}}</span> awaiting for Audit in the Current Selection of <span style="color:lightgrey;">{{pdf_total_count}}</span> Documents. </h5>
+                        <h5>There are <span style="color:limegreen"> {{pdf_audited}} </span> Entries Completely Audited and <span style="color:wheat;">{{pdf_left_to_audit}}</span> awaiting for Audit in the Current Selection of <span style="color:lightgrey;">{{pdf_total_count}}</span> Documents.  <span style="color:tomato;">{{pdf_needs_reentry_confirmation}}</span> Documents need Re-Entry confirmation, and <span style="color:plum;">{{pdf_being_reentered}}</span> are being Re-Entered. </h5>
                         
                     </div>
                     
