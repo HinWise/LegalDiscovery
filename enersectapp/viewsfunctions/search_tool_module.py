@@ -1108,8 +1108,6 @@ def search_tool(request):
         if len(merging_records) > 10:
         
             merging_records = merging_records[:10]
- 
-        print len(merging_records)
 
         response = HttpResponse(mimetype="application/pdf")
         response['Content-Disposition'] = 'attachment; filename=output_document.pdf'

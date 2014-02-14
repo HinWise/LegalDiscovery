@@ -26,7 +26,7 @@ from django.db.models import Count
 from enersectapp.viewsfunctions import (app_index_module,app_login_module,linkui_spiderweb_module,linkui_spiderweb_viceversa_module,dataentryui_spider_module,
                                         pair_randomqa_spider_module,assign_source_pdfs_module,webcocoons_module,randomqa_spider_module,categorization_tool_module,
                                         blank_or_not_blank_module,sudo_assignsourcepdfsui_by_module,progress_report_module,category_changer_module,
-                                        arabic_memo_edit_module,search_tool_module)
+                                        arabic_memo_edit_module,search_tool_module,legal_discovery_module)
 
 from enersectapp.models import *
 
@@ -173,7 +173,7 @@ def search_tool(request):
     
 def legal_discovery(request):
     
-    return search_tool_module.search_tool(request)
+    return legal_discovery_module.legal_discovery(request)
 
   
 

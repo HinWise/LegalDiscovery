@@ -1,0 +1,181 @@
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block page_title %}
+<head>
+<title>Search Tool</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/dragtablejs/jquery.dragtable.js' %}"></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-panelsnap/jquery.panelSnap.js' %}"></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %}
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/search_tool.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dragtablejs/dragtable.css' %}" />
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+    $(document).ready(function () {
+
+        configLoadingScreen();
+        
+        createUserPanel();
+
+        //Cute tooltips, configures fade-ins and outs for the Tooltips.
+
+        $(function() {
+            $( ".show-option" ).tooltip({
+
+              show: {
+                effect: "slideDown",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+            $( ".hide-option" ).tooltip({
+              hide: {
+                effect: "slideUp",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+        });
+
+        function configLoadingScreen(){
+
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+
+        function toggleLoadingScreen(){
+
+            $('#LoadingScreen').toggleClass("invisible");
+            $('#export_mark').attr("value", "none");
+
+        }
+
+        function createUserPanel(){
+
+            $( "#user-panel" ).dialog({
+
+                  autoOpen:false,
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  closeOnEscape: false,
+                  resizable:true,
+                  show: {
+                    effect: "drop",
+                    duration: 500
+                  },
+                  hide: {
+                    effect: "drop",
+                    duration: 500
+                  },
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+
+                });
+
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+
+                    }
+                });
+            }
+
+    });
+
+</script>
+
+{% endblock jqueryui_setups %}
+ <body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+</div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+
+    <div id="right_container">
+
+        <div id="userpanel_container">
+            <div id="user-panel" class="invisible" title="{{the_user}}">
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div id="left_container">
+        
+        
+    </div>
+
+
+
+{% endblock content%}
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}
