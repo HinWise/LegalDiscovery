@@ -254,4 +254,10 @@ urlpatterns = patterns('',
     # ex: enersectapp/searchui/search_tool/
     url(r'^searchui/search_tool/$', views.search_tool, name='search_tool'),
    
+    # Legal Discovery Tool
+    # Allows to choose a Document Type, the extraction fields to include for them, and the sorting of them,
+    # to be exported as a Legal Discovery Pdf Set
+    # ex: enersectapp/legalui/legal_discovery/
+    url(r'^legalui/legal_discovery/$', views.legal_discovery, name='legal_discovery'),
+   
 )

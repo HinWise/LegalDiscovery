@@ -126,6 +126,8 @@ class SourceDocTypeAdmin(admin.ModelAdmin):
     ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),]
     list_display = ('id','name', 'pretty_name','related_extraction_fields')
     
+    filter_horizontal = ('extraction_fields',)
+    
     search_fields = ['id','name', 'pretty_name']
     
 class SourcePdfToHandleInline(admin.TabularInline):

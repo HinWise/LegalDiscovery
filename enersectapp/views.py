@@ -170,6 +170,10 @@ def arabic_memo_edit(request):
 def search_tool(request):
     
     return search_tool_module.search_tool(request)
+    
+def legal_discovery(request):
+    
+    return search_tool_module.search_tool(request)
 
   
 
