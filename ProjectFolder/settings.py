@@ -21,7 +21,7 @@ elif socket.gethostname() == 'Marios-PC':
     template_dirs = 'F:/Nath_Database/ProjectFolder/templates'
 
 else:
-
+   
     database_path = '/srv/enersectapp/app/ProjectFolder/databases/nathansqlite3db'    
     template_dirs = '/srv/enersectapp/app/ProjectFolder/templates'
 
@@ -32,7 +32,7 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
 else:
     DEBUG = TEMPLATE_DEBUG = False
 
-DEBUG = False
+#DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -230,7 +230,7 @@ DEFAULT_FROM_EMAIL = 'Developers <enersect.developers@gmail.com>'
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 
-if DEBUG == False or DEBUG == True:
+if DEBUG == False:
 
     LOGGING = {
         'version': 1,

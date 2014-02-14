@@ -48,11 +48,41 @@ class UserInterfaceType(models.Model):
     def __unicode__(self):
         return self.name
 
+class ExtractionField(models.Model):
+    name = models.CharField(max_length=127, default="unnamed")
+    pretty_name = models.CharField(max_length=127, default="Unnamed")
+    importance = models.IntegerField(default=0)
+    
+    def __unicode__(self):
+        return self.name      
+    
+    class Meta:
+        ordering = ['name']
+        
+    
+    
+        
 class SourceDocType(models.Model):
     name = models.CharField(max_length=255, default="uncategorized")
     pretty_name = models.CharField(max_length=255, default="Uncategorized")
+    extraction_fields = models.ManyToManyField(ExtractionField,related_name='extraction fields list', null=True, blank=True, default=None)
+    
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        ordering = ['name']
+    
+    def related_extraction_fields(self):
+        '''extraction_fields_names_list = ""
+        extraction_fields_data_list = self.extraction_fields.all()
+        for item in extraction_fields_data_list:
+            extraction_fields_names_list += item.name + " , "
+            
+        return extraction_fields_names_list'''
+        return self.extraction_fields.all().values_list('name',flat=True).order_by('importance')
+    related_extraction_fields.short_description = 'Assigned Extraction Fields'
+    
 
 class SourcePdfToHandle(models.Model):
     checked = models.CharField(max_length=255, default="unchecked")

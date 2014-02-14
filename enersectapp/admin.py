@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelMultipleChoiceField
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from enersectapp.models import Record,UserInterfaceType,PdfRecord,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,SourceDocType,Report,CompanyOriginal,CompanyTemplate,SourcePdfToHandle
+from enersectapp.models import Record,UserInterfaceType,ExtractionField,PdfRecord,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,SourceDocType,Report,CompanyOriginal,CompanyTemplate,SourcePdfToHandle
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User,Group
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -112,10 +112,19 @@ class InternalRecordAdmin(admin.ModelAdmin):
     
     search_fields = ['Credit', 'Debit','Company','Day','Month','Year','LedgerYear','Memo']
 
+
+
+class ExtractionFieldAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Extraction Field Details",               {'fields': ['name', 'pretty_name','importance']}),]
+    list_display = ('id','name', 'pretty_name','importance')
+    
+    search_fields = ['id','name', 'pretty_name','importance']
+    
 class SourceDocTypeAdmin(admin.ModelAdmin):
     fieldsets = [
-    ("Source Doc Type Details",               {'fields': ['name', 'pretty_name']}),]
-    list_display = ('id','name', 'pretty_name')
+    ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),]
+    list_display = ('id','name', 'pretty_name','related_extraction_fields')
     
     search_fields = ['id','name', 'pretty_name']
     
@@ -297,6 +306,7 @@ admin.site.register(PdfRecord, PdfRecordAdmin)
 admin.site.register(OcrRecord, OcrRecordAdmin)
 admin.site.register(InternalRecord, InternalRecordAdmin)
 admin.site.register(SourcePdf, SourcePdfAdmin)
+admin.site.register(ExtractionField, ExtractionFieldAdmin)
 admin.site.register(SourceDocType, SourceDocTypeAdmin)
 admin.site.register(SourcePdfToHandle, SourcePdfToHandleAdmin)
 admin.site.register(Report, ReportAdmin)
