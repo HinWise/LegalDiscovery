@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelMultipleChoiceField
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from enersectapp.models import Record,UserInterfaceType,ExtractionField,PdfRecord,FilterSearchWords,InternalRecord,OcrRecord,SourcePdf,SourceDocType,Report,CompanyOriginal,CompanyTemplate,SourcePdfToHandle
+from enersectapp.models import *
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User,Group
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -116,19 +116,40 @@ class InternalRecordAdmin(admin.ModelAdmin):
 
 class ExtractionFieldAdmin(admin.ModelAdmin):
     fieldsets = [
-    ("Extraction Field Details",               {'fields': ['name', 'pretty_name','importance']}),]
-    list_display = ('id','name', 'pretty_name','importance')
+    ("Extraction Field Details",               {'fields': ['name', 'pretty_name','real_field_name','importance','checked','field_sorting']}),]
+    list_display = ('id','name', 'pretty_name','real_field_name','importance','checked','field_sorting')
     
-    search_fields = ['id','name', 'pretty_name','importance']
+    search_fields = ['id','name', 'pretty_name','real_field_name','importance','checked','field_sorting']
+
+class ExtractionFieldTemplateAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Extraction Field Template Details",               {'fields': ['name', 'pretty_name','real_field_name','importance','checked','field_sorting']}),]
+    list_display = ('id','name', 'pretty_name','real_field_name','importance','checked','field_sorting','modification_date','creation_user')
+    
+    search_fields = ['id','name', 'pretty_name','real_field_name','importance','checked','field_sorting','creation_user__username']
     
 class SourceDocTypeAdmin(admin.ModelAdmin):
     fieldsets = [
-    ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),]
-    list_display = ('id','name', 'pretty_name','related_extraction_fields')
+    ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),
+    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']}),
+    ]
+    list_display = ('id','name', 'pretty_name','clean_name','related_extraction_fields','checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting')
     
     filter_horizontal = ('extraction_fields',)
     
-    search_fields = ['id','name', 'pretty_name']
+    search_fields = ['id','name', 'pretty_name','clean_name','=checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']
+    
+    
+class SourceDocTypeTemplateAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),
+    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']}),
+    ]
+    list_display = ('id','name', 'pretty_name','clean_name','related_extraction_fields','modification_date','creation_user','checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting')
+    
+    filter_horizontal = ('extraction_fields',)
+    
+    search_fields = ['id','name', 'pretty_name','clean_name','=checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting','creation_user__username']
     
 class SourcePdfToHandleInline(admin.TabularInline):
     model = SourcePdfToHandle
@@ -140,7 +161,14 @@ class SourcePdfToHandleAdmin(admin.ModelAdmin):
     
     search_fields = ['id','=checked', 'times_checked','assignedcompany__name','assigneduser__username','lot_number']
 
+class LegalDiscoveryTemplateAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Legal Discovery Template Details",               {'fields': ['name']}),]
+    list_display = ('id','name', 'creation_date','modification_date','creation_user','related_sourcedoctypes_list')
     
+    search_fields = ['id','=checked', 'times_checked','assignedcompany__name','assigneduser__username','sourcedoctypes_list__name']    
+
+
     
 '''class SourcePdfForm(forms.ModelForm): 
     def __init__(self, *args, **kwargs):
@@ -223,16 +251,16 @@ class ReportAdmin(admin.ModelAdmin):
 
 
     
-'''class UserProfileAdmin(admin.ModelAdmin):
+class UserProfileAdmin(admin.ModelAdmin):
     
-    list_display = ('user',)
+    list_display = ('user','user_company','assignation_locked','admin_created_legaldiscovery_templates')
     
-    search_fields = ['user']   
+    search_fields = ['user','user_company','assignation_locked']   
     
     fieldsets = [
-    ("User Profile Details",               {'fields': ['user']}),]
+    ("User Profile Details",               {'fields': ['user','user_company','assignation_locked','created_legaldiscovery_templates']}),]
 
-    #filter_horizontal = ('assignedsourcepdfs',)'''
+    filter_horizontal = ('created_legaldiscovery_templates',)
     
  
 class MyUserAdmin(UserAdmin):
@@ -301,7 +329,7 @@ class MyUserAdmin(UserAdmin):
         
 
 admin.site.unregister(User)
-admin.site.register(User, MyUserAdmin)       
+admin.site.register(User, MyUserAdmin)
 admin.site.register(Record, RecordAdmin)
 admin.site.register(UserInterfaceType)
 admin.site.register(PdfRecord, PdfRecordAdmin)
@@ -309,10 +337,13 @@ admin.site.register(OcrRecord, OcrRecordAdmin)
 admin.site.register(InternalRecord, InternalRecordAdmin)
 admin.site.register(SourcePdf, SourcePdfAdmin)
 admin.site.register(ExtractionField, ExtractionFieldAdmin)
+admin.site.register(ExtractionFieldTemplate, ExtractionFieldTemplateAdmin)
 admin.site.register(SourceDocType, SourceDocTypeAdmin)
+admin.site.register(SourceDocTypeTemplate, SourceDocTypeTemplateAdmin)
+admin.site.register(LegalDiscoveryTemplate, LegalDiscoveryTemplateAdmin)
 admin.site.register(SourcePdfToHandle, SourcePdfToHandleAdmin)
 admin.site.register(Report, ReportAdmin)
-'''admin.site.register(UserProfile, UserProfileAdmin)'''
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(CompanyOriginal, CompanyOriginalAdmin)
 admin.site.register(CompanyTemplate, CompanyTemplateAdmin)
 admin.site.register(FilterSearchWords)

@@ -1,6 +1,7 @@
-
 {% load i18n %}
 {% load staticfiles %}
+
+
 
 {% block page_title %}
 <head>
@@ -24,18 +25,56 @@
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/search_tool.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dragtablejs/dragtable.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/legal_discovery.css' %}" />
 {% endblock special_libs %}
 
 {% block jqueryui_setups %}
 
-<script>
+
+<script type="text/javascript">
+
+    
+
     $(document).ready(function () {
 
+    
+        {% autoescape off %}
+        
+        var document_types_list_dictionary = {{document_types_list_dictionaries}};
+
+        {% endautoescape %}
+        
+        
+        mapped_DocType_info = {}
+        
+        //Converting the dictionaries in objects, with the "name" as their access key
+        
+        for (var i = 0; i < document_types_list_dictionary.length; i++)
+        {
+            mapped_DocType_info[document_types_list_dictionary[i].name] = document_types_list_dictionary[i];
+
+            var pointer_extractionfields = mapped_DocType_info[document_types_list_dictionary[i].name].extraction_fields;
+            
+            var mapped_extractionfields = {}
+            
+            //Converting the extraction_field lists in objects, with the "name" as their access key
+            
+            for (var j = 0; j < pointer_extractionfields.length; j++)
+            {
+                
+                mapped_extractionfields[pointer_extractionfields[j].name] = pointer_extractionfields[j];
+                
+            }
+            
+            mapped_DocType_info[document_types_list_dictionary[i].name].extraction_fields = mapped_extractionfields;
+            
+            
+        }
+        
         configLoadingScreen();
         
         createUserPanel();
+        
 
         //Cute tooltips, configures fade-ins and outs for the Tooltips.
 
@@ -55,6 +94,298 @@
             });
         });
 
+        //Panel for the Categories / Doctypes
+        
+        $( "#doctypes_panel" ).dialog({
+          autoOpen: true,
+          height: $("#doctypes_panel_container").height(),
+          width: $("#doctypes_panel_container").width(),
+          modal: false,
+          closeOnEscape: false,
+          resizable: true,
+          position: {
+                    my: "left top", at: "left top", of: $('#doctypes_panel_container')
+          }
+        });
+
+        //Panel for the Details when choosing a DocType
+        
+        $( "#doctypes_detail_panel" ).dialog({
+          autoOpen: true,
+          height: $("#doctypes_detail_panel_container").height(),
+          width: $("#doctypes_detail_panel_container").width(),
+          modal: false,
+          closeOnEscape: false,
+          resizable: true,
+          position: {
+                    my: "left top", at: "left top", of: $('#doctypes_detail_panel_container')
+          }
+        });
+        
+        //Panel for the Template Selection
+        
+        $( "#doctypes_choose_template_panel" ).dialog({
+          autoOpen: true,
+          height: $("#doctypes_choose_template_panel_container").height(),
+          width: $("#doctypes_choose_template_panel_container").width(),
+          modal: true,
+          closeOnEscape: false,
+          resizable: true,
+          position: {
+                    my: "left top", at: "left top", of: $('#doctypes_choose_template_panel_container')
+          }
+        });
+        
+        //Choose Template Button
+        
+        $("#choose_template_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#action_mark').attr("action_mark","choose_template");
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Save Template Button
+        
+        $("#save_template_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#action_mark').attr("action_mark","save_template");
+            $('#discovery_form').submit();
+        
+        });
+        
+
+        //Make DocType_List sortable
+        
+        $( "#doctype_list" ).sortable({
+          placeholder: "ui-state-highlight-line",
+          distance: 10
+        });
+        $( "#doctype_list" ).disableSelection();
+        
+        //Event so when you click on a name, the detail panel shows the appropriate checkboxes
+        
+        isAnyActive = false;
+        
+        $( ".doctype_list_name" ).click(function(){
+        
+            self = $(this)
+            
+            var clicked_name = self.text();
+            
+            var info_element = mapped_DocType_info[clicked_name];
+            
+            var extraction_fields_objects = info_element.extraction_fields;
+            
+            var destination_panel = $( "#doctypes_detail_panel" );
+            
+            var $ulist = $( "#doctypes_detail_extraction_list" );
+            
+            
+            if($ulist.length && isAnyActive == true)
+            {
+                doctype = $ulist.attr("doctype");
+            
+                var new_extraction_fields_object = {}
+            
+                $(".extraction_field_checkbox").each(function(){
+                
+                    extraction_field_name = $(this).attr("field_name");
+                    is_checked = $(this).attr("checked");
+                    
+                    sort_checked = $(".order_by[field_name = "+extraction_field_name+"]:checked").attr("order");
+                    
+                    var extraction_field = {}
+                    
+                    
+                    extraction_field.name = extraction_field_name;
+                    extraction_field.checked = is_checked;
+                    extraction_field.sorting = sort_checked;
+                    
+                    new_extraction_fields_object[extraction_field_name] = extraction_field;
+                    
+                });
+                
+                mapped_DocType_info[doctype].extraction_fields = new_extraction_fields_object;
+                
+                slider_value_min = $( "#slider_amount_min" ).val();
+                slider_value_max = $( "#slider_amount_max" ).val();
+                
+                //$( "#slider_amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                
+                mapped_DocType_info[doctype].min_selected = slider_value_min;
+                mapped_DocType_info[doctype].max_selected = slider_value_max;
+                
+                
+                $('#slider_title').remove();
+                
+                $('#doctypes_detail_selection_range').remove();
+                
+                $ulist.remove();
+                
+                isAnyActive = false;
+                
+            }
+            
+            if($.isEmptyObject(extraction_fields_objects) == false && isAnyActive == false)
+            {
+
+            
+                var str = '<p id="slider_title">';
+                str += '<label for="slider_amount">Selection Range:</label>';
+                str += '<input type="text" id="slider_amount" style="border:0; color:#f6931f; font-weight:bold;">';
+                str += '</p>' ;
+                str += '<div id="doctypes_detail_selection_range">';
+                str += '<input type="text" class="invisible" value="" id="slider_amount_min">';
+                str += '<input type="text" class="invisible"  value="" id="slider_amount_max">';
+                str += '</div>';
+            
+                destination_panel.append(str);
+            
+                var ulist = '<ul doctype='+clicked_name+' id="doctypes_detail_extraction_list"></ul>';
+                
+                destination_panel.append(ulist);
+                
+                destination_panel = $( "#doctypes_detail_extraction_list" );
+                
+                
+                for (var obj in extraction_fields_objects) {
+                
+                    if (extraction_fields_objects.hasOwnProperty(obj)) {
+                        
+                        field_name = extraction_fields_objects[obj].name;
+                        checked = extraction_fields_objects[obj].checked;
+                        sorting = extraction_fields_objects[obj].sorting;
+                    
+                        
+                    
+                        str = '<li>';
+                        
+                        str += '<input type="checkbox" field_name='+field_name+' id="checkbox_'+field_name+'" class="extraction_field_checkbox"';
+                        
+                        if(checked == "checked")
+                        {
+                            str += ' checked="checked" ';
+                        }
+                        
+                        str += '>';
+                        
+                        str += '<label for="checkbox_'+field_name+'">';
+                        str += field_name;
+                        str += '</label>';
+                        
+                        //Sorting buttonset
+                        
+                            str += '<div class="sorting_buttonset">';
+                        
+                            str += '<input type="radio" field_name='+field_name+' ';
+                            
+                            if(sorting == "default")
+                            {
+                                str += ' checked="checked" ';
+                            }
+                            
+                            str += 'class="order_default order_by" order="default" id="radio_'+field_name+'" name="radio_'+field_name+'">';
+                            
+                            str += '<label class="order_tab" for="radio_'+field_name+'"></label>';
+                            
+                            str += '<input type="radio" field_name='+field_name+' ';
+                            
+                            if(sorting == "down")
+                            {
+                                str += ' checked="checked" ';
+                            }
+                            
+                            str += 'class="order_down order_by" order="down" id="radio_'+field_name+'1" name="radio_'+field_name+'">';
+                            
+                            str += '<label class="order_tab" for="radio_'+field_name+'1"></label>';
+                            
+                            str += '<input type="radio" field_name='+field_name+' ';
+                            
+                            if(sorting == "up")
+                            {
+                                str += ' checked="checked" ';
+                            }
+                            
+                            str += 'class="order_up order_by" order="up" id="radio_'+field_name+'2" name="radio_'+field_name+'">';
+                        
+                            str += '<label class="order_tab" for="radio_'+field_name+'2"></label>';
+                        
+                            str += '<input type="text" field_name='+field_name+' class="invisible" value='+sorting+' id="sorting_info'+field_name+'">';
+                        
+                            str += '</div>';
+                        
+                        str += '</li>';
+                        
+                        
+                        destination_panel.append(str);
+                    }
+                    
+                }
+                
+                $( "#doctypes_detail_selection_range" ).slider({
+                    range: true,
+                    min: info_element.min_show,
+                    max: info_element.max_show,
+                    values: [ info_element.min_selected, info_element.max_selected ],
+                    slide: function( event, ui ) {
+                    
+                        $( "#slider_amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                      
+                        $( "#slider_amount_min" ).val(ui.values[ 0 ]);
+                        $( "#slider_amount_max" ).val(ui.values[ 1 ]);
+                      
+                      }
+                    });
+                    
+                $( "#slider_amount" ).val( $( "#doctypes_detail_selection_range" ).slider( "values", 0 ) +
+                " - " + $( "#doctypes_detail_selection_range" ).slider( "values", 1 ) );
+                
+                $( "#slider_amount_min" ).val(info_element.min_selected);
+                $( "#slider_amount_max" ).val(info_element.max_selected);
+                
+                
+                $( "#doctypes_detail_extraction_list" ).sortable({
+                  placeholder: "ui-state-highlight-line",
+                  distance: 10
+                });
+                $( "#doctypes_detail_extraction_list" ).disableSelection();
+                
+                
+                //$(".sorting_buttonset").buttonset();
+                
+
+                $(".order_default").button( { icons: {primary:'ui-icon-carat-2-n-s'} } ).click(function(){
+
+                    //$(this).attr("checked","checked");
+                });
+                
+                //$(".order_default").button("refresh");
+                
+                $(".order_down").button( { icons: {primary:'ui-icon-triangle-1-s'} } ).click(function(){
+
+                    //$(this).attr("checked","checked");
+                });
+                
+                //$(".order_down").button("refresh");
+                
+                $(".order_up").button( { icons: {primary:'ui-icon-triangle-1-n'} } ).click(function(){
+
+                    //$(this).attr("checked","checked");
+                });
+                
+                //$(".order_up").button("refresh");
+                
+                isAnyActive = true;
+            }
+        
+        });
+        
+        
         function configLoadingScreen(){
 
             image_width = $('#LoadingSpinner').width();
@@ -156,7 +487,60 @@
     </div>
 
 
-    <div id="left_container">
+    <div id="panels_container">
+        
+            <form id="discovery_form" action="{% url 'enersectapp:legal_discovery' %}" method="post">
+            {% csrf_token %}
+                <fieldset id="fieldset_fields">
+                
+                    <div id="doctypes_panel_container">
+
+                        <div id="doctypes_panel" title="Select and Sort Categories">
+                    
+                            
+                            <ul id="doctype_list">
+                                {% for doctype in document_types_list_dictionaries %}
+                                    <li class="ui-state-default doctype_element"><span class="doctype_list_name">{{doctype.name}}</span><span class="doctype_list_count">Total : {{doctype.count}}</span></li>
+                                {% endfor %}
+                                     
+                            </ul>
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="doctypes_detail_panel_container">
+                    
+                        <div id="doctypes_detail_panel" title="Selected Category Details">
+                    
+
+                        </div>
+                    
+                    </div>
+                    
+                    <div id="doctypes_choose_template_panel_container">
+                    
+                        <div id="doctypes_choose_template_panel" title="Legal Discovery Templates">
+                            
+                            <select id="select_template_menu" name="selected_template" id="selected_template" value="">
+                                    <option value="new_template">New Template</option>
+                                {% for template_name in legaldiscovery_templates_list %}
+                                    <option value="{{template_name}}">{{template_name}}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button id="choose_template_button">Choose</button>
+                            <button id="save_template_button">Save</button>
+                            
+                            
+                        </div>
+                    
+                    </div>
+                    
+                    
+            
+                </fieldset>
+            </form>
         
         
     </div>

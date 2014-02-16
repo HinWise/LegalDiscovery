@@ -1,0 +1,190 @@
+@charset "UTF-8";
+
+
+
+#fieldset_fields { padding:0; border:0; margin-top:12%; overflow:hidden;}
+#fieldset_fields ul
+    { 
+    width: 85%;
+    overflow: hidden;
+    
+   }
+
+#doctype_list { list-style-type: none; margin-top: 8px;
+                padding: 0;
+                width: 100%; }
+                
+  #doctype_list li { height: 6%; line-height: 200%; }
+  .ui-state-highlight-line { height: 1% !important; line-height: 2px; background-color: #231d2b !important;}
+  .doctype_element { background:none !important; color:white !important; border: 1 !important; border-top: 1px dashed white !important; }
+  
+.doctype_list_name{ position:absolute; left:5%; }
+.doctype_list_count{ position:absolute; left:80%; }
+ 
+#select_template_menu {
+
+    display: block;
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 2%;
+}
+
+#choose_template_button {
+
+    width:45%;
+    margin-left: 3%;
+
+}
+
+#save_template_button {
+
+   width:45%;
+
+}
+
+ 
+.sorting_buttonset {
+     position: relative;
+    display: inline-block;
+    width: 16%;
+    height: 5%;
+    left: 2%; 
+}
+ 
+.order_tab {
+
+    width: 20%;
+    height: 50%;
+    font-size: 80% !important;
+
+}
+
+.order_tab .ui-button-text {
+
+    padding: 0 !important;
+
+}
+
+.order_tab .ui-icon {
+
+    left: -10% !important;
+
+}
+ 
+#panels_container{
+    position: absolute;
+    top: 0%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    pointer-events: all;
+    
+}
+
+
+#doctypes_panel_container{
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    width: 45%;
+    height: 85%;
+    pointer-events: all;
+    
+    
+    overflow:auto;
+}
+
+#doctypes_detail_panel_container{
+    position: absolute;
+    top: 22%;
+    left: 50.5%;
+    width: 45%;
+    height: 85%;
+    pointer-events: all;
+    
+    overflow:auto;
+}
+
+#doctypes_choose_template_panel_container{
+    position: absolute;
+    top: 1%;
+    left: 37%;
+    width: 26%;
+    height: 20%;
+    pointer-events: all;
+    
+    overflow:auto;
+}
+
+
+
+#accordion_table {
+
+    position:absolute;
+    
+    top:0;
+    left: -50%;
+    width: 205%;
+    height:100%;
+    
+    overflow:auto;
+    
+}
+
+#accordion .ui-accordion-content {
+    
+    padding: 1%;
+    border-top: 0;
+    overflow: auto;
+
+}
+
+
+#right_container {
+
+    position:absolute;
+    
+    width:45%;
+    height:100%;
+    
+    left: 0.5%;
+    top: 0;
+}
+
+   
+    .divisor-line {
+    
+        width: 92%;
+        margin-left: 1%;
+
+        height: 0.5%;
+        border: 1px dashed silver;
+
+    }
+    
+
+.custom-tooltip {
+
+    width:260px;
+    height:35px;
+    
+    font-size:14px;
+
+}
+
+
+
+.ui-state-custom-linked {
+    
+	border: 1px solid #8cce3b;
+	background: #f6ecd5 url("images/ui-bg_gloss-wave_85_76e361_500x100.png") 50% 50% repeat-x;
+	color: #030303;
+}
+
+.ui-state-custom-error {
+        
+	border: 1px solid #f1ac88;
+	background: #f6ecd5 url("images/ui-bg_gloss-wave_85_d25d72_500x100.png") 50% 50% repeat-x;
+	
+}
+	

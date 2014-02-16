@@ -51,21 +51,54 @@ class UserInterfaceType(models.Model):
 class ExtractionField(models.Model):
     name = models.CharField(max_length=127, default="unnamed")
     pretty_name = models.CharField(max_length=127, default="Unnamed")
+    real_field_name = models.CharField(max_length=127, default="NeedsInput")
     importance = models.IntegerField(default=0)
+    checked = models.CharField(max_length=31,default="checked")
+    field_sorting = models.CharField(max_length=31, default="default")
+
+    def __unicode__(self):
+        return self.name      
+    
+    class Meta:
+        ordering = ['name']   
+    
+class ExtractionFieldTemplate(models.Model):
+    name = models.CharField(max_length=127, default="unnamed")
+    pretty_name = models.CharField(max_length=127, default="Unnamed")
+    real_field_name = models.CharField(max_length=127, default="NeedsInput")
+    importance = models.IntegerField(default=0)
+    checked = models.CharField(max_length=31,default="checked")
+    field_sorting = models.CharField(max_length=31, default="default")
+    modification_date = models.DateTimeField('modification time of extraction field template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    creation_user = models.ForeignKey(User,null=True,blank=True) 
     
     def __unicode__(self):
         return self.name      
     
     class Meta:
-        ordering = ['name']
-        
+        ordering = ['modification_date']
     
-    
-        
 class SourceDocType(models.Model):
     name = models.CharField(max_length=255, default="uncategorized")
     pretty_name = models.CharField(max_length=255, default="Uncategorized")
+    clean_name = models.CharField(max_length=255, default="uncategorized" )
     extraction_fields = models.ManyToManyField(ExtractionField,related_name='extraction fields list', null=True, blank=True, default=None)
+    min_show = models.IntegerField(default=1)
+    max_show = models.IntegerField(default=1)
+    min_selected = models.IntegerField(default=1)
+    max_selected = models.IntegerField(default=1)
+    checked = models.CharField(max_length=31,default="checked")
+    general_sorting = models.CharField(max_length=31, default="count")
+    extraction_fields_sorting = models.CharField(max_length=31, default="importance")
+    
+    '''def __init__(self, *args, **kwargs):
+        super(SourceDocType, self).__init__(*args, **kwargs)
+        self.clean_name = self.name.lower().replace("'","").replace(" ","_")'''
+        
+    def save(self, *args, **kwargs):
+        
+        self.clean_name = self.name.lower().replace("'","").replace(" ","_")
+        super(SourceDocType, self).save(*args, **kwargs)   
     
     def __unicode__(self):
         return self.name
@@ -81,9 +114,70 @@ class SourceDocType(models.Model):
             
         return extraction_fields_names_list'''
         return self.extraction_fields.all().values_list('name',flat=True).order_by('importance')
+        
     related_extraction_fields.short_description = 'Assigned Extraction Fields'
     
+class SourceDocTypeTemplate(models.Model):
+    name = models.CharField(max_length=255, default="uncategorized")
+    pretty_name = models.CharField(max_length=255, default="Uncategorized")
+    clean_name = models.CharField(max_length=255, default="uncategorized")
+    extraction_fields = models.ManyToManyField(ExtractionFieldTemplate,related_name='extraction fields list', null=True, blank=True, default=None)
+    min_show = models.IntegerField(default=1)
+    max_show = models.IntegerField(default=1)
+    min_selected = models.IntegerField(default=1)
+    max_selected = models.IntegerField(default=1)
+    checked = models.CharField(max_length=31,default="checked")
+    general_sorting = models.CharField(max_length=31, default="modification_date")
+    extraction_fields_sorting = models.CharField(max_length=31, default="modification_date")
+    modification_date = models.DateTimeField('modification time of sourcedoc template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    creation_user = models.ForeignKey(User,null=True,blank=True)
+    
+    def save(self, *args, **kwargs):
+        
+        self.clean_name = self.name.lower().replace("'","").replace(" ","_")
+        super(SourceDocType, self).save(*args, **kwargs) 
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['modification_date']
+    
+    def related_extraction_fields(self):
+        '''extraction_fields_names_list = ""
+        extraction_fields_data_list = self.extraction_fields.all()
+        for item in extraction_fields_data_list:
+            extraction_fields_names_list += item.name + " , "
+            
+        return extraction_fields_names_list'''
+        return self.extraction_fields.all().values_list('name',flat=True).order_by('modification_date')
+    related_extraction_fields.short_description = 'Assigned Extraction Fields'
 
+class LegalDiscoveryTemplate(models.Model):
+    name = models.CharField(max_length=127, default="Saved Template ")
+    creation_date = models.DateTimeField('creation time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    modification_date = models.DateTimeField('modification time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    creation_user = models.ForeignKey(User,null=True,blank=True)
+    sourcedoctypes_list = models.ManyToManyField(SourceDocTypeTemplate,related_name='source doc template list', null=True, blank=True, default=None)
+    
+    
+    def __init__(self, *args, **kwargs):
+        super(LegalDiscoveryTemplate, self).__init__(*args, **kwargs)
+        if self.name == "Saved Template ":
+            self.name = self.name + str(self.pk)
+        
+        
+    def __unicode__(self):
+        return self.name      
+    
+    class Meta:
+        ordering = ['creation_date'] 
+
+    def related_sourcedoctypes_list(self):
+        
+        return self.sourcedoctypes_list.all().values_list('name',flat=True).order_by('modification_date')
+        
+    
 class SourcePdfToHandle(models.Model):
     checked = models.CharField(max_length=255, default="unchecked")
     times_checked = models.IntegerField(default=0)
@@ -261,11 +355,18 @@ class UserProfile(models.Model):
     modifiedpdfs_audit_marked = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_marked', null=True, blank=True, default=None)
     modifiedpdfs_audit_saved = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_saved', null=True, blank=True, default=None)
     modifiedpdfs_audit_revision = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_revisioned', null=True, blank=True, default=None)
+    created_legaldiscovery_templates = models.ManyToManyField(LegalDiscoveryTemplate,related_name='legaldiscovery_templates', null=True, blank=True, default=None)
     #other fields here
 
     def __str__(self):  
           return "%s's profile" % self.user 
 
+    def admin_created_legaldiscovery_templates(self):
+        
+        return self.created_legaldiscovery_templates.all().values_list('name',flat=True)     
+    
+    
+     
 def create_user_profile(sender, instance, created, **kwargs):  
     if created:  
         
@@ -273,3 +374,6 @@ def create_user_profile(sender, instance, created, **kwargs):
 
         
 post_save.connect(create_user_profile, sender=User)
+
+
+
