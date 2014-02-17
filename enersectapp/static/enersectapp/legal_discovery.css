@@ -1,6 +1,22 @@
 @charset "UTF-8";
 
+html,body {
 
+    background: none !important;
+    background-image: none !important;
+    
+}
+
+.ui-dialog-titlebar-close {
+
+    display:none;
+}
+
+.ui-widget {
+
+    font-family: Arial,sans-serif;
+    font-size: 80%;
+}
 
 #fieldset_fields { padding:0; border:0; margin-top:12%; overflow:hidden;}
 #fieldset_fields ul
@@ -14,12 +30,12 @@
                 padding: 0;
                 width: 100%; }
                 
-  #doctype_list li { height: 6%; line-height: 200%; }
+  #doctype_list li { height: 6%; }
   .ui-state-highlight-line { height: 1% !important; line-height: 2px; background-color: #231d2b !important;}
-  .doctype_element { background:none !important; color:white !important; border: 1 !important; border-top: 1px dashed white !important; }
+  .doctype_element { }
   
-.doctype_list_name{ position:absolute; left:5%; }
-.doctype_list_count{ position:absolute; left:80%; }
+.doctype_list_name{ position:relative; }
+.doctype_list_count{ position:absolute; left:73%; top:23%; }
  
 #select_template_menu {
 
@@ -90,6 +106,7 @@
     height: 85%;
     pointer-events: all;
     
+    z-index: 50 !important;
     
     overflow:auto;
 }
@@ -103,6 +120,14 @@
     pointer-events: all;
     
     overflow:auto;
+}
+
+#doctypes_detail_extraction_list {
+
+    list-style-type: none;
+    margin-top: 10%;
+    margin-left: -10%;
+
 }
 
 #doctypes_choose_template_panel_container{
@@ -171,6 +196,32 @@
     font-size:14px;
 
 }
+
+/*Selectable && Sortable css*/
+
+
+li { position:relative !important; padding: 1% !important; padding-left: 8% !important;  }
+
+li .handle { background: #f8f8f8 !important; position: absolute !important; left: 0 !important; top: 0 !important; bottom: 0 !important; padding:2% !important; }
+
+li .edit_doctype_element { background: #f8f8f8 !important; position: absolute !important; right: 0 !important; top: 0 !important; bottom: 0 !important; padding:2% !important; }
+
+.unavailable_element {background-color: rgba(255,0,0,0.02) !important; /*color: rgba(112,112,112,0.6) !important;*/ }
+
+.available_element {background-color: rgba(0,255,0,0.02) !important;}
+
+.ui-selecting { background: rgba(238,238,238,0.3) !important; z-index:3000 !important;}
+.ui-selecting .handle { background-color: rgba(221,221,221,0.3) !important; }
+.ui-selected { background-color: rgba(221,238,255,0.3) !important; color:white !important; }
+.ui-selected .handle { background-color: rgba(204,221,238,0.3) !important; }
+
+.selected_list_element { }
+
+.ui-selectable-helper{display:block; z-index:200; background-color: yellow; opacity:0.1;}
+
+
+
+
 
 
 

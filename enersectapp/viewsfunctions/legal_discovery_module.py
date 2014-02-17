@@ -66,7 +66,7 @@ def legal_discovery(request):
     
     final_entries = PdfRecord.objects.filter(audit_mark = "None").distinct()
     
-    used_document_types_dictionary_list = final_entries.values('modified_document_type__name').order_by().annotate(count=Count('id')).order_by('-count')
+    used_document_types_dictionary_list = final_entries.values('modified_document_type__clean_name','modified_document_type__name').order_by().annotate(count=Count('id')).order_by('-count')
     
     
     document_types_list_dictionaries = []
@@ -74,33 +74,41 @@ def legal_discovery(request):
     with transaction.commit_on_success():
         for item in used_document_types_dictionary_list:
         
-            doctype = SourceDocType.objects.get(name = item['modified_document_type__name'] )
+            doctype = SourceDocType.objects.get(clean_name = item['modified_document_type__clean_name'] )
             
             new_element = {}
-            new_element.update({"name":str(doctype.name)})
+            new_element.update({"clean_name":str(doctype.clean_name)})
+            new_element.update({"name":str(doctype.pretty_name)})
             new_element.update({"count":item['count']})
             new_element.update({"min_show":1})
             new_element.update({"max_show":item['count']})
             new_element.update({"min_selected":1})
             new_element.update({"max_selected":item['count']})
-            
+            new_element.update({"checked":"checked"})
+            new_element.update({"general_sorting":str(doctype.general_sorting)})
+            new_element.update({"extraction_fields_sorting":str(doctype.extraction_fields_sorting)})
+             
             new_element.update({"id":doctype.pk})
             
+            
 
-            extraction_fields_list = doctype.extraction_fields.all().order_by('-importance').values_list('real_field_name',flat=True)
+            extraction_fields_list = doctype.extraction_fields.all().order_by('-importance').values('real_field_name','pretty_name','field_sorting')
             clean_extraction_fields_list = []
             
             for field in extraction_fields_list:
                 
                 new_extraction_marker = {}
                 
-                new_extraction_marker.update({"name":str(field)})
+                new_extraction_marker.update({"real_field_name":str(field["real_field_name"])})
+                new_extraction_marker.update({"name":str(field["pretty_name"])})
                 new_extraction_marker.update({"checked":"checked"})
-                new_extraction_marker.update({"sorting":"default"})
+                new_extraction_marker.update({"field_sorting":str(field["field_sorting"])})
+                
                 
                 clean_extraction_fields_list.append(new_extraction_marker)
             
             new_element.update({"extraction_fields":clean_extraction_fields_list})
+            new_element.update({"number_extraction_fields":len(clean_extraction_fields_list)})
             
             document_types_list_dictionaries.append(new_element)
             

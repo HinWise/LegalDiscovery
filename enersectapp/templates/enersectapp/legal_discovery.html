@@ -25,6 +25,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/aristo/css/Aristo/Aristo.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/legal_discovery.css' %}" />
 {% endblock special_libs %}
 
@@ -51,9 +52,9 @@
         
         for (var i = 0; i < document_types_list_dictionary.length; i++)
         {
-            mapped_DocType_info[document_types_list_dictionary[i].name] = document_types_list_dictionary[i];
+            mapped_DocType_info[document_types_list_dictionary[i].clean_name] = document_types_list_dictionary[i];
 
-            var pointer_extractionfields = mapped_DocType_info[document_types_list_dictionary[i].name].extraction_fields;
+            var pointer_extractionfields = mapped_DocType_info[document_types_list_dictionary[i].clean_name].extraction_fields;
             
             var mapped_extractionfields = {}
             
@@ -62,11 +63,11 @@
             for (var j = 0; j < pointer_extractionfields.length; j++)
             {
                 
-                mapped_extractionfields[pointer_extractionfields[j].name] = pointer_extractionfields[j];
+                mapped_extractionfields[pointer_extractionfields[j].real_field_name] = pointer_extractionfields[j];
                 
             }
             
-            mapped_DocType_info[document_types_list_dictionary[i].name].extraction_fields = mapped_extractionfields;
+            mapped_DocType_info[document_types_list_dictionary[i].clean_name].extraction_fields = mapped_extractionfields;
             
             
         }
@@ -159,23 +160,36 @@
         });
         
 
-        //Make DocType_List sortable
+        //Make DocType_List sortable && dragable! 
         
         $( "#doctype_list" ).sortable({
           placeholder: "ui-state-highlight-line",
+          handle: ".handle",
           distance: 10
-        });
-        $( "#doctype_list" ).disableSelection();
+        })
+        .selectable({ filter:"li", cancel:".handle" })
+        .find( "li" )
+        .addClass( "selected_list_element")
+        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
+        
         
         //Event so when you click on a name, the detail panel shows the appropriate checkboxes
         
         isAnyActive = false;
         
-        $( ".doctype_list_name" ).click(function(){
+        $( ".edit_doctype_element" ).mousedown(function(event){
         
+            event.preventDefault();
+
             self = $(this)
             
-            var clicked_name = self.text();
+            //Name that is properly formated for data use
+            
+            var clicked_name = self.attr("clean_name");
+            
+            //Name that is actually shown
+            
+            var cute_name = self.attr("cute_name");
             
             var info_element = mapped_DocType_info[clicked_name];
             
@@ -185,6 +199,7 @@
             
             var $ulist = $( "#doctypes_detail_extraction_list" );
             
+            //Erasing the previous panel and saving the data in mapInfo
             
             if($ulist.length && isAnyActive == true)
             {
@@ -194,17 +209,21 @@
             
                 $(".extraction_field_checkbox").each(function(){
                 
-                    extraction_field_name = $(this).attr("field_name");
+                    extraction_field_name = $(this).attr("real_field_name");
+                    
+                    field_name = $(this).attr("field_name");
+                    
                     is_checked = $(this).attr("checked");
                     
-                    sort_checked = $(".order_by[field_name = "+extraction_field_name+"]:checked").attr("order");
+                    sort_checked = $(".order_by[real_field_name = "+extraction_field_name+"]:checked").attr("order");
                     
                     var extraction_field = {}
                     
                     
-                    extraction_field.name = extraction_field_name;
+                    extraction_field.real_field_name = extraction_field_name;
+                    extraction_field.name = field_name;
                     extraction_field.checked = is_checked;
-                    extraction_field.sorting = sort_checked;
+                    extraction_field.field_sorting = sort_checked;
                     
                     new_extraction_fields_object[extraction_field_name] = extraction_field;
                     
@@ -231,20 +250,31 @@
                 
             }
             
+            //Creating the detailed panel for the selected DocType, absorbing the info from mapInfo
+            
             if($.isEmptyObject(extraction_fields_objects) == false && isAnyActive == false)
             {
 
             
+                destination_panel.dialog({title: cute_name+" Details"});
+                
+                
+                //Creating the slider with the document range
+            
                 var str = '<p id="slider_title">';
-                str += '<label for="slider_amount">Selection Range:</label>';
-                str += '<input type="text" id="slider_amount" style="border:0; color:#f6931f; font-weight:bold;">';
+                str += '<label for="slider_amount_min">Selection Range:</label>';
+                //str += '<input type="text" id="slider_amount" style="border:0; margin-left:2%; background:none; font-weight:bold;">';
+                str += '<input type="text" value="" style="display: inline-block; border:0; margin-left:2%; text-align:center; width:10%; background:none; font-weight:bold;" id="slider_amount_min">';
+                str += '-';
+                str += '<input type="text" value="" style="display: inline-block; border:0; margin-left:2%; text-align:center; width:10%; background:none; font-weight:bold;" id="slider_amount_max">';
                 str += '</p>' ;
                 str += '<div id="doctypes_detail_selection_range">';
-                str += '<input type="text" class="invisible" value="" id="slider_amount_min">';
-                str += '<input type="text" class="invisible"  value="" id="slider_amount_max">';
+                
                 str += '</div>';
             
                 destination_panel.append(str);
+            
+                //Creating the unordered list container
             
                 var ulist = '<ul doctype='+clicked_name+' id="doctypes_detail_extraction_list"></ul>';
                 
@@ -253,19 +283,22 @@
                 destination_panel = $( "#doctypes_detail_extraction_list" );
                 
                 
+                //Loop creating the li elements, that contain a selection checkbox, the field name, and a set of sorting buttons
+                
                 for (var obj in extraction_fields_objects) {
                 
                     if (extraction_fields_objects.hasOwnProperty(obj)) {
                         
+                        real_field_name = extraction_fields_objects[obj].real_field_name;
                         field_name = extraction_fields_objects[obj].name;
                         checked = extraction_fields_objects[obj].checked;
-                        sorting = extraction_fields_objects[obj].sorting;
+                        field_sorting = extraction_fields_objects[obj].field_sorting;
                     
                         
                     
-                        str = '<li>';
+                        str = '<li class="ui-state-default doctype_element">';
                         
-                        str += '<input type="checkbox" field_name='+field_name+' id="checkbox_'+field_name+'" class="extraction_field_checkbox"';
+                        str += '<input type="checkbox" field_name='+field_name+' real_field_name='+real_field_name+' id="checkbox_'+real_field_name+'" class="extraction_field_checkbox"';
                         
                         if(checked == "checked")
                         {
@@ -274,7 +307,7 @@
                         
                         str += '>';
                         
-                        str += '<label for="checkbox_'+field_name+'">';
+                        str += '<label for="checkbox_'+real_field_name+'">';
                         str += field_name;
                         str += '</label>';
                         
@@ -282,40 +315,40 @@
                         
                             str += '<div class="sorting_buttonset">';
                         
-                            str += '<input type="radio" field_name='+field_name+' ';
+                            str += '<input type="radio" real_field_name='+real_field_name+' ';
                             
-                            if(sorting == "default")
+                            if(field_sorting == "default")
                             {
                                 str += ' checked="checked" ';
                             }
                             
-                            str += 'class="order_default order_by" order="default" id="radio_'+field_name+'" name="radio_'+field_name+'">';
+                            str += 'class="order_default order_by" order="default" id="radio_'+real_field_name+'" name="radio_'+real_field_name+'">';
                             
-                            str += '<label class="order_tab" for="radio_'+field_name+'"></label>';
+                            str += '<label class="order_tab" for="radio_'+real_field_name+'"></label>';
                             
-                            str += '<input type="radio" field_name='+field_name+' ';
+                            str += '<input type="radio" real_field_name='+real_field_name+' ';
                             
-                            if(sorting == "down")
+                            if(field_sorting == "down")
                             {
                                 str += ' checked="checked" ';
                             }
                             
-                            str += 'class="order_down order_by" order="down" id="radio_'+field_name+'1" name="radio_'+field_name+'">';
+                            str += 'class="order_down order_by" order="down" id="radio_'+real_field_name+'1" name="radio_'+real_field_name+'">';
                             
-                            str += '<label class="order_tab" for="radio_'+field_name+'1"></label>';
+                            str += '<label class="order_tab" for="radio_'+real_field_name+'1"></label>';
                             
-                            str += '<input type="radio" field_name='+field_name+' ';
+                            str += '<input type="radio" real_field_name='+real_field_name+' ';
                             
-                            if(sorting == "up")
+                            if(field_sorting == "up")
                             {
                                 str += ' checked="checked" ';
                             }
                             
-                            str += 'class="order_up order_by" order="up" id="radio_'+field_name+'2" name="radio_'+field_name+'">';
+                            str += 'class="order_up order_by" order="up" id="radio_'+real_field_name+'2" name="radio_'+real_field_name+'">';
                         
-                            str += '<label class="order_tab" for="radio_'+field_name+'2"></label>';
+                            str += '<label class="order_tab" for="radio_'+real_field_name+'2"></label>';
                         
-                            str += '<input type="text" field_name='+field_name+' class="invisible" value='+sorting+' id="sorting_info'+field_name+'">';
+                            str += '<input type="text" real_field_name='+real_field_name+' class="invisible" value='+field_sorting+' id="sorting_info'+real_field_name+'">';
                         
                             str += '</div>';
                         
@@ -334,54 +367,76 @@
                     values: [ info_element.min_selected, info_element.max_selected ],
                     slide: function( event, ui ) {
                     
-                        $( "#slider_amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
                       
                         $( "#slider_amount_min" ).val(ui.values[ 0 ]);
                         $( "#slider_amount_max" ).val(ui.values[ 1 ]);
                       
-                      }
+                      },
+                      
                     });
                     
-                $( "#slider_amount" ).val( $( "#doctypes_detail_selection_range" ).slider( "values", 0 ) +
-                " - " + $( "#doctypes_detail_selection_range" ).slider( "values", 1 ) );
-                
+              
                 $( "#slider_amount_min" ).val(info_element.min_selected);
                 $( "#slider_amount_max" ).val(info_element.max_selected);
                 
+                //Getting the values represented in the slider
                 
+                $( "#slider_amount_min" ).blur(function(){
+                
+                    val1 = $( "#slider_amount_min" ).val();
+                    val2 = $( "#slider_amount_max" ).val();
+                    
+                    //Maximum and minimum controls
+                    
+                    if(val1 < info_element.min_show) val1 = info_element.min_show;
+                    if(val1 > info_element.max_show) val1 = info_element.max_show;
+                    if(val1 > val2) {alert("min"); val1 = val2;}
+                    
+                    $( "#slider_amount_min" ).val(val1);
+                
+                    $( "#doctypes_detail_selection_range" ).slider('values',[val1,val2]);
+                });
+                
+                $( "#slider_amount_max" ).blur(function(){
+                
+                    val1 = $( "#slider_amount_min" ).val();
+                    val2 = $( "#slider_amount_max" ).val();
+                
+                    //Maximum and minimum controls
+                    
+                    if(val2 < info_element.min_show) val2 = info_element.min_show;
+                    if(val2 > info_element.max_show) val2 = info_element.max_show;
+                    if(val2 < val1) {alert("max");val2 = val1;}
+                
+                    $( "#slider_amount_max" ).val(val2);
+                
+                    $( "#doctypes_detail_selection_range" ).slider('values',[val1,val2]);
+                });
+               
+                
+                //Make Extraction Fields List sortable && dragable! 
+        
                 $( "#doctypes_detail_extraction_list" ).sortable({
                   placeholder: "ui-state-highlight-line",
+                  handle: ".handle",
                   distance: 10
-                });
-                $( "#doctypes_detail_extraction_list" ).disableSelection();
+                })
+                .selectable({ filter:"li", cancel:".handle" })
+                .find( "li" )
+                .addClass( "selected_list_element")
+                .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
                 
                 
-                //$(".sorting_buttonset").buttonset();
+                $(".order_default").button( { icons: {primary:'ui-icon-carat-2-n-s'} } );
                 
-
-                $(".order_default").button( { icons: {primary:'ui-icon-carat-2-n-s'} } ).click(function(){
-
-                    //$(this).attr("checked","checked");
-                });
+                $(".order_down").button( { icons: {primary:'ui-icon-triangle-1-s'} } );
                 
-                //$(".order_default").button("refresh");
-                
-                $(".order_down").button( { icons: {primary:'ui-icon-triangle-1-s'} } ).click(function(){
-
-                    //$(this).attr("checked","checked");
-                });
-                
-                //$(".order_down").button("refresh");
-                
-                $(".order_up").button( { icons: {primary:'ui-icon-triangle-1-n'} } ).click(function(){
-
-                    //$(this).attr("checked","checked");
-                });
-                
-                //$(".order_up").button("refresh");
+                $(".order_up").button( { icons: {primary:'ui-icon-triangle-1-n'} } );
                 
                 isAnyActive = true;
             }
+            
+            return false;
         
         });
         
@@ -500,7 +555,24 @@
                             
                             <ul id="doctype_list">
                                 {% for doctype in document_types_list_dictionaries %}
-                                    <li class="ui-state-default doctype_element"><span class="doctype_list_name">{{doctype.name}}</span><span class="doctype_list_count">Total : {{doctype.count}}</span></li>
+                                    <li class="ui-state-default doctype_element {% if doctype.number_extraction_fields == 0 %}unavailable_element{% else %}available_element{% endif %}">
+                                        
+                                        <input type="checkbox" {% if doctype.checked == "checked" %} checked="checked" {% endif %} field_name="{{doctype.name}}" real_field_name="{{doctype.clean_name}}" id="doctype_item_{{doctype.clean_name}}" class="doctype_item_checkbox">
+                                    
+                                        <span clean_name="{{doctype.clean_name}}" class="doctype_list_name">{{doctype.name}}</span><span class="doctype_list_count">Total : {{doctype.count}}</span>
+                                    
+                                        
+                                        {% if doctype.number_extraction_fields > 0 %}
+                                        <div class='edit_doctype_element' clean_name="{{doctype.clean_name}}" cute_name="{{doctype.name}}">
+                                            <span class='ui-icon ui-icon-gear'></span>
+                                        </div>
+                                        {% endif %}
+                                        
+                                    
+                                    </li>
+                                    
+                                    
+                                    
                                 {% endfor %}
                                      
                             </ul>
