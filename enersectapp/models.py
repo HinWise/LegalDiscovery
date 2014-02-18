@@ -68,6 +68,7 @@ class ExtractionFieldTemplate(models.Model):
     real_field_name = models.CharField(max_length=127, default="NeedsInput")
     importance = models.IntegerField(default=0)
     checked = models.CharField(max_length=31,default="checked")
+    sequential_order = models.IntegerField(default=0)
     field_sorting = models.CharField(max_length=31, default="default")
     modification_date = models.DateTimeField('modification time of extraction field template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
     creation_user = models.ForeignKey(User,null=True,blank=True) 
@@ -83,12 +84,12 @@ class SourceDocType(models.Model):
     pretty_name = models.CharField(max_length=255, default="Uncategorized")
     clean_name = models.CharField(max_length=255, default="uncategorized" )
     extraction_fields = models.ManyToManyField(ExtractionField,related_name='extraction fields list', null=True, blank=True, default=None)
+    number_extraction_fields = models.IntegerField(default=0)
     min_show = models.IntegerField(default=1)
     max_show = models.IntegerField(default=1)
     min_selected = models.IntegerField(default=1)
     max_selected = models.IntegerField(default=1)
     checked = models.CharField(max_length=31,default="checked")
-    general_sorting = models.CharField(max_length=31, default="count")
     extraction_fields_sorting = models.CharField(max_length=31, default="importance")
     
     '''def __init__(self, *args, **kwargs):
@@ -98,6 +99,7 @@ class SourceDocType(models.Model):
     def save(self, *args, **kwargs):
         
         self.clean_name = self.name.lower().replace("'","").replace(" ","_")
+        self.number_extraction_fields = len(self.extraction_fields.all())
         super(SourceDocType, self).save(*args, **kwargs)   
     
     def __unicode__(self):
@@ -122,20 +124,22 @@ class SourceDocTypeTemplate(models.Model):
     pretty_name = models.CharField(max_length=255, default="Uncategorized")
     clean_name = models.CharField(max_length=255, default="uncategorized")
     extraction_fields = models.ManyToManyField(ExtractionFieldTemplate,related_name='extraction fields list', null=True, blank=True, default=None)
+    number_extraction_fields = models.IntegerField(default=0)
+    sequential_order = models.IntegerField(default=0)
     min_show = models.IntegerField(default=1)
     max_show = models.IntegerField(default=1)
     min_selected = models.IntegerField(default=1)
     max_selected = models.IntegerField(default=1)
     checked = models.CharField(max_length=31,default="checked")
-    general_sorting = models.CharField(max_length=31, default="modification_date")
     extraction_fields_sorting = models.CharField(max_length=31, default="modification_date")
     modification_date = models.DateTimeField('modification time of sourcedoc template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
     creation_user = models.ForeignKey(User,null=True,blank=True)
     
-    def save(self, *args, **kwargs):
+    '''def save(self, *args, **kwargs):
         
         self.clean_name = self.name.lower().replace("'","").replace(" ","_")
-        super(SourceDocType, self).save(*args, **kwargs) 
+        self.number_extraction_fields = len(self.extraction_fields.all())
+        super(SourceDocType, self).save(*args, **kwargs) '''
     
     def __unicode__(self):
         return self.name
@@ -157,14 +161,15 @@ class LegalDiscoveryTemplate(models.Model):
     name = models.CharField(max_length=127, default="Saved Template ")
     creation_date = models.DateTimeField('creation time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
     modification_date = models.DateTimeField('modification time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    general_sorting = models.CharField(max_length=31, default="modification_date")
     creation_user = models.ForeignKey(User,null=True,blank=True)
     sourcedoctypes_list = models.ManyToManyField(SourceDocTypeTemplate,related_name='source doc template list', null=True, blank=True, default=None)
     
     
-    def __init__(self, *args, **kwargs):
+    '''def __init__(self, *args, **kwargs):
         super(LegalDiscoveryTemplate, self).__init__(*args, **kwargs)
         if self.name == "Saved Template ":
-            self.name = self.name + str(self.pk)
+            self.name = self.name + str(self.pk)'''
         
         
     def __unicode__(self):

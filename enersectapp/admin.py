@@ -124,32 +124,32 @@ class ExtractionFieldAdmin(admin.ModelAdmin):
 class ExtractionFieldTemplateAdmin(admin.ModelAdmin):
     fieldsets = [
     ("Extraction Field Template Details",               {'fields': ['name', 'pretty_name','real_field_name','importance','checked','field_sorting']}),]
-    list_display = ('id','name', 'pretty_name','real_field_name','importance','checked','field_sorting','modification_date','creation_user')
+    list_display = ('id','sequential_order','name', 'pretty_name','real_field_name','importance','checked','field_sorting','modification_date','creation_user')
     
     search_fields = ['id','name', 'pretty_name','real_field_name','importance','checked','field_sorting','creation_user__username']
     
 class SourceDocTypeAdmin(admin.ModelAdmin):
     fieldsets = [
     ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),
-    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']}),
+    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','extraction_fields_sorting']}),
     ]
-    list_display = ('id','name', 'pretty_name','clean_name','related_extraction_fields','checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting')
+    list_display = ('id','name', 'pretty_name','clean_name','related_extraction_fields','number_extraction_fields','checked','min_show','max_show','min_selected','max_selected','extraction_fields_sorting')
     
     filter_horizontal = ('extraction_fields',)
     
-    search_fields = ['id','name', 'pretty_name','clean_name','=checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']
+    search_fields = ['id','name', 'pretty_name','clean_name','=checked','number_extraction_fields','min_show','max_show','min_selected','max_selected','extraction_fields_sorting']
     
     
 class SourceDocTypeTemplateAdmin(admin.ModelAdmin):
     fieldsets = [
     ("Source Doc Type Details",               {'fields': ['name', 'pretty_name','extraction_fields']}),
-    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting']}),
+    ("Optional Details",               {'fields': ['min_show','max_show','min_selected','max_selected','extraction_fields_sorting']}),
     ]
-    list_display = ('id','name', 'pretty_name','clean_name','related_extraction_fields','modification_date','creation_user','checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting')
+    list_display = ('id','sequential_order','name', 'pretty_name','clean_name','related_extraction_fields','modification_date','creation_user','checked','min_show','max_show','min_selected','max_selected','extraction_fields_sorting')
     
     filter_horizontal = ('extraction_fields',)
     
-    search_fields = ['id','name', 'pretty_name','clean_name','=checked','min_show','max_show','min_selected','max_selected','general_sorting','extraction_fields_sorting','creation_user__username']
+    search_fields = ['id','name', 'pretty_name','clean_name','=checked','min_show','max_show','min_selected','max_selected','extraction_fields_sorting','creation_user__username']
     
 class SourcePdfToHandleInline(admin.TabularInline):
     model = SourcePdfToHandle
@@ -163,10 +163,10 @@ class SourcePdfToHandleAdmin(admin.ModelAdmin):
 
 class LegalDiscoveryTemplateAdmin(admin.ModelAdmin):
     fieldsets = [
-    ("Legal Discovery Template Details",               {'fields': ['name']}),]
-    list_display = ('id','name', 'creation_date','modification_date','creation_user','related_sourcedoctypes_list')
+    ("Legal Discovery Template Details",               {'fields': ['name','general_sorting']}),]
+    list_display = ('id','name', 'general_sorting','creation_date','modification_date','creation_user','related_sourcedoctypes_list')
     
-    search_fields = ['id','=checked', 'times_checked','assignedcompany__name','assigneduser__username','sourcedoctypes_list__name']    
+    search_fields = ['id','=checked', 'general_sorting', 'times_checked','assignedcompany__name','assigneduser__username','sourcedoctypes_list__name']    
 
 
     
