@@ -58,6 +58,14 @@ html,body {
 
 }
 
+#export_template_button {
+
+    width: 98%;
+    height: 80%;
+    margin-top: 1.2%;
+
+}
+
  
 .sorting_buttonset {
      position: relative;

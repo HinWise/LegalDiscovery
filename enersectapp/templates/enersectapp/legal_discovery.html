@@ -177,6 +177,33 @@
         
         });
         
+        //Export Template Button
+        
+        $("#export_template_button").button().click(function(){
+        
+            //toggleLoadingScreen();
+            //$('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#action_mark').attr("value","export_template");
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+            
+            var $ulist = $( "#doctypes_detail_extraction_list" );
+            
+            if($ulist.length) saveAndEraseExtractionFieldsPanel($ulist);
+            
+            var final_LegalDiscoveryTemplate = saveAndEraseDocTypesPanel();
+            
+            testInfo = final_LegalDiscoveryTemplate;
+            
+            var stringified_report = JSON.stringify(final_LegalDiscoveryTemplate);
+            
+            $('#final_legal_discovery').val(stringified_report);
+            
+            $('#discovery_form').submit();
+        
+        });
+        
+        
+        
 
         //Make DocType_List sortable && dragable! 
         
@@ -766,6 +793,7 @@
 
                             <button id="choose_template_button">Choose</button>
                             <button id="save_template_button">Save</button>
+                            <button id="export_template_button">Produce Legal Discovery Report</button>
                             
                             
                         </div>
