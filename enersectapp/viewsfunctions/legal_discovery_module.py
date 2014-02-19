@@ -860,7 +860,17 @@ def legal_discovery(request):
     
 def string_to_pdf(canvas,string):
 
-    canvas.drawString(2,800,string)
+    splited_string = string.split("\n")
+                            
+    times = 0
+    
+    for item in splited_string:
+        
+        canvas.drawString(2,800-(14*times),item)
+    
+        times +=1
+                            
+
     '''textobject = canvas.beginText()
     textobject.setTextOrigin(2, 800)
     textobject.setFont("Helvetica-Oblique", 14)
