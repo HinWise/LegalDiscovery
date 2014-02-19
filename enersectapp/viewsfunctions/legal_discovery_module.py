@@ -449,7 +449,7 @@ def legal_discovery(request):
                                                 
                                             corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
                                             
-                                        else:
+                                        elif sorting_element == "up":
                                         
                                             corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
                                         
