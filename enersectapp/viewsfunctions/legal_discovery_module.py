@@ -860,7 +860,8 @@ def legal_discovery(request):
     
 def string_to_pdf(canvas,string):
 
-    textobject = canvas.beginText()
+    canvas.drawString(2,800,string)
+    '''textobject = canvas.beginText()
     textobject.setTextOrigin(2, 800)
     textobject.setFont("Helvetica-Oblique", 14)
     
@@ -870,4 +871,4 @@ def string_to_pdf(canvas,string):
     # textobject.setFillColorRGB(0.4,0,1)
     textobject.textLines(string)
     
-    canvas.drawText(textobject)
+    canvas.drawText(textobject)'''
