@@ -213,6 +213,8 @@ def legal_discovery(request):
                     try:
                         new_Legal_Discovery_Template = LegalDiscoveryTemplate.objects.get(name=selected_template,creation_user=the_user)
                         
+                        new_Legal_Discovery_Template.modification_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
+                        
                         all_sourcedocs = new_Legal_Discovery_Template.sourcedoctypes_list.all()
                         
                         for sourcedoc in all_sourcedocs:
@@ -230,7 +232,7 @@ def legal_discovery(request):
                         new_Legal_Discovery_Template = LegalDiscoveryTemplate()
                         new_Legal_Discovery_Template.name = "Saved Template "+str(len(legaldiscovery_templates_names_list)+1)
                         new_Legal_Discovery_Template.creation_user = the_user
-                    
+                        new_Legal_Discovery_Template.modification_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
 
                     new_Legal_Discovery_Template.save()
                     
