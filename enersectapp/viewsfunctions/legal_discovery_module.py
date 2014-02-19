@@ -393,6 +393,7 @@ def legal_discovery(request):
                             
                             tmpfile = tempfile.SpooledTemporaryFile(1048576)
                             # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                            tmpfile.rollover()
                                     
                             the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                             string_to_pdf(the_canvas,title_string+title_date)
@@ -575,7 +576,8 @@ def legal_discovery(request):
                                         
                                             tmpfile = tempfile.SpooledTemporaryFile(1048576)
                                             # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                                    
+                                            tmpfile.rollover()
+                                            
                                             the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                                             string_to_pdf(the_canvas,pdf_string)
                                                    
@@ -593,7 +595,8 @@ def legal_discovery(request):
                                     
                                 tmpfile = tempfile.SpooledTemporaryFile(1048576)
                                 # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                        
+                                tmpfile.rollover()
+                                
                                 the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                                 string_to_pdf(the_canvas,pdf_string)
                                        
@@ -730,7 +733,8 @@ def legal_discovery(request):
                                         
                                         tmpfile = tempfile.SpooledTemporaryFile(1048576)
                                         # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                            
+                                        tmpfile.rollover()
+                                        
                                         the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                                         string_to_pdf(the_canvas,pdf_string)
                                            
