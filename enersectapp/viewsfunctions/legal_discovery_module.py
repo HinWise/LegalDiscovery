@@ -99,29 +99,29 @@ def legal_discovery(request):
     
         default_method = False
         
-        print "GOT HERE!--------------------------------------------------------->0 ALL GOES ALRIGHT"
+        
         
         if action_mark == "choose_template":
         
-            print "GOT HERE!--------------------------------------------------------->1 CHOOSEN TEMPLATE MARK"
+            
         
             template_exists = selected_template in legaldiscovery_templates_names_list
         
             if selected_template == "New Template":
                 
-                print "GOT HERE!--------------------------------------------------------->2 CHOOSING NEW TEMPLATE, NORMAL ROUTE"
+                
                 
                 default_method = True
         
             elif template_exists == False:
             
-                print "GOT HERE!--------------------------------------------------------->3 TEMPLATE DOESNT EXIST, NORMAL ROUTE"
+                
             
                 default_method = True
             
             else:
             
-                print "GOT HERE!--------------------------------------------------------->4  CHOOSING TEMPLATE THAT EXISTS"
+                
                 
                 ###After choosing the EXISTING TEMPLATE, produce data so it can be shown in the app THIS CODE IS ALMOST THE SAME AS AFTER NEW CREATION
                 
@@ -176,7 +176,7 @@ def legal_discovery(request):
         
         elif (action_mark == "save_template" or action_mark == "export_template") and len(stringified_legal_discovery_template) > 0:
         
-            print "GOT HERE!--------------------------------------------------------->5 SAVE_TEMPLATE_MARK"
+            
         
             template_exists = selected_template in legaldiscovery_templates_names_list
             
@@ -204,11 +204,11 @@ def legal_discovery(request):
                 
         
             if converting_json ==True:
-                print "GOT HERE!--------------------------------------------------------->7 SAVING NEW LEGALD TEMPLATE TYPE"
+                
                 
                 with transaction.commit_on_success():
                 
-                    print selected_template
+                    
                 
                     try:
                         new_Legal_Discovery_Template = LegalDiscoveryTemplate.objects.get(name=selected_template,creation_user=the_user)
@@ -368,7 +368,7 @@ def legal_discovery(request):
                     
                     else:
  
-                        print "GOT HERE!--------------------------------------------------------->8 BEGINNING THE REPORT EXPORTING!!"
+                        
                     
                         
                         Legal_Discovery_object = new_Legal_Discovery_Template
