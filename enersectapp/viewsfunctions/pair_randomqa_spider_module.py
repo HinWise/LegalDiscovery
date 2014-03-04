@@ -1126,10 +1126,13 @@ def pair_randomqa_spider(request):
         
         ##Re-Entry Confirmation button behaviour. Changes records with audit_mark_saved = "needs_reentry_confirmation" to "being_reentered"
         
-        pdf_needs_reentry_confirmation = pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct()
+        #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
+        #pdf_needs_reentry_confirmation = pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct()
         
         
         if save_mark == "button_reentry_confirmation":
+        
+            pdf_needs_reentry_confirmation = pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct()
         
             maximum_sample = 2500
         
@@ -1157,11 +1160,17 @@ def pair_randomqa_spider(request):
         
         
 
+        
         pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
+        #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
+        #pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
         
-        pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
+        pdf_needs_reentry_confirmation = 0
         
-        pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
+        #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
+        #pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
+        
+        pdf_being_reentered = 0
         
         pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
         
