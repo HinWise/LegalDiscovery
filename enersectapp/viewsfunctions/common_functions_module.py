@@ -167,9 +167,10 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
         audit_mark_saved = "awaiting_audit"
     
     else:
-
-        audit_mark_saved = "needs_reentry_confirmation"
+        #Commented to fit FlatWorld's mid-process requirements. If starting a new project, this should be the way to do it
+        #audit_mark_saved = "needs_reentry_confirmation"
     
+        audit_mark_saved = "awaiting_audit"
     
     translation_type = "no"
 
