@@ -971,7 +971,7 @@
                     
                     is_correct_format = /^-?(0|([1-9]\d*))(\.\d{1,3})?$/.test(the_value)
                     
-                    if( !(is_correct_format || the_value == "NoAmountField" || the_value == "MISSING" || the_value == "UNREADABLE") )
+                    if( !(is_correct_format || the_value == "NoAmountField" || the_value == "MISSING" || the_value == "UNREADABLE" || the_value == "Blank") )
                     {
                         goodAmount = false;
                     }
@@ -1019,7 +1019,7 @@
                         }
                     }
                     
-                    else if(the_value != "NoIssueDateField")
+                    else if(the_value != "NoIssueDateField" && the_value != "Blank" && the_value != "MISSING")
                     {
                         goodDate = false;
                     }
