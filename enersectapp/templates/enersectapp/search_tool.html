@@ -23,9 +23,12 @@
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/zebra_table.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/simpletable/simpletable.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/search_tool.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/aristo/css/Aristo/Aristo.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/dragtablejs/dragtable.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/search_tool_override.css' %}" />
+
 {% endblock special_libs %}
 
 {% block jqueryui_setups %}
@@ -282,7 +285,7 @@
         
         if(orientation=="horizontal")
         {
-        
+            
             $('#accordion_table').unbind('scroll');
             
             //Fit the header to the right place at the beginning
@@ -300,20 +303,20 @@
             
             
             $('#accordion_table').scroll(function(){ //when the user is scrolling...
-            
-            headers_width = $("#records_table").width();
-            headers_height = $(".th_full").first().height();
+                
+                headers_width = $("#records_table").width();
+                headers_height = $(".th_full").first().height();
 
-            $("#headers_cover").css("width",headers_width+"px");
-            $("#headers_cover").css("height",headers_height+"px");
-            $("#headers_cover").css("display","block");
-            $(".th_full").offset({top:originalPositionYHeaderRow});
-            top_position = $(".th_full").css('top');
-            
-            $("#headers_cover").css('top',top_position);
+                $("#headers_cover").css("width",headers_width+"px");
+                $("#headers_cover").css("height",headers_height+"px");
+                $("#headers_cover").css("display","block");
+                $(".th_full").offset({top:originalPositionYHeaderRow});
+                top_position = $(".th_full").css('top');
+                
+                $("#headers_cover").css('top',top_position);
             
 
-        });
+            });
         }
     
     }
@@ -423,7 +426,7 @@
                 
                 headers_width = $("#records_table").width();
                 headers_height = $(".th_full").first().height();
-
+               
                 $("#headers_cover").css("width",headers_width+"px");
                 $("#headers_cover").css("height",headers_height+"px");
                 $("#headers_cover").css("display","block");
@@ -432,6 +435,7 @@
                 
                 $("#headers_cover").css('top',top_position);
                 
+                 
 
             });
         
@@ -1540,7 +1544,7 @@
             <div id="user-panel" class="invisible" title="{{the_user}}">
                 <ul class="menuclass" id="userpanelmenu">
                     <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
-                    <li>--</li>
+                    
                     <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
 
                 </ul>
@@ -2234,7 +2238,7 @@
                                     <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
 
                                 {% for type in types_list %}
-                                  <li>--</li>
+                                  
                                   <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
 
                                  {% endfor %}
@@ -2316,7 +2320,7 @@
                                     <li><a href="#"><input type="text" name="search_word_doctype" id="option_text_input_doctype" value="{{word_doctype}}" class="text ui-widget-content ui-corner-all" /></a></li>
 
                                 {% for type in types_list %}
-                                  <li>--</li>
+                                  
                                   <li><a class="doctypeoption" href="#" value='{{type.name}}'>{{type.pretty_name}}</a></li>
 
                                  {% endfor %}
@@ -2541,7 +2545,7 @@
 
                 <input type="radio" class="filter_choice" id="filter_source_all" name="radio" checked="checked" /><label class="filter_choice_label" for="filter_source_all">All</label>
                 <input type="radio" class="filter_choice" id="filter_source_assigned" name="radio" /><label class="filter_choice_label" for="filter_source_assigned">Assigned</label>
-                <input type="radio" class="filter_choice" id="filter_source_notassigned" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_source_notassigned">Not Assigned</label>
+                <input type="radio" class="filter_choice" id="filter_source_notassigned" name="radio" /><label id="filter_unlinked" class="filter_choice_label" for="filter_source_notassigned">Unassigned</label>
 
                 {% endif %}
         </div>
