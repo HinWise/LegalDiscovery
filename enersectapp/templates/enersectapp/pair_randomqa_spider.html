@@ -1160,7 +1160,7 @@
                     </div>
                     <div class="show-option" id="filter_container_author" title="Filter the Search Results by Author">
                             {% for item in pdf_author_distinct %}
-                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item.assigneduser__username}}" choice_value="{{item.assigneduser__username}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item.assigneduser__username}}">{{item.assigneduser__username}}</label>
+                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item}}" choice_value="{{item}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
                     </div>

@@ -322,7 +322,7 @@ def pair_randomqa_spider(request):
         
         #Filling a Usernames in the Company list
         
-        pdf_author_distinct = pdf_author_distinct.distinct()
+        pdf_author_distinct = pdf_author_distinct.values_list('assigneduser__username',flat=True).distinct()
         
         user_names_list = []
         
@@ -845,7 +845,7 @@ def pair_randomqa_spider(request):
             lot_number_list.append(lot_number_check)
         
         
-        pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values('assigneduser__username').distinct()
+        pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values_list('assigneduser__username',flat=True).distinct()
         
         #Filling a Usernames in the Company list
         
