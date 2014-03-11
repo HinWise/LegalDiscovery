@@ -866,7 +866,8 @@
         <div id="fields_container">  
         
             <div id="dialog-form" title="Random Audit of Data Entries from Lot {{lot_number}}">
-                 
+                
+                
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
