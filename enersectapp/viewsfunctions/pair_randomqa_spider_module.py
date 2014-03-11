@@ -29,7 +29,7 @@ def pair_randomqa_spider(request):
         
     '''
     lastsave = time.time()
-    print "STARTING THE TIMER!! --->" + str(lastsave)
+    print lastsave
     
     
     
@@ -1306,6 +1306,7 @@ def pair_randomqa_spider(request):
         
         timeStop = "STOPPING THE TIMER. TIME ELAPSED:"+str(time.time() - lastsave)
         print timeStop
+        raise Exception(timeStop)
         
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
