@@ -28,11 +28,7 @@ def pair_randomqa_spider(request):
         
         
     '''
-    lastsave = time.time()
-    print lastsave
-    
-    
-    
+
     the_user = request.user
 
     if not the_user.is_authenticated():
@@ -1304,10 +1300,7 @@ def pair_randomqa_spider(request):
         'filters_panel_width':filters_panel_width,
         'filters_panel_width':filters_panel_height,'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list}
         
-        timeStop = "STOPPING THE TIMER. TIME ELAPSED:"+str(time.time() - lastsave)
-        print timeStop
-        raise Exception(timeStop)
-        
+                
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
     else:
