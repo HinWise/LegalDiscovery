@@ -29,7 +29,7 @@ def pair_randomqa_spider(request):
         
     '''
     
-    raise Exception(str(time.time()))
+    
 
     the_user = request.user
 
@@ -262,7 +262,7 @@ def pair_randomqa_spider(request):
         except:
             chequenum = "NoChequeNumberField"
             
-
+        
         ###
         
         error_rate = 0
@@ -614,7 +614,9 @@ def pair_randomqa_spider(request):
     
    
     elif user_type == "TeamLeader" or user_type == "TeamAuditor":
-          
+        
+        
+        
         user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]  
      
         try:
@@ -823,7 +825,7 @@ def pair_randomqa_spider(request):
 
         ###
         
-        
+        raise Exception(str(time.time()))
         
         error_rate = 0
         
