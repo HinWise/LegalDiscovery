@@ -825,7 +825,7 @@ def pair_randomqa_spider(request):
 
         ###
         
-        raise Exception(str(time.time()))
+        
         
         error_rate = 0
         
@@ -1290,6 +1290,8 @@ def pair_randomqa_spider(request):
         companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
        
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
+        
+        raise Exception(str(time.time()))
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
