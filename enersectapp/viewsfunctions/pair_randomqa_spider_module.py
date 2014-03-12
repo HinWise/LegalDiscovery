@@ -627,11 +627,7 @@ def pair_randomqa_spider(request):
             lot_number_check = request.POST['selected_lot']
         except (KeyError):
             lot_number_check =  "all"
-        
-        if lot_number_check != "all":
-            raise Exception(str(time.time()))
-        
-        
+
         try:
             show_progress_mark = request.POST['show_progress_mark']
         except (KeyError):
