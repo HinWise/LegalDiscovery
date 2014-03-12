@@ -323,8 +323,6 @@ def pair_randomqa_spider(request):
             pdf_author_distinct = pdf_author_distinct | SourcePdfToHandle.objects.filter(assignedcompany = company,checked = 'checked').values('assigneduser__username')
         
         
-        #Filling a Usernames in the Company list
-       
         pdf_author_distinct = pdf_author_distinct.values_list('assigneduser__username',flat=True).distinct()
         
         user_names_list = []
@@ -833,7 +831,7 @@ def pair_randomqa_spider(request):
         pdf_records_list = PdfRecord.objects.none()
         
         
-        pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values('lot_number').distinct()
+        pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company).order_by().values('lot_number').distinct()
         
         #pdf_author_distinct = PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company).values('sourcedoc_link__assigndata__assigneduser__username').distinct()
 
@@ -853,7 +851,10 @@ def pair_randomqa_spider(request):
             lot_number_list.append(lot_number_check)
         
         
-        pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values_list('assigneduser__username',flat=True).distinct()
+        
+        
+        pdf_author_distinct = User.objects.filter(groups=user_company).exclude(groups__name="TeamLeaders").exclude(groups__name="TeamAuditors").values_list('username',flat=True)
+        #pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values_list('assigneduser__username',flat=True).distinct()
         
         #Filling a Usernames in the Company list
         
@@ -1293,7 +1294,8 @@ def pair_randomqa_spider(request):
         error_rate = 50
         pdf_doctype_distinct = {}'''
         
-        companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
+        #companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
+        companyname_list = CompanyTemplate.objects.none()
        
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
