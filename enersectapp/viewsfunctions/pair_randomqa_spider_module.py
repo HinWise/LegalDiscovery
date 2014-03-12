@@ -14,6 +14,7 @@ from django.views import generic
 from django.utils import timezone
 from datetime import timedelta
 import datetime
+import time
 
 import random
 from django.db.models import Count
@@ -27,6 +28,8 @@ def pair_randomqa_spider(request):
         
         
     '''
+    
+    raise Exception(str(time.time()))
 
     the_user = request.user
 
