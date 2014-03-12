@@ -1160,7 +1160,7 @@
                     </div>
                     <div class="show-option" id="filter_container_author" title="Filter the Search Results by Author">
                             {% for item in pdf_author_distinct %}
-                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item.assigneduser__username}}" choice_value="{{item.assigneduser__username}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item.assigneduser__username}}">{{item.assigneduser__username}}</label>
+                            <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item}}" choice_value="{{item}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
                     </div>
@@ -1216,9 +1216,7 @@
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:pair_randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
-                {% if pdf_audited %}
-                
-                    
+              
                     <div id="statistics_panel">
                         
                         <h5>There are <span style="color:limegreen"> {{pdf_audited}} </span> Entries Completely Audited and <span style="color:wheat;">{{pdf_left_to_audit}}</span> awaiting for Audit in the Current Selection of <span style="color:lightgrey;">{{pdf_total_count}}</span> Documents.  <span style="color:tomato;">{{pdf_needs_reentry_confirmation}}</span> Documents need Re-Entry confirmation, and <span style="color:plum;">{{pdf_being_reentered}}</span> are being Re-Entered. </h5>
@@ -1226,19 +1224,6 @@
                     </div>
                     
                 
-                
-                {% else %}
-                
-                    {% if show_progress_mark == "show" %}
-                    <div id="statistics_panel">
-                        
-                        <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
-                        <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
-                    </div>
-                    {% endif %}
-                
-                
-                {% endif %}
                 
                 
                 <fieldset id="fieldset_fields">

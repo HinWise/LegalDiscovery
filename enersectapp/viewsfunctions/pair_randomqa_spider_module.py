@@ -322,15 +322,16 @@ def pair_randomqa_spider(request):
         
             pdf_author_distinct = pdf_author_distinct | SourcePdfToHandle.objects.filter(assignedcompany = company,checked = 'checked').values('assigneduser__username')
         
-        #Filling a Usernames in the Company list
         
-        pdf_author_distinct = pdf_author_distinct.distinct()
+        #Filling a Usernames in the Company list
+       
+        pdf_author_distinct = pdf_author_distinct.values_list('assigneduser__username',flat=True).distinct()
         
         user_names_list = []
         
         if selected_user == "all":
-            for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])
+            '''for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])'''
             
             for lot_num in lot_number_list:
                 for company in company_list:
@@ -852,15 +853,15 @@ def pair_randomqa_spider(request):
             lot_number_list.append(lot_number_check)
         
         
-        pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values('assigneduser__username').distinct()
+        pdf_author_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company,checked = 'checked').order_by().values_list('assigneduser__username',flat=True).distinct()
         
         #Filling a Usernames in the Company list
         
         user_names_list = []
         
         if selected_user == "all":
-            for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])
+            '''for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])'''
             
             #Selecting All PdfRecords that have the Lots and Users in their fields in SourcePdfsToHandle
             for lot_num in lot_number_list:
