@@ -113,7 +113,7 @@
                                     
                                     
                         },
-                        /*"Send Incorrect Entries from Selection to Re-Entry": function() {
+                        "Send Incorrect Entries from Selection to Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -123,19 +123,19 @@
                                     $('#fields_form').submit();
                                     
                                     
-                        },*/
-                        "Send Selection to Re-Audit": function() {
+                        },
+                        "Send Entire Lot/User Selection to Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     disableButtonsets();
                                     savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit");
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reentry");
                                     $('#fields_form').submit();
                                     
                                     
                         }, 
-                        /*"Execute Re-Entry": function() {
+                        "Execute Re-Entry": function() {
                             
                             toggleLoadingScreen();
                             $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -145,7 +145,7 @@
                             $('#fields_form').submit();
                             
                             
-                        },*/
+                        },
                         
                         
                     },
@@ -466,19 +466,19 @@
                                     $('#fields_form').submit();
                                     
                                     
-                                },*/
-                                "Send Selected to Re-Audit": function() {
+                                },
+                                "Send Selected to Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     disableButtonsets();
                                     savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit");
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reentry");
                                     $('#fields_form').submit();
                                     
                                     
                                 }, 
-                                /*"Execute Re-Entry": function() {
+                                "Execute Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");

@@ -1216,7 +1216,8 @@
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:pair_randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
-               
+                {% if pdf_audited %}
+                
                     
                     <div id="statistics_panel">
                         
@@ -1225,6 +1226,19 @@
                     </div>
                     
                 
+                
+                {% else %}
+                
+                    {% if show_progress_mark == "show" %}
+                    <div id="statistics_panel">
+                        
+                        <h5>There are <span style="color:limegreen"> {{pdf_correct_count}} </span> Entries marked as Correct, <span style="color:red;"> {{pdf_incorrect_count}} </span> Entries marked as Incorrect and <span style="color:wheat;">{{pdf_reentry_count}}</span> marked for Re-Entry from a total of <span style="color:lightgrey;">{{pdf_total_count}}</span> in the Current Selection. </h5>
+                        <h5>The Error Rate for the Selected Editor is: {{error_rate}}%</h5>
+                    </div>
+                    {% endif %}
+                
+                
+                {% endif %}
                 
                 
                 <fieldset id="fieldset_fields">
