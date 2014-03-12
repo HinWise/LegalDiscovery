@@ -29,7 +29,6 @@ def pair_randomqa_spider(request):
     '''
 
 
-    
     the_user = request.user
 
     if not the_user.is_authenticated():

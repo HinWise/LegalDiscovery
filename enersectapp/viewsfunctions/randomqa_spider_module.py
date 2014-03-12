@@ -174,7 +174,6 @@ def randomqa_spider(request):
         
         if selected_user == "all":
         
-        
             '''for item in pdf_author_distinct:
                 user_names_list.append(item['assigneduser__username'])'''
             
