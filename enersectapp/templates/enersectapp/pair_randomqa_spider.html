@@ -1262,6 +1262,8 @@
                 <input class="invisible" type="text" name="show_progress_mark" id="show_progress_mark" value="no" />
                 <input class="invisible" type="text" name="save_filename" id="save_filename" value="{{pdf_random_item.sourcedoc_link.filename}}" />
                 
+                <input type="text" name="companiesarray" id="companiesarray" value="{{ companyname_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
+                <input type="text" name="doctypesarray" id="doctypesarray" value="{{ document_type_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
      
                 {% if pdf_item_list %}
         
@@ -1451,9 +1453,6 @@
                 </fieldset>
                 
                 </form>
-                
-                <input type="text" name="companiesarray" id="companiesarray" value="{{ companyname_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
-                <input type="text" name="doctypesarray" id="doctypesarray" value="{{ document_type_list|safeseq }}" class="invisible text ui-widget-content ui-corner-all" />
                 
             </div>
             
