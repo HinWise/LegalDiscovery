@@ -847,6 +847,8 @@ def pair_randomqa_spider(request):
                 lot_number_list.append(item['lot_number'])
         
         else:
+            raise Exception(str(time.time()))
+        
             lot_number_list.append(lot_number_check)
         
         
@@ -866,6 +868,9 @@ def pair_randomqa_spider(request):
                 pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company ,sourcedoc_link__assigndata__lot_number = lot_num)
                 
         else:
+        
+            
+        
             user_names_list.append(selected_user)
         
             for lot_num in lot_number_list:
@@ -1291,7 +1296,6 @@ def pair_randomqa_spider(request):
        
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
-        raise Exception(str(time.time()))
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
