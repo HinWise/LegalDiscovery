@@ -113,7 +113,7 @@
                                     
                                     
                         },
-                        "Send Incorrect Entries from Selection to Re-Entry": function() {
+                        /*"Send Incorrect Entries from Selection to Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -123,19 +123,30 @@
                                     $('#fields_form').submit();
                                     
                                     
-                        },
-                        "Send Entire Lot/User Selection to Re-Entry": function() {
+                        },*/
+                        "Send Selection to Re-Audit": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     disableButtonsets();
                                     savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reentry");
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                        },
+                        "Send Selection to Re-Audit (Minus Corrects)": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit_minus_corrects");
                                     $('#fields_form').submit();
                                     
                                     
                         }, 
-                        "Execute Re-Entry": function() {
+                        /*"Execute Re-Entry": function() {
                             
                             toggleLoadingScreen();
                             $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -145,7 +156,7 @@
                             $('#fields_form').submit();
                             
                             
-                        },
+                        },*/
                         
                         
                     },
@@ -466,19 +477,30 @@
                                     $('#fields_form').submit();
                                     
                                     
-                                },
-                                "Send Selected to Re-Entry": function() {
+                                },*/
+                                "Send Selected to Re-Audit": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
                                     disableButtonsets();
                                     savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reentry");
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit");
                                     $('#fields_form').submit();
                                     
                                     
                                 }, 
-                                "Execute Re-Entry": function() {
+                                "Send Selection to Re-Audit (Minus Corrects)": function() {
+                                    
+                                    toggleLoadingScreen();
+                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
+                                    disableButtonsets();
+                                    savePanelSizes();
+                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit_minus_corrects");
+                                    $('#fields_form').submit();
+                                    
+                                    
+                                }, 
+                                /*"Execute Re-Entry": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -833,8 +855,8 @@
                     <div class="show-option" id="filter_container_auditmark" title="Filter the Search Results by Audit Mark">
                             
                             {% if selected_auditmark %}
-                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkcorrect" choice_value="correct" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkcorrect">Correct</label>
-                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkincorrect" choice_value="incorrect" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkincorrect">Incorrect</label>
+                                <!--<input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkcorrect" choice_value="correct" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkcorrect">Correct</label>
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkincorrect" choice_value="incorrect" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkincorrect">Incorrect</label>-->
                                 <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkall" choice_value="all" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkall">All Audit Marks</label>
                             {% endif %}
                     </div>
@@ -844,7 +866,8 @@
         <div id="fields_container">  
         
             <div id="dialog-form" title="Random Audit of Data Entries from Lot {{lot_number}}">
-                 
+                
+                
                 <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:randomqa_spider' %}" method="post">
                 {% csrf_token %}
 
@@ -1019,7 +1042,6 @@
                                     <td>{{pdf_item.modification_date}}</td>
                                     {% endfor %}
                                 </tr>
-                                
                                 
                                 
                             </thead>

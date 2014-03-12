@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
+from django.db import transaction
 
 import random
 
@@ -27,7 +28,6 @@ def randomqa_spider(request):
     '''
 
 
-    
     the_user = request.user
 
     if not the_user.is_authenticated():
@@ -173,8 +173,10 @@ def randomqa_spider(request):
         user_names_list = []
         
         if selected_user == "all":
-            for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])
+        
+        
+            '''for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])'''
             
             for lot_num in lot_number_list:
                 for company in company_list:
@@ -216,9 +218,9 @@ def randomqa_spider(request):
         
         #Getting rid of Duplicates
         
-        pdf_records_list.distinct()
+        pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").distinct()
         
-        pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
+        pdf_records_list = pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
         
         #Compare the Time to the selected TimeFrame in Filter
         
@@ -274,7 +276,7 @@ def randomqa_spider(request):
                 if pdf_record_id is not "None":
                     recover_pdf = PdfRecord.objects.filter(id=pdf_record_id)[0]
                     if selected_auditmark == "all":
-                        recover_pdf.audit_mark = save_mark
+                        recover_pdf.audit_mark_revision = save_mark
                         recover_pdf.modification_author = the_user.username
                         recover_pdf.save()
                         memo_report = "Marked PdfRecord PK."+str(recover_pdf.pk)+" as"+save_mark+"."
@@ -303,19 +305,35 @@ def randomqa_spider(request):
                         report.save()
         
         
-            elif save_mark == "auditmarked_as_selection_reentry":
+            elif save_mark == "auditmarked_as_selection_reaudit":
                
                 with transaction.commit_on_success():
                     for pdf in pdf_records_list:
 
                         pdf.modification_author = the_user.username
-                        pdf.audit_mark = "auditmarked_as_selection_reentry"
+                        memo_report = "Pressed the Send Selection for Re-Audit Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark_revision
+                        pdf.audit_mark_saved = "awaiting_audit"
+                        pdf.audit_mark_revision = "None"
+                        pdf.audit_mark = "None"
                         pdf.save()
-                        memo_report = "Pressed the Send All Lots/User Selection for Re-Entry Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark
-                        report = Report(report_type="Audit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                        report = Report(report_type="Audit",report_subtype="auditmarked_as_selection_reaudit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
+                        report.save()
+            
+            elif save_mark == "auditmarked_as_selection_reaudit_minus_corrects":
+            
+                with transaction.commit_on_success():
+                    for pdf in pdf_records_list.exclude(audit_mark_revision = "auditmarked_as_correct"):
+                    
+                        pdf.modification_author = the_user.username
+                        memo_report = "Pressed the Send Selection for Re-Audit Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark_revision
+                        pdf.audit_mark_saved = "awaiting_audit"
+                        pdf.audit_mark_revision = "None"
+                        pdf.audit_mark = "None"
+                        pdf.save()
+                        report = Report(report_type="Audit",report_subtype="auditmarked_as_selection_reaudit_minus_corrects",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
                     
-        
+
         #Creating an Editor/Modification Authors List:
         
         modification_authors_selection = User.objects.filter(groups__name="NathanTeam")|User.objects.filter(groups__name="TeamLeaders")|User.objects.filter(groups__name="Auditors")
@@ -323,7 +341,7 @@ def randomqa_spider(request):
         
         #Selection by Modification Author
         
-        pdf_authors_list = pdf_records_list
+        pdf_authors_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").distinct()
         
         if selected_modification_author!="all":
             pdf_authors_list = pdf_authors_list.filter(modification_author=selected_modification_author)
@@ -332,17 +350,16 @@ def randomqa_spider(request):
         
             show_progress_mark = "show" 
         
-            
-            
+
             if selected_auditmark == "all":
-                pdf_total_count = len(pdf_records_list)
-                pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
-                pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
-            
-            else:
-                
+                pdf_total_count = len(pdf_authors_list)
                 pdf_correct_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_correct"))
                 pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_incorrect"))
+            
+            '''else:
+                
+                pdf_correct_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_correct"))
+                pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_incorrect"))'''
                 
             pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
             
@@ -364,13 +381,17 @@ def randomqa_spider(request):
         
 
         if selected_auditmark == "all":
-            pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
-        elif selected_auditmark == "correct":
-            pdf_records_list = pdf_records_list.filter(audit_mark="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect")
+            
+            #pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+            pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect").distinct()
+           
+        '''elif selected_auditmark == "correct":
+            pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").filter(audit_mark="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect")
             pdf_total_count = len(pdf_records_list)
         elif selected_auditmark == "incorrect":
-            pdf_records_list = pdf_records_list.filter(audit_mark="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_correct")
-            pdf_total_count = len(pdf_records_list)
+            pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").filter(audit_mark="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_incorrect").exclude(audit_mark_revision="auditmarked_as_correct")
+            pdf_total_count = len(pdf_records_list)'''
+            
         
         pdf_id_list_to_randomize = []
         
@@ -502,8 +523,8 @@ def randomqa_spider(request):
         user_names_list = []
         
         if selected_user == "all":
-            for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])
+            '''for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])'''
             
             #Selecting All PdfRecords that have the Lots and Users in their fields in SourcePdfsToHandle
             for lot_num in lot_number_list:
@@ -543,9 +564,9 @@ def randomqa_spider(request):
         
         #Getting rid of Duplicates
         
-        pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
+        pdf_records_list = pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
         
-        pdf_records_list.distinct()
+        pdf_records_list = pdf_records_list.distinct()
 
         
         #Compare the Time to the selected TimeFrame in Filter
@@ -672,7 +693,7 @@ def randomqa_spider(request):
         
         #Selection by Modification Author
       
-        pdf_authors_list = pdf_records_list
+        pdf_authors_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").distinct()
        
         if selected_modification_author!="all" and selected_modification_author!=user_company.name:
            
@@ -692,10 +713,10 @@ def randomqa_spider(request):
         
             show_progress_mark = "show" 
         
-            pdf_total_count = len(pdf_records_list)
+            pdf_total_count = len(pdf_authors_list.distinct())
             
-            pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
-            pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
+            pdf_correct_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_correct"))
+            pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_incorrect"))
             pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
             
             if pdf_correct_count!=0 and pdf_incorrect_count!=0:
@@ -715,7 +736,7 @@ def randomqa_spider(request):
             show_progress_mark = "no" 
             
         
-        pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
+        pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").distinct()
         
         
         pdf_id_list_to_randomize = []
