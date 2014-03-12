@@ -29,7 +29,7 @@ def pair_randomqa_spider(request):
         
     '''
     
-    
+    raise Exception(str(time.time()))
 
     the_user = request.user
 
@@ -847,7 +847,7 @@ def pair_randomqa_spider(request):
                 lot_number_list.append(item['lot_number'])
         
         else:
-            raise Exception(str(time.time()))
+            
         
             lot_number_list.append(lot_number_check)
         
