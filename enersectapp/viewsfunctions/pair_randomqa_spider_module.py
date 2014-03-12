@@ -29,7 +29,13 @@ def pair_randomqa_spider(request):
         
     '''
     
+    try:
+        selected_user = request.POST['selected_user']
+    except (KeyError):
+        selected_user =  "all"
     
+    if selected_user != "all":
+        return HttpResponseRedirect(reverse('enersectapp:main', args=()))  
 
     the_user = request.user
 
@@ -631,6 +637,7 @@ def pair_randomqa_spider(request):
         
         if lot_number_check != "all":
             raise Exception(str(time.time()))
+        
         
         try:
             show_progress_mark = request.POST['show_progress_mark']
