@@ -173,8 +173,8 @@ def randomqa_spider(request):
         user_names_list = []
         
         if selected_user == "all":
-            '''for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])'''
+            for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])
             
             for lot_num in lot_number_list:
                 for company in company_list:
@@ -521,8 +521,8 @@ def randomqa_spider(request):
         user_names_list = []
         
         if selected_user == "all":
-            '''for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])'''
+            for item in pdf_author_distinct:
+                user_names_list.append(item['assigneduser__username'])
             
             #Selecting All PdfRecords that have the Lots and Users in their fields in SourcePdfsToHandle
             for lot_num in lot_number_list:
