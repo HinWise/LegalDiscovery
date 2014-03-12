@@ -1217,6 +1217,15 @@
                 {% csrf_token %}
 
                
+                    
+                    <div id="statistics_panel">
+                        
+                        <h5>There are <span style="color:limegreen"> {{pdf_audited}} </span> Entries Completely Audited and <span style="color:wheat;">{{pdf_left_to_audit}}</span> awaiting for Audit in the Current Selection of <span style="color:lightgrey;">{{pdf_total_count}}</span> Documents.  <span style="color:tomato;">{{pdf_needs_reentry_confirmation}}</span> Documents need Re-Entry confirmation, and <span style="color:plum;">{{pdf_being_reentered}}</span> are being Re-Entered. </h5>
+                        
+                    </div>
+                    
+                
+                
                 
                 <fieldset id="fieldset_fields">
                
