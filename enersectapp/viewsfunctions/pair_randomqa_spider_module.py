@@ -29,13 +29,6 @@ def pair_randomqa_spider(request):
         
     '''
     
-    try:
-        selected_user = request.POST['selected_user']
-    except (KeyError):
-        selected_user =  "all"
-    
-    if selected_user != "all":
-        raise Exception(str(time.time())) 
 
     the_user = request.user
 
