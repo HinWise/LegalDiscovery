@@ -30,7 +30,7 @@ else:
 if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or socket.gethostname() == 'Nemot-PC':
     DEBUG = TEMPLATE_DEBUG = True
 else:
-    DEBUG = TEMPLATE_DEBUG = True
+    DEBUG = TEMPLATE_DEBUG = False
 
 #DEBUG = False
 TEMPLATE_DEBUG = DEBUG
