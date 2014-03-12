@@ -35,7 +35,7 @@ def pair_randomqa_spider(request):
         selected_user =  "all"
     
     if selected_user != "all":
-        return HttpResponseRedirect(reverse('enersectapp:main', args=()))  
+        raise Exception(str(time.time())) 
 
     the_user = request.user
 
