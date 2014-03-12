@@ -316,22 +316,8 @@ def randomqa_spider(request):
                         pdf.save()
                         report = Report(report_type="Audit",report_subtype="auditmarked_as_selection_reaudit",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
                         report.save()
-            
-            elif save_mark == "auditmarked_as_selection_reaudit_minus_corrects":
-            
-                with transaction.commit_on_success():
-                    for pdf in pdf_records_list.exclude(audit_mark_revision = "auditmarked_as_correct"):
                     
-                        pdf.modification_author = the_user.username
-                        memo_report = "Pressed the Send Selection for Re-Audit Button for "+str(len(pdf_records_list))+" objs. This being PK."+str(pdf.pk)+".Previous mark was:"+pdf.audit_mark_revision
-                        pdf.audit_mark_saved = "awaiting_audit"
-                        pdf.audit_mark_revision = "None"
-                        pdf.audit_mark = "None"
-                        pdf.save()
-                        report = Report(report_type="Audit",report_subtype="auditmarked_as_selection_reaudit_minus_corrects",report_author=the_user,report_company=user_company,report_date=datetime.datetime.now().replace(tzinfo=timezone.utc),report_memo = memo_report)
-                        report.save()
-                    
-
+        
         #Creating an Editor/Modification Authors List:
         
         modification_authors_selection = User.objects.filter(groups__name="NathanTeam")|User.objects.filter(groups__name="TeamLeaders")|User.objects.filter(groups__name="Auditors")

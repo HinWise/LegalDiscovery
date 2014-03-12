@@ -134,17 +134,6 @@
                                     $('#fields_form').submit();
                                     
                                     
-                        },
-                        "Send Selection to Re-Audit (Minus Corrects)": function() {
-                                    
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    disableButtonsets();
-                                    savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit_minus_corrects");
-                                    $('#fields_form').submit();
-                                    
-                                    
                         }, 
                         /*"Execute Re-Entry": function() {
                             
@@ -485,17 +474,6 @@
                                     disableButtonsets();
                                     savePanelSizes();
                                     $('#save_mark').attr("value","auditmarked_as_selection_reaudit");
-                                    $('#fields_form').submit();
-                                    
-                                    
-                                }, 
-                                "Send Selection to Re-Audit (Minus Corrects)": function() {
-                                    
-                                    toggleLoadingScreen();
-                                    $('button').attr("disabled", true).addClass("ui-state-disabled");
-                                    disableButtonsets();
-                                    savePanelSizes();
-                                    $('#save_mark').attr("value","auditmarked_as_selection_reaudit_minus_corrects");
                                     $('#fields_form').submit();
                                     
                                     
@@ -855,8 +833,8 @@
                     <div class="show-option" id="filter_container_auditmark" title="Filter the Search Results by Audit Mark">
                             
                             {% if selected_auditmark %}
-                                <!--<input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkcorrect" choice_value="correct" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkcorrect">Correct</label>
-                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkincorrect" choice_value="incorrect" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkincorrect">Incorrect</label>-->
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkcorrect" choice_value="correct" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkcorrect">Correct</label>
+                                <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkincorrect" choice_value="incorrect" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkincorrect">Incorrect</label>
                                 <input type="radio" class="filter_choice choice_auditmark" id="filter_pdf_auditmarkall" choice_value="all" name="radio7" /><label class="filter_choice_label" for="filter_pdf_auditmarkall">All Audit Marks</label>
                             {% endif %}
                     </div>
