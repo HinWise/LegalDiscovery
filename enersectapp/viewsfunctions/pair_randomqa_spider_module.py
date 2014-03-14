@@ -1032,11 +1032,6 @@ def pair_randomqa_spider(request):
         
             elif save_mark == "save_audited_entry":
             
-                
-                print request
-    
-                return
-            
 
                 new_pdf = common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
                 company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
@@ -1065,6 +1060,9 @@ def pair_randomqa_spider(request):
                 user_profile.modifiedpdfs_audit_saved.add(new_pdf)
                 user_profile.save()
 
+                print request
+    
+                return
         
         
         #Creating an Editor/Modification Authors List:
