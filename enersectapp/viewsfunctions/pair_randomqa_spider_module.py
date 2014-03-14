@@ -1173,7 +1173,7 @@ def pair_randomqa_spider(request):
         
         
 
-        return
+        
         
         pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
         #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
@@ -1304,7 +1304,7 @@ def pair_randomqa_spider(request):
         
         #print request
     
-        
+        return
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
