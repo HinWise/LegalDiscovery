@@ -29,7 +29,6 @@ def pair_randomqa_spider(request):
         
     '''
     
-
     the_user = request.user
 
     if not the_user.is_authenticated():
@@ -483,6 +482,7 @@ def pair_randomqa_spider(request):
             elif save_mark == "save_audited_entry":
             
 
+            
                 new_pdf = common_functions_module.save_new_data_entry(doctype,currency,amount,company_name,company_address,company_telephone,
                 company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
                 memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
@@ -1031,6 +1031,11 @@ def pair_randomqa_spider(request):
             
         
             elif save_mark == "save_audited_entry":
+            
+                
+                print request
+    
+                return
             
 
                 new_pdf = common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
