@@ -232,7 +232,7 @@ DEFAULT_FROM_EMAIL = 'Developers <enersect.developers@gmail.com>'
 
 if DEBUG == False:
 
-    LOGGING = {
+    '''LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
         'filters': {
@@ -263,6 +263,24 @@ if DEBUG == False:
                 'propagate': True,
             },
         }
+    }'''
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/srv/enersectapp/logs/django/error.log',
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
     }
 
 # debug_toolbar settings
