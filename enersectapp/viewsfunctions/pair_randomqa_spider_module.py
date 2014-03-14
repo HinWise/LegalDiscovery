@@ -1060,9 +1060,7 @@ def pair_randomqa_spider(request):
                 user_profile.modifiedpdfs_audit_saved.add(new_pdf)
                 user_profile.save()
 
-                print request
-    
-                return
+                
         
         
         #Creating an Editor/Modification Authors List:
@@ -1175,6 +1173,7 @@ def pair_randomqa_spider(request):
         
         
 
+        return
         
         pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
         #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
@@ -1301,6 +1300,10 @@ def pair_randomqa_spider(request):
         companyname_list = CompanyTemplate.objects.none()
        
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
+        
+        
+        #print request
+    
         
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
