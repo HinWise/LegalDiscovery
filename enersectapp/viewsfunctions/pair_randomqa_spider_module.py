@@ -1296,8 +1296,8 @@ def pair_randomqa_spider(request):
         error_rate = 50
         pdf_doctype_distinct = {}'''
         
-        #companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
-        companyname_list = CompanyTemplate.objects.none()
+        companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
+        #companyname_list = CompanyTemplate.objects.none()
        
         document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
