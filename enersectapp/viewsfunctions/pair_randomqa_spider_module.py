@@ -1304,7 +1304,9 @@ def pair_randomqa_spider(request):
         
         #print request
     
-        return
+        if save_mark == "save_audited_entry":
+    
+            return
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
