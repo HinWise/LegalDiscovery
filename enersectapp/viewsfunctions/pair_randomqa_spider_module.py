@@ -29,6 +29,7 @@ def pair_randomqa_spider(request):
         
     '''
     
+    
     the_user = request.user
 
     if not the_user.is_authenticated():
@@ -615,6 +616,7 @@ def pair_randomqa_spider(request):
         
         
         
+        
         user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]  
      
         try:
@@ -1175,8 +1177,9 @@ def pair_randomqa_spider(request):
         
 
         
-        
+         
         pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
+        
         #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
         #pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
         
@@ -1278,7 +1281,7 @@ def pair_randomqa_spider(request):
             
             pdf_item_list = PdfRecord.objects.filter(sourcedoc_link=pdf_random_item.sourcedoc_link,ocrrecord_link__OcrByCompany = user_company).distinct()
             
-         
+            
         
         else:
         
@@ -1308,6 +1311,8 @@ def pair_randomqa_spider(request):
         '''if save_mark == "save_audited_entry":
     
             return'''
+        
+        
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
