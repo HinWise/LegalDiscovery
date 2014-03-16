@@ -1096,11 +1096,11 @@ def pair_randomqa_spider(request):
         
         
         #if show_progress_mark == "show_progress_mark":
-        if show_progress_mark:
+        '''if show_progress_mark:
         
-            show_progress_mark = "show" 
+            show_progress_mark = "show"
         
-            '''pdf_total_count = len(pdf_records_list)
+            pdf_total_count = len(pdf_records_list)
             
             pdf_correct_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_correct"))
             pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect"))
@@ -1111,24 +1111,24 @@ def pair_randomqa_spider(request):
                 correct = float(pdf_correct_count)
                 incorrect = float(pdf_incorrect_count)
                 error_rate = incorrect/(correct + incorrect)*100
-                error_rate = int(error_rate)'''
+                error_rate = int(error_rate)
                 
                 
-            #pdf_left_to_audit = len(pdf_records_list.exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark = "auditmarked_as_correct"))
-            #pdf_audited = pdf_total_count - pdf_left_to_audit
+            pdf_left_to_audit = len(pdf_records_list.exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark = "auditmarked_as_correct"))
+            pdf_audited = pdf_total_count - pdf_left_to_audit
             
            
             
         else:
 
             pdf_total_count = 0
-            '''pdf_correct_count = 0
+            pdf_correct_count = 0
             pdf_incorrect_count = 0
             pdf_reentry_count = 0
-            error_rate = 0'''
+            error_rate = 0
             show_progress_mark = "no" 
             pdf_left_to_audit = 0
-            pdf_audited=0
+            pdf_audited=0'''
             
         
         #pdf_records_list = pdf_records_list.exclude(audit_mark = "duplicatemarked_reentered").exclude(audit_mark_saved = "save_audited_entry").exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark = "auditmarked_confirmed_reassignment").distinct()
@@ -1177,26 +1177,40 @@ def pair_randomqa_spider(request):
         
 
         
+        if show_progress_mark == "show_progress_mark":
+        
+            print "LOLOLOLO"
+        
+            pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
+        
+            #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
+            #pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
+            
+            pdf_needs_reentry_confirmation = 0
+            
+            #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
+            #pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
+            
+            pdf_being_reentered = 0
+            
+            #pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
+            pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
+            
+            pdf_left_to_audit = len(pdf_records_list)
+            
+            pdf_total_count = pdf_left_to_audit + pdf_audited + pdf_needs_reentry_confirmation + pdf_being_reentered
+           
+            
+        else:
+            print "CACACA"
+            pdf_total_count = 0
+            show_progress_mark = "no" 
+            pdf_left_to_audit = 0
+            pdf_audited=0
+            pdf_needs_reentry_confirmation = 0
+            pdf_being_reentered = 0
+        
       
-        
-        pdf_audited = len(pdf_records_list.filter(audit_mark_saved = "save_audited_entry").distinct())
-        
-        #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
-        #pdf_needs_reentry_confirmation = len(pdf_records_list.filter(audit_mark_saved = "needs_reentry_confirmation").distinct())
-        
-        pdf_needs_reentry_confirmation = 0
-        
-        #Commented for new FlatWorld requirements. To make it work for new projects,use the commented version
-        #pdf_being_reentered = len(pdf_records_list.filter(audit_mark_saved = "being_reentered").distinct())
-        
-        pdf_being_reentered = 0
-        
-        #pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
-        pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
-        
-        pdf_left_to_audit = len(pdf_records_list)
-        
-        pdf_total_count = pdf_left_to_audit + pdf_audited + pdf_needs_reentry_confirmation + pdf_being_reentered
         
         pdf_id_list_to_randomize = []
         
