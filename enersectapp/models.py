@@ -184,9 +184,9 @@ class LegalDiscoveryTemplate(models.Model):
         
     
 class SourcePdfToHandle(models.Model):
-    checked = models.CharField(max_length=255, default="unchecked")
+    checked = models.CharField(max_length=255, default="unchecked",db_index = True)
     times_checked = models.IntegerField(default=0)
-    lot_number = models.IntegerField(default=0)
+    lot_number = models.IntegerField(default=0,db_index = True)
     date_checked = models.DateTimeField('date the document was checked by someone',null=True, blank=True)
     assignedcompany = models.ForeignKey(Group)
     assigneduser = models.ForeignKey(User)
