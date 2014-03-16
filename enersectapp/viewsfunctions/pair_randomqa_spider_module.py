@@ -842,8 +842,9 @@ def pair_randomqa_spider(request):
         
         if lot_number_check == "all":
            
-            for item in pdf_lot_number_distinct:
-                lot_number_list.append(item['lot_number'])
+            lot_number_list = pdf_lot_number_distinct
+            '''for item in pdf_lot_number_distinct:
+                lot_number_list.append(item['lot_number'])'''
         
         else:
             
