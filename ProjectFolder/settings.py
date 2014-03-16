@@ -288,7 +288,7 @@ if DEBUG:
     if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or socket.gethostname() == 'Nemot-PC':
         INTERNAL_IPS = ('127.0.0.1',)
     else:
-        INTERNAL_IPS = ('46.19.138.162',)
+        INTERNAL_IPS = ('81.17.28.58',)
        
     MIDDLEWARE_CLASSES += (
         'debug_toolbar.middleware.DebugToolbarMiddleware',

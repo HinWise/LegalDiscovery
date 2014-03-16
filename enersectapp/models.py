@@ -291,7 +291,7 @@ class CompanyOriginal(models.Model):
         return self.companyname_original
     
 class CompanyTemplate(models.Model):
-    companyname_base = models.CharField(max_length=255, default="None")
+    companyname_base = models.CharField(max_length=255, default="None",db_index = True)
     companyaddress_base = models.CharField(max_length=255, default="None")
     companytelephone_base = models.CharField(max_length=255, default="None")
     companycity_base = models.CharField(max_length=255, default="None")
