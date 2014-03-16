@@ -12,7 +12,7 @@
 {% block config_libs %} 
 
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
-<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.min.js' %}" ></script>
 <script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
 
 
@@ -1153,7 +1153,7 @@
                     
                     <div class="show-option" id="filter_container_lot" title="Filter the Search Results by Lot">
                             {% for item in pdf_lot_number_distinct %}
-                            <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lot{{item.lot_number}}" choice_value="{{item.lot_number}}" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lot{{item.lot_number}}">Lot {{item.lot_number}}</label>
+                            <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lot{{item}}" choice_value="{{item}}" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lot{{item}}">Lot {{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lotall" choice_value="all" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lotall">All Lots</label>
                             

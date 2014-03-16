@@ -831,7 +831,7 @@ def pair_randomqa_spider(request):
         pdf_records_list = PdfRecord.objects.none()
         
         
-        pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company).order_by().values('lot_number').distinct()
+        pdf_lot_number_distinct = SourcePdfToHandle.objects.filter(assignedcompany = user_company).order_by().values_list('lot_number',flat=True).distinct()
         
         #pdf_author_distinct = PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = user_company).values('sourcedoc_link__assigndata__assigneduser__username').distinct()
 
