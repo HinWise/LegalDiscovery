@@ -155,7 +155,7 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
     
     #If it is duplicated (Was entered before), mark previous Entries as "Revised"
     
-    is_duplicated_list = PdfRecord.objects.filter(sourcedoc_link = source,ocrrecord_link__OcrByCompany = user_group)
+    is_duplicated_list = PdfRecord.objects.filter(sourcedoc_link = source,EntryByCompany = user_group)
     
     if is_duplicated_list.count() > 0:
         
@@ -179,6 +179,11 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
         print "ATTENTION!DOC TYPE CLASS NOT SELECTED, views.py Line 1181!"
     
     new_pdf = PdfRecord(modified_doctype_from=doctype,original_document_type=doctype2_class,modified_document_type=doctype_class,record_link=control_rec,ocrrecord_link=new_ocr,sourcedoc_link=source,companytemplate_link=company_link,commentary="No modifications",skip_counter='0',audit_mark="None",audit_mark_saved = audit_mark_saved,modification_date=datetime.datetime.now().replace(tzinfo=timezone.utc),modification_author=the_user.username,translated=translation_type)
+    
+
+    
+    new_pdf.EntryByCompany = user_group
+    new_pdf.EntryAuthor = the_user
     
     new_pdf.save()
     

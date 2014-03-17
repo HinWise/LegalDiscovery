@@ -112,7 +112,7 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
                     for source in docs_to_assign:
                         if source:
                              
-                            tohandle = SourcePdfToHandle(assignedcompany=the_company,assigneduser=user_to_assign,lot_number=max_lotnum+1)  
+                            tohandle = SourcePdfToHandle(assignedcompany=the_company,assigneduser=user_to_assign,lot_number=max_lotnum+1)
                             tohandle.save()
                             source.assigndata.add(tohandle)
                             source.save()
@@ -123,7 +123,18 @@ def sudo_assignsourcepdfsui_by_doctype_and_number(request):
                         success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + ", User '"+ user_name +"' as Lot "+ str(max_lotnum) + "."
                     else:
                         success_message = str(len(docs_to_assign)) + " Documents from " + doctype_name + " were assigned to " + company_name + " as Lot "+ str(max_lotnum) + "."
-                            
+                    
+                    try:
+                        new_lotnum = LotNumber.objects.get(lot_number = max_lotnum+1)
+                    except:
+                        new_lotnum = LotNumber(lot_number = max_lotnum+1)
+                    
+                    new_lotnum.save()
+                    
+                    group_profile = GroupProfile.objects.get(group = the_company)
+                    group_profile.unique_lot_number_list.add(new_lotnum)
+                    group_profile.save()
+                    
             the_doctype =  SourceDocType.objects.get(name=doctype_name)
             
             docs_not_in_company = SourcePdf.objects.exclude(assigndata__assignedcompany = the_company).order_by()

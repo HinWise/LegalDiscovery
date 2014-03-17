@@ -18,6 +18,8 @@ from datetime import timedelta
 import datetime
 
 
+
+
 def randomqa_spider(request):
 
     '''Audit Notes
@@ -775,6 +777,8 @@ def randomqa_spider(request):
         lot_number_check = "all"
         error_rate = 50
         pdf_doctype_distinct = {}'''
+        
+        
         
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,

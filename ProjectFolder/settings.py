@@ -171,7 +171,7 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
         'django.contrib.staticfiles',
         'enersectapp',
         'south',
-	'django_extensions',
+        'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
@@ -190,7 +190,7 @@ else:
         'django.contrib.staticfiles',
         'enersectapp',
         'maintenance',
-	'django_extensions',
+        'django_extensions',
         #'template_previewer',
         #'previewer',
         # Uncomment the next line to enable the admin:
@@ -319,5 +319,5 @@ if DEBUG:
 
     DEBUG_TOOLBAR_CONFIG = {
         'INTERCEPT_REDIRECTS': False,
-        #'SHOW_TEMPLATE_CONTEXT': True,
+        'SHOW_TEMPLATE_CONTEXT': True,
     }

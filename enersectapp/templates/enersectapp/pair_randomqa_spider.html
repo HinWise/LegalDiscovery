@@ -385,7 +385,7 @@
                     resizable: true,
                     closeOnEscape: false,
                     buttons: {
-                        "Show Progress / Error Rate": function() {
+                        "Show Progress": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -434,7 +434,7 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
-                                "Show Progress / Error Rate": function() {
+                                "Show Progress": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -526,7 +526,7 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
-                                "Show Progress / Error Rate": function() {
+                                "Show Progress": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -613,7 +613,7 @@
                             resizable: true,
                             closeOnEscape: false,
                             buttons: {
-                                "Show Progress / Error Rate": function() {
+                                "Show Progress": function() {
                                     
                                     toggleLoadingScreen();
                                     $('button').attr("disabled", true).addClass("ui-state-disabled");
@@ -723,12 +723,12 @@
             });
             
             $( "#filter_container_lot" ).buttonset();
-            $( "#filter_container_author" ).buttonset();
+            /*$( "#filter_container_author" ).buttonset();
             $( "#filter_container_doctype" ).buttonset();
             $( "#filter_container_date" ).buttonset();
             $( "#filter_container_modification_author" ).buttonset();
             $( "#filter_container_auditmark" ).buttonset();
-            $( "#filter_container_company" ).buttonset();
+            $( "#filter_container_company" ).buttonset();*/
         
         
             $('.choice_lot').click(function(){
@@ -838,30 +838,30 @@
         function disableButtonsets(){
             
             $( "#filter_container_lot" ).buttonset("disable");
-            $( "#filter_container_author" ).buttonset("disable");
+            /*$( "#filter_container_author" ).buttonset("disable");
             $( "#filter_container_doctype" ).buttonset("disable");
             $( "#filter_container_date" ).buttonset("disable");
             $( "#filter_container_modification_author" ).buttonset("disable");
             $( "#filter_container_auditmark" ).buttonset("disable");
-            $( "#filter_container_company" ).buttonset("disable");
+            $( "#filter_container_company" ).buttonset("disable");*/
         }
         
         function savePanelSizes(){
         
-            filters_panel_width = $("#filters_dialog").width();
+            /*filters_panel_width = $("#filters_dialog").width();
             filters_panel_height = $("#filters_dialog").height();
             $("#filters_panel_width").attr("value",filters_panel_width);
-            $("#filters_panel_height").attr("value",filters_panel_height);
+            $("#filters_panel_height").attr("value",filters_panel_height);*/
             
             
         }
         
         function stablishPanelSizes(){
         
-            filters_panel_width = $("#filters_panel_width").attr("value"); 
+            /*filters_panel_width = $("#filters_panel_width").attr("value"); 
             filters_panel_height = $("#filters_panel_height").attr("value");
             if (filters_panel_width) $("#filters_panel").width(filters_panel_width);
-            if (filters_panel_width) $("#filters_panel").height(filters_panel_height);
+            if (filters_panel_width) $("#filters_panel").height(filters_panel_height);*/
             
             
         }
@@ -877,39 +877,39 @@
             
             //For the User Choice
             
-            var user_choice = $('#selected_user').attr("value");
+            /*var user_choice = $('#selected_user').attr("value");
         
-            $('#filter_pdf_author'+user_choice).attr("checked","checked").button("refresh");
+            $('#filter_pdf_author'+user_choice).attr("checked","checked").button("refresh");*/
             
             //For the Doctype Choice
             
-            var doctype_choice = $('#selected_doctype').attr("value");
+            /*var doctype_choice = $('#selected_doctype').attr("value");
         
-            $('#filter_pdf_doctype'+doctype_choice).attr("checked","checked").button("refresh");
+            $('#filter_pdf_doctype'+doctype_choice).attr("checked","checked").button("refresh");*/
             
             //For the Date Choice
             
-            var date_choice = $('#selected_date').attr("value");
+            /*var date_choice = $('#selected_date').attr("value");
         
-            $('#filter_pdf_date'+date_choice).attr("checked","checked").button("refresh");
+            $('#filter_pdf_date'+date_choice).attr("checked","checked").button("refresh");*/
             
             //For the Editor/Modification Author Choice
             
-            var modification_author = $('#selected_modification_author').attr("value");
+            /*var modification_author = $('#selected_modification_author').attr("value");
         
-            $('#filter_pdf_modification_author'+modification_author).attr("checked","checked").button("refresh");
+            $('#filter_pdf_modification_author'+modification_author).attr("checked","checked").button("refresh");*/
             
             //For the Audit Mark Choice
             
-            var auditmark = $('#selected_auditmark').attr("value");
+            /*var auditmark = $('#selected_auditmark').attr("value");
         
-            $('#filter_pdf_auditmark'+auditmark).attr("checked","checked").button("refresh");
+            $('#filter_pdf_auditmark'+auditmark).attr("checked","checked").button("refresh");*/
             
             //For the Company Choice
             
-            var company = $('#selected_company').attr("value");
+            /*var company = $('#selected_company').attr("value");
         
-            $('#filter_pdf_company'+company).attr("checked","checked").button("refresh");
+            $('#filter_pdf_company'+company).attr("checked","checked").button("refresh");*/
             
         }    
         
@@ -1158,45 +1158,45 @@
                             <input type="radio" class="filter_choice choice_lot" id="filter_pdf_lotall" choice_value="all" name="radio1" /><label class="filter_choice_label" for="filter_pdf_lotall">All Lots</label>
                             
                     </div>
-                    <div class="show-option" id="filter_container_author" title="Filter the Search Results by Author">
+                    <!-- <div class="show-option" id="filter_container_author" title="Filter the Search Results by Author">
                             {% for item in pdf_author_distinct %}
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_author{{item}}" choice_value="{{item}}" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_author{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
-                    </div>
-                    <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
+                    </div> -->
+                    <!-- <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
                             {% for item in pdf_doctype_distinct %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}" choice_value="{{item.ocrrecord_link__Document_Type}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}">{{item.ocrrecord_link__Document_Type}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctypeall" choice_value="all" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctypeall">All Document Types</label>
-                    </div>
-                    <div class="show-option" id="filter_container_date" title="Filter the Search Results by Date of Creation">
+                    </div> -->
+                    <!-- <div class="show-option" id="filter_container_date" title="Filter the Search Results by Date of Creation">
                             
                             <input type="radio" class="filter_choice choice_date" id="filter_pdf_datetoday" choice_value="today" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datetoday">Today</label>
-                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastdays" choice_value="lastdays" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastdays">Last Days</label> -->
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastdays" choice_value="lastdays" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastdays">Last Days</label>
                             <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastweek" choice_value="lastweek" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datelastweek">Last Week</label>
                             <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastmonth" choice_value="lastmonth" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datelastmonth">Last Month</label>
-                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastmonths" choice_value="lastmonths" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastmonths">Last Months</label> -->
-                            <!-- <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastyear" choice_value="lastyear" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastyear">Last Year</label> -->
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastmonths" choice_value="lastmonths" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastmonths">Last Months</label>
+                            <input type="radio" class="filter_choice choice_date" id="filter_pdf_datelastyear" choice_value="lastyear" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_datelastyear">Last Year</label>
                             <input type="radio" class="filter_choice choice_date" id="filter_pdf_dateall" choice_value="all" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_dateall">All Dates</label>  
-                    </div>
+                    </div> -->
                     
-                    <div class="show-option" id="filter_container_company" title="Filter the Search Results by Company">
+                    <!-- <div class="show-option" id="filter_container_company" title="Filter the Search Results by Company">
                             {% if company_names_list %}
                             {% for item in company_names_list %}
                             <input type="radio" class="filter_choice choice_company" id="filter_pdf_company{{item}}" choice_value="{{item}}" name="radio5" /><label class="filter_choice_label" for="filter_pdf_company{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_company" id="filter_pdf_companyall" choice_value="all" name="radio5" /><label class="filter_choice_label" for="filter_pdf_companyall">All Companies</label>
                             {% endif %}
-                    </div>
+                    </div> -->
 
-                    <div class="show-option" id="filter_container_modification_author" title="Filter the Search Results by Editor">
+                    <!-- <div class="show-option" id="filter_container_modification_author" title="Filter the Search Results by Editor">
                             {% for item in modification_authors_list %}
                             <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_author{{item}}" choice_value="{{item}}" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_author{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_author{{company_name}}" choice_value="{{company_name}}" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_author{{company_name}}">{{company_name}}</label>
                             <input type="radio" class="filter_choice choice_modification_author" id="filter_pdf_modification_authorall" choice_value="all" name="radio6" /><label class="filter_choice_label" for="filter_pdf_modification_authorall">All Editors</label>
-                    </div>
+                    </div> -->
                     
                     <div class="show-option" id="filter_container_auditmark" title="Filter the Search Results by Audit Mark">
                             
@@ -1229,23 +1229,23 @@
                 <fieldset id="fieldset_fields">
                
                
-                <input class="invisible" type="text" name="filters_panel_width" id="filters_panel_width" value="{{filters_panel_width}}" />
-                <input class="invisible" type="text" name="filters_panel_height" id="filters_panel_height" value="{{filters_panel_height}}" />
+                <!--<input class="invisible" type="text" name="filters_panel_width" id="filters_panel_width" value="{{filters_panel_width}}" />
+                <input class="invisible" type="text" name="filters_panel_height" id="filters_panel_height" value="{{filters_panel_height}}" />-->
                 
                 <input class="invisible" type="text" name="save_mark" id="save_mark" value="None" />
-                <input class="invisible" type="text" name="selected_modification_author" id="selected_modification_author" value="{{selected_modification_author}}" />
-                <input class="invisible" type="text" name="selected_auditmark" id="selected_auditmark" value="{{selected_auditmark}}" />
+                <!-- <input class="invisible" type="text" name="selected_modification_author" id="selected_modification_author" value="{{selected_modification_author}}" /> -->
+                <!-- <input class="invisible" type="text" name="selected_auditmark" id="selected_auditmark" value="{{selected_auditmark}}" /> -->
                 <input class="invisible" type="text" name="selected_lot" id="selected_lot" value="{{lot_number}}" />
-                <input class="invisible" type="text" name="selected_user" id="selected_user" value="{{selected_user}}" />
-                <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" />
-                {% if company_names_list %}
+                <!-- <input class="invisible" type="text" name="selected_user" id="selected_user" value="{{selected_user}}" /> -->
+                <!-- <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" /> -->
+                <!-- {% if company_names_list %}
                 <input class="invisible" type="text" name="selected_company" id="selected_company" value="{{selected_company}}" />
-                {% endif %}
-                <input class="invisible" type="text" name="selected_date" id="selected_date" value="{{selected_date}}" />
+                {% endif %} -->
+                <!-- <input class="invisible" type="text" name="selected_date" id="selected_date" value="{{selected_date}}" /> -->
                 <input class="invisible" type="text" name="pdf_record_id" id="pdf_record_id" value="{{pdf_random_item.id}}" />
                 <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
                 <input class="invisible" type="text" name="show_progress_mark" id="show_progress_mark" value="no" />
-                <input class="invisible" type="text" name="save_filename" id="save_filename" value="{{pdf_random_item.sourcedoc_link.filename}}" />
+                <input class="invisible" type="text" name="save_filename" id="save_filename" value="{{pdf_random_item.sourcedoc_link__filename}}" />
 
      
                 {% if pdf_item_list %}
@@ -1256,7 +1256,7 @@
                         <div>
                             
                             <table class="pdf_zebra zebra">
-                            <caption><h4 id="table_caption">Document Name: <br>{{pdf_random_item.sourcedoc_link.filename}}<br></h4></caption>
+                            <caption><h4 id="table_caption">Document Name: <br>{{pdf_random_item.sourcedoc_link__filename}}<br></h4></caption>
                             <thead>
                                 <tr>
                                     <th>Action Buttons</th>
@@ -1448,7 +1448,7 @@
     <div id="right_container">
         
                 
-        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{pdf_random_item.sourcedoc_link.job_directory}}\{{pdf_random_item.sourcedoc_link.filename}}">
+        <div id="pdf_view" value="http:\\54.200.180.182\sourcepdfs\{{pdf_random_item.sourcedoc_link__job_directory}}\{{pdf_random_item.sourcedoc_link__filename}}">
             
         </div>
         

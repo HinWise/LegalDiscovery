@@ -247,7 +247,35 @@ with transaction.commit_on_success():
             if count % 10 == 0:
                 print count
             
+
+
+'''
+from enersectapp.models import *
+from django.db import transaction
+
+new_lotnumber = LotNumber.objects.get(lot_number = 88)
+
+count = 0
+all_pdfs = PdfRecord.objects.filter(AssignedLotNumber = None)
+all_pdfs.count()
+with transaction.commit_on_success():
+    for item in all_pdfs[0:25000]:
+        group = item.EntryByCompany
+        sourcedoc = item.sourcedoc_link
+        handle = sourcedoc.assigndata.filter(assignedcompany = group)
+        try:
+            lot_number = LotNumber.objects.get(lot_number = handle[0].lot_number)
+        except:
+            lot_number = new_lotnumber
+        item.AssignedLotNumber = lot_number
+        item.save()
+        count +=1
+        if count % 1000 == 0:
+            print count
         
+        
+        
+'''            
             
     
     

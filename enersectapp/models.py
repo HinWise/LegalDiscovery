@@ -182,7 +182,14 @@ class LegalDiscoveryTemplate(models.Model):
         
         return self.sourcedoctypes_list.all().values_list('name',flat=True).order_by('modification_date')
         
+
+class LotNumber(models.Model):
+
+    lot_number = models.IntegerField(default=0,db_index = True)
     
+    def __unicode__(self):
+        return str(self.lot_number)
+        
 class SourcePdfToHandle(models.Model):
     checked = models.CharField(max_length=255, default="unchecked",db_index = True)
     times_checked = models.IntegerField(default=0)
@@ -312,7 +319,7 @@ class PdfRecord(models.Model):
     modified_doctype_from = models.CharField(max_length=255, default="uncategorized")
     original_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='pdf_original_document_type')
     modified_doctype_date = models.DateTimeField('last time doctype date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
-    modified_doctype_author = models.ForeignKey(User,null=True,blank=True)
+    modified_doctype_author = models.ForeignKey(User,null=True,blank=True,related_name='pdf_modified_doctype_author')
     commentary = models.CharField(max_length=512, default="None")
     audit_mark = models.CharField(max_length=512, default="None")
     audit_mark_saved = models.CharField(max_length=512, default="None")
@@ -327,6 +334,9 @@ class PdfRecord(models.Model):
     sourcedoc_link = models.ForeignKey(SourcePdf)
     ocrrecord_link = models.ForeignKey(OcrRecord)
     companytemplate_link = models.ForeignKey(CompanyTemplate)
+    EntryByCompany = models.ForeignKey(Group,null=True,blank=True)
+    EntryAuthor = models.ForeignKey(User,null=True,blank=True)
+    AssignedLotNumber = models.ForeignKey(LotNumber,null=True,blank=True)
     def __unicode__(self):
         return self.name
     
@@ -363,6 +373,8 @@ class UserProfile(models.Model):
     created_legaldiscovery_templates = models.ManyToManyField(LegalDiscoveryTemplate,related_name='legaldiscovery_templates', null=True, blank=True, default=None)
     #other fields here
 
+    
+    
     def __str__(self):  
           return "%s's profile" % self.user 
 
@@ -380,5 +392,23 @@ def create_user_profile(sender, instance, created, **kwargs):
         
 post_save.connect(create_user_profile, sender=User)
 
+
+
+class GroupProfile(models.Model):  
+    group = models.OneToOneField(Group)
+    unique_lot_number_list = models.ManyToManyField(LotNumber,related_name='lot_number_list', null=True, blank=True, default=None)
+    
+    
+    def __str__(self):  
+          return "%s's profile" % self.group 
+
+     
+def create_group_profile(sender, instance, created, **kwargs):  
+    if created:  
+        
+        profile, created = GroupProfile.objects.get_or_create(group=instance)  
+
+        
+post_save.connect(create_group_profile, sender=Group)
 
 
