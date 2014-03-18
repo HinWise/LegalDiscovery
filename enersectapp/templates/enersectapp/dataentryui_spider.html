@@ -2535,6 +2535,7 @@
                           {% endif %}
                           <li><a href="#">Other</a></li>
                           <li><a href="#">Blank</a></li>
+                          <li><a href="#">Misc</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -2815,7 +2816,7 @@
          
                 {% endif %}
                 <!-- MEMO -->
-                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Funds Transfer" or document_type = "Cheque Receipt" or document_type = "Virement" or document_type = "Bon a Payer" or document_type = "Remise de Cheques" or document_type = "Movement en Cours" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Misc" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Contract Page X" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Funds Transfer" or document_type = "Cheque Receipt" or document_type = "Virement" or document_type = "Bon a Payer" or document_type = "Remise de Cheques" or document_type = "Movement en Cours" %}
                 <label for="memo">Memo</label>
                 <input type="text" name="memo" id="memo" placeholder="Write Notes and Extra Details:" value="" class="disablecopypaste text ui-widget-content ui-corner-all" />
                 {% endif %}
