@@ -2356,7 +2356,13 @@
                                 {% if document_type = "Bulletin de Paie" or document_type = "Expense Claim" %}
                                     <label for="companyform_name">Employee Name</label>
                                 {% endif %}
-                                    <input type="text" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                                
+                                  {% if document_type = "Custom Generic Template" %}
+                                  <input type="text" value="MISSING NAME" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                                  {% else %}
+                                  <input type="text" value="" name="companyform_name" id="companyform_name" class="disablecopypaste text ui-widget-content ui-corner-all" />
+                                  {% endif %}
+                                
                                 
                             {% endif %}
                             {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" %}
@@ -2364,7 +2370,12 @@
                                 <li>
                                     <a id="companyaddress_link" href="#">Address</a>
                                     <ul>
+                                       {% if document_type = "Custom Generic Template" %}
+                                      <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Address here" name="companyform_address" id="companyform_address" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% else %}
                                       <li><a href="#"><input type="text" value="" placeholder="Write the Address here" name="companyform_address" id="companyform_address" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% endif %}
+                                      
                                       <li>--</li>
                                       <li><a class="companyaddress_option" value="MISSING" href="#">MISSING</a></li>
                                       <li>--</li>
@@ -2378,7 +2389,12 @@
                                 <li>
                                     <a id="companytelephone_link" href="#">Telephone</a>
                                     <ul>
+                                        {% if document_type = "Custom Generic Template" %}
+                                      <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Telephone here" name="companyform_telephone" id="companyform_telephone" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% else %}
                                       <li><a href="#"><input type="text" value="" placeholder="Write the Telephone here" name="companyform_telephone" id="companyform_telephone" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% endif %}
+                                      
                                       <li>--</li>
                                       <li><a class="companytelephone_option" value="MISSING" href="#">MISSING</a></li>
                                       <li>--</li>
@@ -2397,7 +2413,12 @@
                                     <a id="companycity_link" href="#">Base</a>
                                     {% endif %}
                                     <ul>
+                                      {% if document_type = "Custom Generic Template" %}
+                                      <li><a href="#"><input type="text" value="MISSING" placeholder="Try to Search the City first." name="companyform_city" id="companyform_city" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% else %}
                                       <li><a href="#"><input type="text" value="" placeholder="Try to Search the City first." name="companyform_city" id="companyform_city" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% endif %}
+                                      
                                       <li>--</li>
                                       <li><a class="companycity_option" value="MISSING" href="#">MISSING</a></li>
                                       <li>--</li>
@@ -2411,7 +2432,12 @@
                                 <li>
                                     <a id="companycountry_link" href="#">Country</a>
                                     <ul>
+                                        {% if document_type = "Custom Generic Template" %}
+                                      <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Country here" name="companyform_country" id="companyform_country" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% else %}
                                       <li><a href="#"><input type="text" value="" placeholder="Write the Country here" name="companyform_country" id="companyform_country" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                                      {% endif %}
+                                      
                                       <li>--</li>
                                       <li><a class="companycountry_option" value="MISSING" href="#">MISSING</a></li>
                                       <li>--</li>
@@ -2576,7 +2602,11 @@
                     <li>
                         <a id="amountlink" href="#">Amount:</a>
                         <ul>
+                          {% if document_type = "Custom Generic Template" %}
+                          <li><a href="#"><input value="MISSING" placeholder="Write the Amount here" type="text" name="amount" id="amount" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% else %}
                           <li><a href="#"><input value="" placeholder="Write the Amount here" type="text" name="amount" id="amount" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
                           <li>--</li>
                           <li><a class="amountoption" href="#" value='MISSING'>MISSING</a></li>
                           <li>--</li>
@@ -2597,7 +2627,12 @@
                     <li>
                         <a id="currencylink" href="#">Currency:</a>
                         <ul>
+                          {% if document_type = "Custom Generic Template" %}
+                          <li><a href="#"><input value="MISSING" placeholder="Try to Search the Currency here" type="text" name="currency" id="currency" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% else %}
                           <li><a href="#"><input value="" placeholder="Try to Search the Currency here" type="text" name="currency" id="currency" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
+                          
                           <li>--</li>
                           <li><a class="currencyoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2617,7 +2652,12 @@
                     <li>
                         <a id="companylink" href="#">Company Beneficiary:</a>
                         <ul>
+                          {% if document_type = "Custom Generic Template" %}
+                          <li><a href="#"><input type="text" value="MISSING NAME" placeholder="Try to Search the Name first." name="companyname_search" id="companyname_search" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% else %}
                           <li><a href="#"><input type="text" value="" placeholder="Try to Search the Name first." name="companyname_search" id="companyname_search" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
+                          
                           <li>--</li>
                           <li><a class="companyoption" value="Add a NEW COMPANY" href="#">Add a NEW COMPANY</a></li>
                           <li>--</li>
@@ -2631,7 +2671,12 @@
                         </ul>
                     </li>
                 </ul>
+                {% if document_type = "Custom Generic Template" %}
+                <input class="invisible" type="text" name="company_name" id="company_name" value="MISSING NAME" class="text ui-widget-content ui-corner-all" />
+                {% else %}
                 <input class="invisible" type="text" name="company_name" id="company_name" value="" class="text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
                 <input class="invisible" type="text" name="company_address" id="company_address" value="" class="text ui-widget-content ui-corner-all" />
                 <input class="invisible" type="text" name="company_telephone" id="company_telephone" value="" class="text ui-widget-content ui-corner-all" />
                 <input class="invisible" type="text" name="company_city" id="company_city" value="" class="text ui-widget-content ui-corner-all" />
@@ -2665,9 +2710,16 @@
                 {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Journal de Paie" or document_type = "Teletec" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" or document_type = "Funds Transfer" or document_type = "Cheque Receipt" or document_type = "Virement" or document_type = "Bon a Payer" or document_type = "Remise de Cheques" or document_type = "Movement en Cours" %}
                 <label for="issuedate-day">Issue Date:</label>
                 <input type="text" name="issuedate" id="issuedate" class="invisible"/>
+                {% if document_type = "Custom Generic Template" %}
+                <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="NaN" class="date_text text ui-widget-content ui-corner-all" />
+                <input type="text" readonly="readonly" name="issuedate_month" placeholder="Ex: 06" id="issuedate_month" value="NaN" class="date_text text ui-widget-content ui-corner-all" />
+                <input type="text" readonly="readonly" name="issuedate_year" placeholder="Ex: 2012" id="issuedate_year" value="NaN" class="date_text text ui-widget-content ui-corner-all" />
+                {% else %}
                 <input type="text" readonly="readonly" name="issuedate_day" placeholder="Ex: 09" id="issuedate_day" value="" class="date_text text ui-widget-content ui-corner-all" />
                 <input type="text" readonly="readonly" name="issuedate_month" placeholder="Ex: 06" id="issuedate_month" value="" class="date_text text ui-widget-content ui-corner-all" />
                 <input type="text" readonly="readonly" name="issuedate_year" placeholder="Ex: 2012" id="issuedate_year" value="" class="date_text text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
                 
                 {% endif %}
                 
@@ -2682,8 +2734,14 @@
                         {% else %}
                         <a id="docnumberlink" href="#">{{document_type}} Number:</a>
                         {% endif %}
+                        
+                        
                         <ul>
-                          <li><a href="#"><input type="text" value="" placeholder="Write the Document Number here" name="docnumber" id="docnumber" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% if document_type = "Custom Generic Template" %}
+                        <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Document Number here" name="docnumber" id="docnumber" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% else %}
+                        <li><a href="#"><input type="text" value="" placeholder="Write the Document Number here" name="docnumber" id="docnumber" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% endif %}
                           <li>--</li>
                           <li><a class="docnumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2702,7 +2760,11 @@
                     <li>
                         <a id="accountnumlink" href="#">Account Number:</a>
                         <ul>
+                          {% if document_type = "Custom Generic Template" %}
+                          <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Account Number here" name="accountnum" id="accountnum" value="MISSING" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% else %}
                           <li><a href="#"><input type="text" value="" placeholder="Write the Account Number here" name="accountnum" id="accountnum" value="" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% endif %}
                           <li>--</li>
                           <li><a class="accountnumoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2722,7 +2784,13 @@
                     <li>
                         <a id="purchasenumberlink" href="#">Purchase Order/Bon de Commande / Contract Number:</a>
                         <ul>
-                          <li><a href="#"><input type="text" value="" placeholder="Write the Purchase Order/Bon de Commande Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                          {% if document_type = "Custom Generic Template" %}
+                            <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Purchase Order/Bon de Commande Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                            {% else %}
+                            <li><a href="#"><input type="text" value="" placeholder="Write the Purchase Order/Bon de Commande Number here" name="purchasenumber" id="purchasenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                            {% endif %}
+                        
+                          
                           <li>--</li>
                           <li><a class="purchasenumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2746,8 +2814,12 @@
                         </ul>
                     </li>
                 </ul>
-                
+                {% if document_type = "Custom Generic Template" %}
+                <input class="invisible" type="text" name="arabic" id="arabic" value="No" class="text ui-widget-content ui-corner-all" />
+                {% else %}
                 <input class="invisible" type="text" name="arabic" id="arabic" value="" class="text ui-widget-content ui-corner-all" />
+                {% endif %}
+                
                 {% endif %}
                 
                 <!-- PIECE NUMBER -->
@@ -2758,7 +2830,12 @@
                     <li>
                         <a id="piecenumberlink" href="#">Piece Number:</a>
                         <ul>
-                          <li><a href="#"><input type="text" value="" placeholder="Write the Piece Number here" name="piecenumber" id="piecenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                            {% if document_type = "Custom Generic Template" %}
+                        <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Piece Number here" name="piecenumber" id="piecenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% else %}
+                        <li><a href="#"><input type="text" value="" placeholder="Write the Piece Number here" name="piecenumber" id="piecenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% endif %}
+                          
                           <li>--</li>
                           <li><a class="piecenumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
@@ -2778,7 +2855,12 @@
                     <li>
                         <a id="pagenumberlink" href="#">Page Number:</a>
                         <ul>
-                          <li><a href="#"><input type="text" value="" placeholder="Write the Page Number here" name="pagenumber" id="pagenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                            {% if document_type = "Custom Generic Template" %}
+                        <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Page Number here" name="pagenumber" id="pagenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% else %}
+                        <li><a href="#"><input type="text" value="" placeholder="Write the Page Number here" name="pagenumber" id="pagenumber" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% endif %}
+                          
                           <li>--</li>
                           <li><a class="pagenumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
