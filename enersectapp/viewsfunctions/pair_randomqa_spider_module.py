@@ -945,7 +945,12 @@ def pair_randomqa_spider(request):
                 
                 except:
                     
-                    new_pdf.AssignedLotNumber = LotNumber.objects.get(lot_number = 69)
+                    new_lot_num = LotNumber.objects.get(lot_number = 69)
+                    new_lot_num.save()
+                    
+                    new_pdf.AssignedLotNumber = new_lot_num
+                
+                
                 
                 new_pdf.audit_mark_saved = "save_audited_entry"
                 new_pdf.save()

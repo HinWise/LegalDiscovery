@@ -264,10 +264,22 @@ def dataentryui_savedata(request):
         chequenum = "NoChequeNumberField"
         
     
-    common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
+    new_pdf = common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
     memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
     the_user)
+    
+    handle = new_pdf.sourcedoc_link.assigndata.get(assigneduser=the_user)
+  
+    try:
+        lot_num = LotNumber.objects.get(lot_number = handle.lot_number)
+    except:
+        lot_num = LotNumber(lot_number = handle.lot_number)
+        
+    lot_num.save()
+        
+    new_pdf.AssignedLotNumber = lot_num
+    new_pdf.save()
     
     
     return HttpResponseRedirect(reverse('enersectapp:dataentryui_spider', args=()))
