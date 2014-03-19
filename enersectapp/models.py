@@ -99,8 +99,10 @@ class SourceDocType(models.Model):
     def save(self, *args, **kwargs):
         
         self.clean_name = self.name.lower().replace("'","").replace(" ","_")
+        
+        super(SourceDocType, self).save(*args, **kwargs)
         self.number_extraction_fields = len(self.extraction_fields.all())
-        super(SourceDocType, self).save(*args, **kwargs)   
+        super(SourceDocType, self).save(*args, **kwargs)
     
     def __unicode__(self):
         return self.name
