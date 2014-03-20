@@ -27,9 +27,17 @@ th,td {
 
 .th_full {
 
+    cursor: pointer;
     border:1px solid black !important;
     z-index: 2;
     
+}
+
+.th_full:hover {
+
+    background:-webkit-linear-gradient(top, #b9e0f5 0%,#92bdd6 100%);
+    color: #1c4257;
+
 }
 
 .ui-button-text {

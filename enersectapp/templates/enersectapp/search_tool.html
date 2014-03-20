@@ -1768,15 +1768,15 @@
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Amount</th>
-                                    <td class="td_partial">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE" and record.ocrrecord_link.Amount != "NoAmountField"  %}{{record.ocrrecord_link.Amount}}{% else %}-{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE" and record.ocrrecord_link.Currency != "NoCurrencyField"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Company Name</th>
-                                    <td class="td_partial">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME" and record.ocrrecord_link.Company != "NoCompanyNameField" %}{{record.ocrrecord_link.Company}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">    
                                     <th class="th_partial">Issue Date</th>
-                                    <td class="td_partial">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Document Type</th>
@@ -1784,39 +1784,39 @@
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Piece Number</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Piece_Number}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Piece_Number != "NoPieceNumberField" %}{{record.ocrrecord_link.Piece_Number}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Document Name</th>
-                                    <td class="td_partial">{{record.sourcedoc_link.filename}}</td>
+                                    <td class="td_partial">{% if record.sourcedoc_link.filename != "NoFilenameField" %}{{record.sourcedoc_link.filename}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Address</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Address}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Address != "NoCompanyAddressField" %}{{record.ocrrecord_link.Address}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Telephone</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Telephone}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Telephone != "NoCompanyTelephoneField" %}{{record.ocrrecord_link.Telephone}}{% else %}-{% endif %}</td>
                                 </tr>    
                                 <tr class="tr_partial">
                                     <th class="th_partial">City</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.City}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.City != "NoCompanyCityField" %}{{record.ocrrecord_link.City}}{% else %}-{% endif %}</td>
                                 </tr>    
                                 <tr class="tr_partial">
                                     <th class="th_partial">Country</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Country}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Country != "NoCompanyCountryField" %}{{record.ocrrecord_link.Country}}{% else %}-{% endif %}</td>
                                 </tr>    
                                 <tr class="tr_partial">
                                     <th class="th_partial">Bank Account Number</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Source_Bank_Account}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Source_Bank_Account != "NoAccountNumberField" %}{{record.ocrrecord_link.Source_Bank_Account}}{% else %}-{% endif %}</td>
                                 </tr>    
                                 <tr class="tr_partial">
                                     <th class="th_partial">Document Number</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.Document_Number}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.Document_Number != "NoDocNumberField" %}{{record.ocrrecord_link.Document_Number}}{% else %}-{% endif %}</td>
                                 </tr>
                                 <tr class="tr_partial">
                                     <th class="th_partial">Purchase Order Number</th>
-                                    <td class="td_partial">{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                    <td class="td_partial">{% if record.ocrrecord_link.PurchaseOrder_Number != "NoPurchaseOrderNumberField" %}{{record.ocrrecord_link.PurchaseOrder_Number}}{% else %}-{% endif %}</td>
                                 </tr>
                                     <!--<tr class="tr_partial">
                                         <th class="th_full">Contains Arabic</th>
@@ -1911,31 +1911,31 @@
 
                                         <td class="td_full">{{record.pk}}</td>
 
-                                        <td class="td_full">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}?{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Amount != "MISSING" and record.ocrrecord_link.Amount != "UNREADABLE"  %}{{record.ocrrecord_link.Amount}}{% else %}-{% endif %}  {% if record.ocrrecord_link.Currency != "MISSING" and record.ocrrecord_link.Currency != "UNREADABLE"  %}{{record.ocrrecord_link.Currency}}{% endif %}</td>
 
-                                        <td class="td_full">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}?{% endif %}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Company != "MISSING NAME" and record.ocrrecord_link.Company != "UNREADABLE NAME"  %}{{record.ocrrecord_link.Company}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}?{% endif %}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.IssueDate != "NoIssueDateField" %}{{record.ocrrecord_link.IssueDate}}{% else %}-{% endif %}</td>
 
                                         <td class="td_full">{{record.modified_document_type.pretty_name}}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Piece_Number}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Piece_Number != "NoPieceNumberField" %}{{record.ocrrecord_link.Piece_Number}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.sourcedoc_link.filename}}</td>
+                                        <td class="td_full">{% if record.sourcedoc_link.filename != "NoFilenameField" %}{{record.sourcedoc_link.filename}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Address}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Address != "NoCompanyAddressField" %}{{record.ocrrecord_link.Address}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Telephone}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Telephone != "NoCompanyTelephoneField" %}{{record.ocrrecord_link.Telephone}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.City}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.City != "NoCompanyCityField" %}{{record.ocrrecord_link.City}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Country}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Country != "NoCompanyCountryField" %}{{record.ocrrecord_link.Country}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Source_Bank_Account}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Source_Bank_Account != "NoAccountNumberField" %}{{record.ocrrecord_link.Source_Bank_Account}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.Document_Number}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.Document_Number != "NoDocNumberField" %}{{record.ocrrecord_link.Document_Number}}{% else %}-{% endif %}</td>
 
-                                        <td class="td_full">{{record.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                        <td class="td_full">{% if record.ocrrecord_link.PurchaseOrder_Number != "NoPurchaseOrderNumberField" %}{{record.ocrrecord_link.PurchaseOrder_Number}}{% else %}-{% endif %}</td>
 
                                         <td class="td_full">{{record.ocrrecord_link.Notes}}</td>
 
