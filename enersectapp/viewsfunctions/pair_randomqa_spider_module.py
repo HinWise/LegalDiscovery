@@ -999,7 +999,7 @@ def pair_randomqa_spider(request):
                 
         
         
-
+        #show_progress_mark = "show_progress_mark"
         
         if show_progress_mark == "show_progress_mark":
         
@@ -1026,6 +1026,7 @@ def pair_randomqa_spider(request):
             
         else:
 
+            pdf_records_list = pdf_records_list.filter(audit_mark_saved = "awaiting_audit").distinct()
             pdf_total_count = 0
             show_progress_mark = "no" 
             pdf_left_to_audit = 0
