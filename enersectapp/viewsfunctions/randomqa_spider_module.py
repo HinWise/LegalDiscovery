@@ -99,16 +99,7 @@ def randomqa_spider(request):
         except (KeyError):
             selected_auditmark =  "all"
         
-        try:
-            filters_panel_width = request.POST['filters_panel_width']
-        except (KeyError):
-            filters_panel_width =  ""
-            
-        try:
-            filters_panel_height = request.POST['filters_panel_height']
-        except (KeyError):
-            filters_panel_height =  ""
-        
+             
         
         error_rate = 0
         
@@ -129,78 +120,55 @@ def randomqa_spider(request):
         
         pdf_lot_number_distinct = SourcePdfToHandle.objects.none()
         
-        for company in company_list:
-           
-            pdf_lot_number_distinct = pdf_lot_number_distinct | SourcePdfToHandle.objects.filter(assignedcompany = company,checked = 'checked').values('lot_number')
-           
-        
-        pdf_lot_number_distinct = pdf_lot_number_distinct.distinct()
-        
-        
-        lot_number_list = []
-        pdf_lot_number_distinct_helper = []
-        
-        for item in pdf_lot_number_distinct:
-            if item['lot_number'] not in lot_number_list:
-                pdf_lot_number_distinct_helper.append(item)
-                lot_number_list.append(item['lot_number'])
-        
-        pdf_lot_number_distinct = pdf_lot_number_distinct_helper
-        
-                
-        
-        #Filling a Lot Numbers in the Company List
-        
-        lot_number_list = []
-        
-        if lot_number_check == "all":
-            for item in pdf_lot_number_distinct:
-                if item['lot_number'] not in lot_number_list:
-                    lot_number_list.append(item['lot_number'])
-        
-        else:
-            lot_number_list.append(lot_number_check)
-        
-        
         pdf_author_distinct = SourcePdfToHandle.objects.none()
         
         for company in company_list:
+            
+            group_profile = GroupProfile.objects.get(group = company)
+            
+            pdf_lot_number_distinct = pdf_lot_number_distinct | group_profile.unique_lot_number_list.all().values_list('lot_number',flat=True)
+            
+            pdf_author_distinct = pdf_author_distinct | User.objects.filter(groups = company).values_list('username',flat=True)
+           
         
-            pdf_author_distinct = pdf_author_distinct | SourcePdfToHandle.objects.filter(assignedcompany = company,checked = 'checked').values('assigneduser__username')
+        #Filling Lot Numbers in the Company List
+  
+        pdf_lot_number_distinct = pdf_lot_number_distinct.distinct()
         
-        #Filling a Usernames in the Company list
+        #Filling Usernames in the Company list
         
-        pdf_author_distinct = pdf_author_distinct.values_list('assigneduser__username',flat=True).distinct()
-        
+        pdf_author_distinct = pdf_author_distinct.distinct()
+
         user_names_list = []
         
-        if selected_user == "all":
         
+        if lot_number_check == "all":
+           
+            
+            pdf_records_list = PdfRecord.objects.all().values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
         
-            '''for item in pdf_author_distinct:
-                user_names_list.append(item['assigneduser__username'])'''
-            
-            for lot_num in lot_number_list:
-                for company in company_list:
-                    pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrByCompany = company ,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
-            
         else:
-            user_names_list.append(selected_user)
+            
+            
+            chosen_lot_number = LotNumber.objects.get(lot_number = lot_number_check)
         
-            #Selecting All PdfRecords that have the Lots and Users in their fields in SourcePdfsToHandle
+            pdf_records_list = PdfRecord.objects.filter(AssignedLotNumber = chosen_lot_number).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
+    
         
-            for lot_num in lot_number_list:
-                for user_name in user_names_list:
-                    pdf_records_list = pdf_records_list | PdfRecord.objects.filter(ocrrecord_link__OcrAuthor__username = user_name,sourcedoc_link__assigndata__lot_number = lot_num,sourcedoc_link__assigndata__checked = "checked")
+        if selected_user != "all":
+           
+            user_selected = User.objects.get(username = selected_user)
+            
+            pdf_records_list = PdfRecord.objects.filter(EntryAuthor = user_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
+ 
+            
+        if selected_company != "all":
+   
+            company_selected = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
         
-        
-        #Making a list of Document Types and selecting the PdfRecords that are of that Document Type (From the Doctype entered, not the actual Doctype)
-        
-        ''' Disabled temporarily, the ability to choose Audit by Document Type, due to speed limitations
-        pdf_doctype_distinct = pdf_records_list.order_by().values('modified_document_type__name').distinct()
-        
-        Changed for the next line instead: (Delete to return to normal, all types list)
-        '''
+            pdf_records_list = PdfRecord.objects.filter(EntryByCompany = company_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
+
+
         pdf_doctype_distinct = PdfRecord.objects.none()
         
         #Delete this line to deactivate selection by Entered Document Types
@@ -347,7 +315,9 @@ def randomqa_spider(request):
         
         if selected_modification_author!="all":
             pdf_authors_list = pdf_authors_list.filter(modification_author=selected_modification_author)
-           
+        
+        show_progress_mark = "show_progress_mark"
+        
         if show_progress_mark == "show_progress_mark":
         
             show_progress_mark = "show" 
@@ -363,7 +333,8 @@ def randomqa_spider(request):
                 pdf_correct_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_correct"))
                 pdf_incorrect_count = len(pdf_authors_list.filter(audit_mark_revision="auditmarked_as_incorrect"))'''
                 
-            pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
+            #pdf_reentry_count = len(pdf_authors_list.filter(audit_mark="auditmarked_as_incorrect_reentry")) + len(pdf_authors_list.filter(audit_mark="auditmarked_as_selection_reentry"))
+            pdf_reentry_count = 0
             
             if pdf_correct_count!=0 and pdf_incorrect_count!=0:
                 correct = float(pdf_correct_count)
@@ -382,11 +353,14 @@ def randomqa_spider(request):
             show_progress_mark = "no" 
         
 
+        pdf_records_list = pdf_authors_list
+        
         if selected_auditmark == "all":
             
             #pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
-            pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect").distinct()
-           
+            pdf_records_list = pdf_records_list.exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect").distinct()
+        
+        
         '''elif selected_auditmark == "correct":
             pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").filter(audit_mark="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_correct").exclude(audit_mark_revision="auditmarked_as_incorrect")
             pdf_total_count = len(pdf_records_list)
@@ -399,30 +373,20 @@ def randomqa_spider(request):
         
         if len(pdf_records_list) > 0:
         
-            '''for item in pdf_records_list:
-                
-                pdf_id_list_to_randomize.append(int(item.id))
             
-            
-                
-            random_id = random.choice(pdf_id_list_to_randomize)
-              
-            pdf_item_list = PdfRecord.objects.filter(id=random_id)[:1]
-            pdf_random_item = pdf_item_list[0]'''
             pdf_random_item = random.choice(pdf_records_list)
-            pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item.id)[:1]
-            pdf_random_source = pdf_random_item.sourcedoc_link
+
+            pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item['id'])[:1]
+            '''pdf_random_source = pdf_random_item.sourcedoc_link
             pdf_random_company = pdf_random_item.ocrrecord_link.OcrByCompany
             
             pdf_item_list = PdfRecord.objects.none()
             
-            '''pdf_random_item = random.choice(pdf_records_list)
-            pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item.id)[:1]'''
             
             for company in company_list:
             
                 pdf_item_list = pdf_item_list | PdfRecord.objects.filter(sourcedoc_link = pdf_random_source, sourcedoc_link__assigndata__assignedcompany=company).distinct()
-            
+            '''
         
         else:
         
@@ -431,6 +395,7 @@ def randomqa_spider(request):
       
         if len(pdf_item_list)>1:
             pdf_item_list = pdf_item_list.order_by('-modification_date')
+       
        
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
@@ -441,12 +406,16 @@ def randomqa_spider(request):
         'pdf_lot_number_distinct':pdf_lot_number_distinct,'pdf_author_distinct':pdf_author_distinct,
         'selected_user': selected_user,'selected_doctype': selected_doctype,'selected_company': selected_company,
         'selected_date':selected_date,'selected_modification_author':selected_modification_author,'selected_auditmark':selected_auditmark,
-        'filters_panel_width':filters_panel_width,
-        'filters_panel_width':filters_panel_height,'company_name':user_company.name}
+        'company_name':user_company.name}
         return render(request,'enersectapp/randomqa_spider.html',context)
     
    
     elif user_type == "TeamLeader" or user_type == "TeamAuditor":
+          
+          
+        return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
+          
+          
           
         user_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]  
      

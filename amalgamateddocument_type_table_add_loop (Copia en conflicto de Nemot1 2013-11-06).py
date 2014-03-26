@@ -39,7 +39,7 @@
 #Path to the .csv to be entered:
 
 #csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/ChequeLIST.csv"
-csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/albaraka2006.csv"
+csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/albaraka2006.csv"
 # Full path to the directory immediately above your django project directory
 #your_djangoproject_home="/srv/enersectapp/app/ProjectFolder"
 your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"

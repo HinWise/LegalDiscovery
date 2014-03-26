@@ -1,0 +1,6 @@
+
+
+csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/albaraka2006.csv"
+# Full path to the directory immediately above your django project directory
+#your_djangoproject_home="/srv/enersectapp/app/ProjectFolder"
+your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"

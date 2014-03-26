@@ -6,7 +6,33 @@ from django.contrib.auth.models import User,Group
 from django.db.models.signals import post_save
 
 
+class BankRecord(models.Model):
+
+    BankRecordIndex = models.IntegerField('BankRecordIndex_Reference')
+    TransactionIndex = models.IntegerField(null=True, blank=True, default= None)
+  
     
+    BankAccount = models.CharField('Bank Account',max_length=31)
+    BankName = models.CharField('Bank Name',max_length=63)
+    BankCurrency = models.CharField('Bank Currency',max_length=31)
+    PostDay = models.CharField('Post Day',max_length=7)
+    PostMonth = models.CharField('Post Month',max_length=7)
+    PostYear = models.CharField('Post Year',max_length=7)
+    ValueDay = models.CharField('Value Day',max_length=7)
+    ValueMonth = models.CharField('Value Month',max_length=7)
+    ValueYear =  models.CharField('Value Year',max_length=7)
+    Libelle = models.CharField('Libelle',max_length=31)
+    Reference = models.CharField('Reference',max_length=31)
+    Amount = models.CharField('Amount',max_length=17)
+    Description = models.CharField('Description',max_length=255)
+    TransactionId = models.CharField('Transaction ID',max_length=31)
+    Libdesc = models.CharField('Lib Description',max_length=63)
+    Reftran = models.CharField('Reference Transaction',max_length=31)
+    Provenance = models.CharField('Provenance',max_length=31)
+
+    def __unicode__(self):
+        return str(self.BankRecordIndex)
+
 class InternalRecord(models.Model):
         
     AccountNum = models.CharField('Account Number',max_length=255)
@@ -25,7 +51,44 @@ class InternalRecord(models.Model):
     Credit = models.CharField('Credit',max_length=255)
     def __unicode__(self):
         return self.Memo  
-   
+
+        
+class TransactionTable(models.Model):
+
+    TransactionIndex = models.IntegerField('TransactionIndex_Reference')
+    
+    BankRecordsListOriginalArray = models.CharField('Original Bank Record (Al Baraka) References',max_length=2047,default="")
+    NumberBankRecordIndexes = models.IntegerField('Number Bank Record Indexes in Transaction',default=0)
+    
+    bank_records_list = models.ManyToManyField(BankRecord,related_name='bank records (albaraka) list', null=True, blank=True, default=None)
+    
+    InternalRecordListOriginalArray = models.CharField('Original Internal Record (Grande Livre) References',max_length=127,default="")
+    NumberInternalRecordIndexes = models.IntegerField('Number Bank Record Indexes in Transaction',default=0)
+    
+    internal_records_list = models.ManyToManyField(InternalRecord,related_name='internal records (grande livre) list', null=True, blank=True, default=None)
+    
+    Amount = models.CharField('Amount',max_length=31)
+    AmountDiscrepancy = models.IntegerField('Amount between Credit and Debit',default=0)
+    
+    PostDay = models.CharField('Post Day',max_length=7)
+    PostMonth = models.CharField('Post Month',max_length=7)
+    PostYear = models.CharField('Post Year',max_length=7)
+    ValueDay = models.CharField('Value Day',max_length=7)
+    ValueMonth = models.CharField('Value Month',max_length=7)
+    ValueYear =  models.CharField('Value Year',max_length=7)
+    
+    DateDiscrepancy = models.IntegerField('Days between Post Date and Value Date',default=0)
+
+    Libdesc = models.CharField('Lib Description',max_length=63)
+    Reftran = models.CharField('Reference Transaction',max_length=31)
+    BankAccount = models.CharField('Bank Account',max_length=31)
+    BankName = models.CharField('Bank Name',max_length=63)
+    BankCurrency = models.CharField('Bank Currency',max_length=31)
+    
+    def __unicode__(self):
+        return str(self.TransactionIndex)
+    
+
         
 class Record(models.Model):
     name = models.CharField(max_length=300, default="None")
