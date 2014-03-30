@@ -1963,7 +1963,7 @@
                             {
                                 bValid = bValid && checkLength( issuedate_year, "Issuedate Year", 1, 255  );
                                 //bValid = bValid && checkRegexp( issuedate_year, /^([0-9])+$/i, "Issue Date Year Field may consist of 0-9 numbers." );
-                                bValid = bValid && checkRange( issuedate_year, [2002,2012], "Date Year must be in the range 2002-2012." );
+                                bValid = bValid && checkRange( issuedate_year, [1990,2012], "Date Year must be in the range 1990-2012." );
                             
                                 var concat = issuedate_day.attr("value")+"/"+issuedate_month.attr("value")+"/"+issuedate_year.attr("value");
                                 issuedate.attr("value",concat);

@@ -159,14 +159,14 @@ def randomqa_spider(request):
            
             user_selected = User.objects.get(username = selected_user)
             
-            pdf_records_list = PdfRecord.objects.filter(EntryAuthor = user_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
+            pdf_records_list = pdf_records_list.filter(EntryAuthor = user_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
  
             
         if selected_company != "all":
    
             company_selected = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
         
-            pdf_records_list = PdfRecord.objects.filter(EntryByCompany = company_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
+            pdf_records_list = pdf_records_list.filter(EntryByCompany = company_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
 
 
         pdf_doctype_distinct = PdfRecord.objects.none()
