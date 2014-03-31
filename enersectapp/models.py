@@ -34,8 +34,14 @@ class BankRecord(models.Model):
         return str(self.BankRecordIndex)
 
 class InternalRecord(models.Model):
-        
-    AccountNum = models.CharField('Account Number',max_length=255)
+    
+
+    InternalRecordIndex = models.IntegerField('InternalRecordIndex_Reference')
+    BestTransactionMatch = models.IntegerField(null=True, blank=True, default= None)
+    
+    DateDiscrepancy = models.IntegerField('Days of difference between dates',default=0)
+    
+    AccountNum = models.CharField('Bank Account Number',max_length=255)
     Company = models.CharField('Company',max_length=255)
     NoMvt = models.CharField('Number Movement',max_length=255)
     Journal = models.CharField('Journal',max_length=255)
@@ -49,6 +55,23 @@ class InternalRecord(models.Model):
     Debit = models.CharField('Debit',max_length=255)
     Lett = models.CharField('Lett',max_length=255)    
     Credit = models.CharField('Credit',max_length=255)
+    
+    MEDollars = models.CharField('Memo extracted Dollar Amount',max_length=31)
+    MEPounds = models.CharField('Memo extracted Pounds Amount',max_length=31)
+    MEEuros = models.CharField('Memo extracted Euro Amount',max_length=31)
+    MEChequeNum = models.CharField('Memo extracted Cheque Number',max_length=31)
+    MECategory = models.CharField('Memo extracted Category',max_length=31)
+    MEDate = models.CharField('Memo extracted Date',max_length=31)
+    MECutoff = models.CharField('If Memo is cut off in the document scan',max_length=31)
+    MEFactureNum = models.CharField('Memo extracted Facture Number',max_length=31)
+    
+    ExchangeRate = models.CharField('Exchange Rate',max_length=31)
+    
+    ExistingBankEntry = models.CharField('If it has a Bank Entry',max_length=31)
+    BankAccount = models.CharField('Existing Bank Account',max_length=31)
+    BankName = models.CharField('Existing Bank Name',max_length=31)
+    BankCurrency = models.CharField('Existing Bank Currency',max_length=31)
+
     def __unicode__(self):
         return self.Memo  
 

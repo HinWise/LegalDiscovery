@@ -1,4 +1,24 @@
 
+from enersectapp.models import *
+from django.contrib.auth.models import User,Group,Permission
+from django.db import transaction
+
+
+###DELETING ALL INTERNAL RECORDS (GRANDE LIVRE) BEFORE ADDING THEM, BUT NOT THE TEST INTERNAL RECORD, AS EVERYTHING IS ASSOCIATED WITH IT
+
+count = 0
+
+all_internal = InternalRecord.objects.all()
+
+all_internal.count()
+
+all_internal = all_internal[1:20000]
+
+with transaction.commit_on_success():
+ for item in all_internal:
+   print count
+   count += 1
+   item.delete()
 
 ###########################################ALBARAKA BANK STATEMENTS
 
