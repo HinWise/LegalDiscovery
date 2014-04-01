@@ -76,11 +76,90 @@ with transaction.commit_on_success():
                 new_bank.Reftran=row[17]
                 new_bank.Provenance=row[18]
                 
-                new_transaction.save()
+                new_bank.save()
                 if(counter % 100 == 0):
                     print counter
 
-###########################################MATCHED ALBARAKA
+
+###########################################INTERNAL RECORD GRANDE LIVRE STATEMENTS
+
+
+#csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/MatchedGrandeLivre.csv"
+csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedGrandeLivre.csv"
+# Full path to the directory immediately above your django project directory
+#your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
+your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
+
+import sys,os
+sys.path.append(your_djangoproject_home)
+os.environ['DJANGO_SETTINGS_MODULE'] ='ProjectFolder.settings'
+
+from enersectapp.models import *
+from django.contrib.auth.models import User,Group,Permission
+from django.db import transaction
+from django.http import HttpResponse
+import csv
+
+
+dataReader = csv.reader(open(csv_filepathname_sourcepdfs), delimiter=',')
+
+counter = 0
+
+num_files = 200000000
+
+num_jump = 1
+
+with transaction.commit_on_success():
+    for row in dataReader:
+        if row:
+            counter = counter+1
+           
+            if counter <= num_files and counter > num_jump:
+
+                new_internal=InternalRecord(InternalRecordIndex = int(row[0]))
+ 
+                try:
+                    new_internal.BestTransactionMatch=int(row[1])
+                except:
+                    missed = ""
+                try:
+                    new_internal.DateDiscrepancy=int(row[2])
+                except:
+                    missed = ""
+                new_internal.Debit=row[3]
+                new_internal.Credit=row[4]
+                new_internal.MEDollars=row[5]
+                new_internal.MEChequeNum=row[6]
+                new_internal.Day=row[7]
+                new_internal.Month=row[8]
+                new_internal.Year=row[9]
+                new_internal.Company=row[10]
+                new_internal.Memo=row[11]
+                new_internal.MECategory=row[12]
+                new_internal.MEPounds=row[13]
+                new_internal.MEEuros=row[14]
+                new_internal.MEFactureNum=row[15]
+                new_internal.AccountNum=row[16]
+                new_internal.NoMvt=row[17]
+                new_internal.NoPiece=row[18]
+                new_internal.LedgerYear=row[19]
+                new_internal.MEDate=row[20]
+                new_internal.MECutoff=row[21]
+                new_internal.Journal=row[22]
+                new_internal.Lett=row[23]
+                new_internal.S=row[24]
+                new_internal.ExchangeRate=row[25]
+                new_internal.ExistingBankEntry=row[26]
+                new_internal.BankAccount=row[27]
+                new_internal.BankName=row[28]
+                new_internal.BankCurrency=row[29]
+                
+                new_internal.save()
+                if(counter % 100 == 0):
+                    print counter                    
+                    
+                    
+###########################################MATCHED ALBARAKA / TRANSACTION TABLE
 
 #csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/AlbarakaBankStatements.csv"
 csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedAlbaraka.csv"
@@ -145,7 +224,7 @@ with transaction.commit_on_success():
 
 
 
-#### TRANSACTION BANK RECORDS LIST
+#### TRANSACTION BANK RECORDS FILLING
 
 all_transactions = TransactionTable.objects.all()
 
@@ -153,15 +232,37 @@ all_transactions = TransactionTable.objects.all()
 for item in all_transactions:
     if item:
             
-        clean_string = str(item.BankRecordsListOriginalArray).replace("[","").replace("]","")
-        split_string = clean_string.split(",")
+        clean_string_bank = str(item.BankRecordsListOriginalArray).replace("[","").replace("]","")
+        split_string_bank = clean_string_bank.split(",")
         
-        if split_string != "":
-            for transaction in split_string:
+        
+        
+        if split_string_bank != "":
+            for transaction in split_string_bank:
                 
                 try:
                     selected_bank = BankRecord.objects.get(BankRecordIndex = int(transaction))
                     item.bank_records_list.add(selected_bank)
                 except:
                     print item.pk
-                    
+
+#### TRANSACTION GRANDELIVRE LIST FILLING
+
+all_transactions = TransactionTable.objects.all()
+
+
+for item in all_transactions:
+    if item:
+            
+        clean_string_internal = str(item.InternalRecordListOriginalArray).replace("[","").replace("]","")
+        split_string_internal = clean_string_internal.split(",")
+        
+        
+        if split_string_internal != "":
+            for transaction in split_string_internal:
+                
+                try:
+                    selected_internal = InternalRecord.objects.get(InternalRecordIndex = int(transaction))
+                    item.internal_records_list.add(selected_internal)
+                except:
+                    print item.pk                    
