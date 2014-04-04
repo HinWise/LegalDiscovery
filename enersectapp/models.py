@@ -10,8 +10,7 @@ class BankRecord(models.Model):
 
     BankRecordIndex = models.IntegerField('BankRecordIndex_Reference')
     TransactionIndex = models.IntegerField(null=True, blank=True, default= None)
-  
-    
+   
     BankAccount = models.CharField('Bank Account',max_length=31)
     BankName = models.CharField('Bank Name',max_length=63)
     BankCurrency = models.CharField('Bank Currency',max_length=31)
@@ -35,7 +34,6 @@ class BankRecord(models.Model):
 
 class InternalRecord(models.Model):
     
-
     InternalRecordIndex = models.IntegerField('InternalRecordIndex_Reference')
     BestTransactionMatch = models.IntegerField(null=True, blank=True, default= None)
     

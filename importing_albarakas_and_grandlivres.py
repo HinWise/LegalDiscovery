@@ -23,11 +23,11 @@ with transaction.commit_on_success():
 ###########################################ALBARAKA BANK STATEMENTS
 
 
-#csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/AlbarakaBankStatements.csv"
-csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/AlbarakaBankStatements.csv"
+csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/AlbarakaBankStatements.csv"
+#csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/AlbarakaBankStatements.csv"
 # Full path to the directory immediately above your django project directory
-#your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
-your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
+your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
+#your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
 
 import sys,os
 sys.path.append(your_djangoproject_home)
@@ -84,11 +84,11 @@ with transaction.commit_on_success():
 ###########################################INTERNAL RECORD GRANDE LIVRE STATEMENTS
 
 
-#csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/MatchedGrandeLivre.csv"
-csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedGrandeLivre.csv"
+csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/MatchedGrandeLivre.csv"
+#csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedGrandeLivre.csv"
 # Full path to the directory immediately above your django project directory
-#your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
-your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
+your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
+#your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
 
 import sys,os
 sys.path.append(your_djangoproject_home)
@@ -161,11 +161,11 @@ with transaction.commit_on_success():
                     
 ###########################################MATCHED ALBARAKA / TRANSACTION TABLE
 
-#csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/AlbarakaBankStatements.csv"
-csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedAlbaraka.csv"
+csv_filepathname_sourcepdfs="/srv/enersectapp/app/ProjectFolder/databases/MatchedAlbaraka.csv"
+#csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedAlbaraka.csv"
 # Full path to the directory immediately above your django project directory
-#your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
-your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
+your_djangoproject_home="/srv/enersectapp/app/ProjectFolder/"
+#your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
 
 import sys,os
 sys.path.append(your_djangoproject_home)
@@ -199,7 +199,10 @@ with transaction.commit_on_success():
                 new_transaction.NumberBankRecordIndexes=int(row[2])
                 
                 new_transaction.InternalRecordListOriginalArray=row[3]
-                new_transaction.NumberInternalRecordIndexes=int(row[4])
+                try:
+                    new_transaction.NumberInternalRecordIndexes=int(row[4])
+                except:
+                    missed = ""
                 
                 new_transaction.DateDiscrepancy=int(row[5])
                 new_transaction.Amount=row[6]
@@ -228,41 +231,53 @@ with transaction.commit_on_success():
 
 all_transactions = TransactionTable.objects.all()
 
+counter = 0
 
-for item in all_transactions:
-    if item:
-            
-        clean_string_bank = str(item.BankRecordsListOriginalArray).replace("[","").replace("]","")
-        split_string_bank = clean_string_bank.split(",")
+with transaction.commit_on_success():
+    for item in all_transactions:
+    
+        counter += 1
+        print counter
         
-        
-        
-        if split_string_bank != "":
-            for transaction in split_string_bank:
+        if item:
                 
-                try:
-                    selected_bank = BankRecord.objects.get(BankRecordIndex = int(transaction))
-                    item.bank_records_list.add(selected_bank)
-                except:
-                    print item.pk
+            clean_string_bank = str(item.BankRecordsListOriginalArray).replace("[","").replace("]","")
+            split_string_bank = clean_string_bank.split(",")
+            
+            
+            
+            if split_string_bank != "":
+                for transact in split_string_bank:
+                    
+                    try:
+                        selected_bank = BankRecord.objects.get(BankRecordIndex = int(transact))
+                        item.bank_records_list.add(selected_bank)
+                    except:
+                        print item.pk
 
 #### TRANSACTION GRANDELIVRE LIST FILLING
 
 all_transactions = TransactionTable.objects.all()
 
+counter = 0
 
-for item in all_transactions:
-    if item:
-            
-        clean_string_internal = str(item.InternalRecordListOriginalArray).replace("[","").replace("]","")
-        split_string_internal = clean_string_internal.split(",")
-        
-        
-        if split_string_internal != "":
-            for transaction in split_string_internal:
+with transaction.commit_on_success():
+    for item in all_transactions:
+    
+        counter += 1
+        print counter
+    
+        if item:
                 
-                try:
-                    selected_internal = InternalRecord.objects.get(InternalRecordIndex = int(transaction))
-                    item.internal_records_list.add(selected_internal)
-                except:
-                    print item.pk                    
+            clean_string_internal = str(item.InternalRecordListOriginalArray).replace("[","").replace("]","")
+            split_string_internal = clean_string_internal.split(",")
+            
+            
+            if split_string_internal != "":
+                for transact in split_string_internal:
+                    
+                    try:
+                        selected_internal = InternalRecord.objects.get(InternalRecordIndex = int(transact))
+                        item.internal_records_list.add(selected_internal)
+                    except:
+                        print item.pk                    
