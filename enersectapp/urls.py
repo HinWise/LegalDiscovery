@@ -259,5 +259,11 @@ urlpatterns = patterns('',
     # to be exported as a Legal Discovery Pdf Set
     # ex: enersectapp/legalui/legal_discovery/
     url(r'^legalui/legal_discovery/$', views.legal_discovery, name='legal_discovery'),
+    
+    # Transactions Report Tool
+    # Allows to search for certain data in TransactionTable, Bank Records and Internal Records,
+    # displays the relationships between those, and makes a formatted report about it in a pdf
+    # ex: enersectapp/legalui/transactions_report/
+    url(r'^legalui/transactions_report/$', views.transactions_report, name='transactions_report'),
    
 )
