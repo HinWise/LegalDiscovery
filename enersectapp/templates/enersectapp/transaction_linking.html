@@ -1,0 +1,460 @@
+{% load i18n %}
+{% load staticfiles %}
+
+
+{% block page_title %}
+<head>
+<title>Transactions Report Tool</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/d3/d3.min.js' %}" ></script>
+
+
+{% endblock config_libs %}
+
+{% block special_libs %}
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" /> -->
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" /> -->
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/transaction_linking.css' %}" />
+
+
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+<script>
+
+    $(document).ready(function () {
+        
+        {% autoescape off %}
+        
+        console.log("STARTING PROGRAM");
+        
+        var transactions_dataset = {{transactions_dataset}};
+        
+        var entry_item_pk = {{entry_item_pk}};
+        console.log(entry_item_pk);
+        var entrylinks_pk = {{entrylinks_pk}};
+        console.log(entrylinks_pk);
+        
+        var high_candidates_list = {{high_candidates_list}};
+        console.log(high_candidates_list);
+        var medium_candidates_list = {{medium_candidates_list}};
+        console.log(medium_candidates_list);
+        var low_candidates_list = {{low_candidates_list}};
+        console.log(low_candidates_list);
+        var excluded_candidates_list = {{excluded_candidates_list}};
+        console.log(excluded_candidates_list);
+        
+        var searchtags = {{searchtags}};
+        console.log(searchtags);
+        var number_of_searchtags = {{number_of_searchtags}};
+        console.log(number_of_searchtags);
+      
+        console.log("-----------------------------");
+        
+        {% endautoescape %}
+        
+        createLeftGraph();
+        
+        createRightGraph();
+    
+        initiateListeners();
+        
+        function createLeftGraph(){
+             
+        
+            $( ".entry_item_candidates_list" ).droppable({
+              accept: ".test_dot",
+              activeClass: "ui-state-hover",
+              hoverClass: "ui-state-active",
+              drop: function( event, ui ) {
+                $( this )
+                  .addClass( "ui-state-highlight" )
+                  .find( "p" )
+                    .html( "Dropped!" );
+              }
+            });
+            
+            $( ".sortable" ).sortable({
+              connectWith: "ul",
+              items: "li:not(.list_description)"
+            });
+            
+            $( ".sortable1, .sortable2, .sortable3" ).disableSelection();
+        
+        }
+    
+        function createRightGraph(){
+        
+            var total_width_panel = $("#transaction_search_candidates").css("width");
+            
+            var new_width_panel = Math.floor(parseInt(total_width_panel)/(number_of_searchtags+1));
+            //var new_font_size = $("#transaction_search_candidates").css("font-size",100-(10*(number_of_searchtags/number_of_searchtags))+"%");
+            
+            $(".transaction_search_candidates_list").css("width",new_width_panel+"px");
+            
+            $(".transaction_search_candidates_list").css("display","inline-block");
+            
+            var candidate_width = $(".entry_item_candidates_list .candidate").width();
+            
+            $(".sortable_transaction_search .transaction_search_candidate").each(function(){
+            
+                if($(this).width()!=candidate_width)
+                {
+                    $(this).css("width",candidate_width+"px");
+                }
+                
+            
+            });
+            
+            
+           
+        }
+        
+    
+        function initiateListeners() {
+        
+            //When Mouse over one of the Candidates, update the iframe to show that Transaction
+            
+            $(".candidate").mousedown(function(){
+                
+                $("#transaction_graph").remove();
+                
+                var frame_width = $("#iframe_test").width()-10+"px";
+                var frame_height = $("#iframe_test").height()-10+"px";
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe id="transaction_graph" src="http://localhost:8000/enersectapp/'+candidate_id+'/show_transaction/" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
+                
+                $("#iframe_test").append(frame);
+                
+            });
+        
+        }
+        
+
+        
+    });
+        
+</script>
+
+{% endblock jqueryui_setups %}  
+
+<body>
+{% if not is_popup %}
+
+<!-- <div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+    </div> -->
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+
+{% block content%}
+    <div id="upper_container">
+        
+        <div id="graph_container_left"> 
+        
+            <div id="entry_item_container">
+            
+                <div id="entry_item_element">
+                
+                    {% if entry_item %}
+                    <div id="entry_item_content">
+                        <table>
+                            <thead>
+                            
+                                <tr>
+                                    <th>Document Type</th>
+                                    <td>{{entry_item.ocrrecord_link.Document_Type}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Amount</th>
+                                    <td>{{entry_item.ocrrecord_link.Amount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Currency</th>
+                                    <td>{{entry_item.ocrrecord_link.Currency}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Company Name</th>
+                                    <td>{{entry_item.ocrrecord_link.Company}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Issue Date</th>
+                                    <td>{{entry_item.ocrrecord_link.IssueDate}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>{{entry_item.ocrrecord_link.Address}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Telephone</th>
+                                    <td>{{entry_item.ocrrecord_link.Telephone}}</td>
+                                </tr>
+                                <tr>
+                                    <th>City</th>
+                                    <td>{{entry_item.ocrrecord_link.City}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Country</th>
+                                    <td>{{entry_item.ocrrecord_link.Country}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Account Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Source_Bank_Account}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Document Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Document_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Purchase Order Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Piece Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Piece_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Memo</th>
+                                    <td>{{entry_item.ocrrecord_link.Memo}}</td>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                            </tbody>
+
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div id="entry_item_candidates">
+
+                    <div id="entry_item_excluded_candidates" class="entry_item_candidates_list">
+                    
+                        <ul class="sortable">
+                          <li class="list_description ui-state-default">EXCLUDED</li>
+                          {% for candidate in excluded_candidates_list %}
+                            <li class="candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                          
+                        </ul>
+                
+                    </div>
+                    
+                    <div id="entry_item_low_candidates" class="entry_item_candidates_list">
+                
+                        <ul class="sortable">
+                          <li class="list_description ui-state-default">LOW</li>
+                          {% for candidate in low_candidates_list %}
+                            <li class="candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                          
+                        </ul>
+                
+                    </div>
+                    
+                    <div id="entry_item_medium_candidates" class="entry_item_candidates_list">
+                        <ul class="sortable">
+                            <li class="list_description ui-state-default">MEDIUM</li>
+                            {% for candidate in medium_candidates_list %}
+                            <li class="candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <div id="entry_item_high_candidates" class="entry_item_candidates_list">
+                        <ul class="sortable">
+                            <li class="list_description ui-state-default">HIGH</li>
+                            {% for candidate in high_candidates_list %}
+                            <li class="candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                        </ul>
+                    </div>
+                
+                </div>
+                
+            </div>
+
+        </div>
+   
+        <div id="graph_container_right"> 
+            
+            <div id="transactions_lists_container">
+            
+                <div id="chosen_transaction_element">
+                
+                    {% if entry_item %}
+                    <div id="chosen_transaction_content">
+                    
+                        <div id="iframe_test">
+     
+                        </div>
+                    
+                        <!-- <table>
+                            <thead>
+                            
+                                <tr>
+                                    <th>Document Type</th>
+                                    <td>{{entry_item.ocrrecord_link.Document_Type}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Amount</th>
+                                    <td>{{entry_item.ocrrecord_link.Amount}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Currency</th>
+                                    <td>{{entry_item.ocrrecord_link.Currency}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Company Name</th>
+                                    <td>{{entry_item.ocrrecord_link.Company}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Issue Date</th>
+                                    <td>{{entry_item.ocrrecord_link.IssueDate}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>{{entry_item.ocrrecord_link.Address}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Telephone</th>
+                                    <td>{{entry_item.ocrrecord_link.Telephone}}</td>
+                                </tr>
+                                <tr>
+                                    <th>City</th>
+                                    <td>{{entry_item.ocrrecord_link.City}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Country</th>
+                                    <td>{{entry_item.ocrrecord_link.Country}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Account Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Source_Bank_Account}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Document Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Document_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Purchase Order Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.PurchaseOrder_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Piece Nº</th>
+                                    <td>{{entry_item.ocrrecord_link.Piece_Number}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Memo</th>
+                                    <td>{{entry_item.ocrrecord_link.Memo}}</td>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                            </tbody>
+
+                        </table> -->
+                    </div>
+                    {% endif %}
+    
+                    
+    
+                </div>
+                <div id="transaction_search_candidates">
+
+                    {% for tag in searchtags %}
+                    <div class="transaction_search_candidates_list" tag = "{{tag}}">
+                    
+                        <ul class="sortable sortable_transaction_search">
+                          <li class="list_description transactions_list_description invisible ui-state-default"></li>
+                          {% for candidate in excluded_candidates_list %}
+                            <li class="candidate transaction_search_candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                          
+                        </ul>
+                
+                    </div>
+                    {% endfor %}
+                
+                </div>
+                
+                
+            </div>
+        </div>
+        
+        
+        
+        <div id="fields_container">  
+        
+
+                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:transaction_linking' %}" method="post">
+                {% csrf_token %}
+
+                
+                <fieldset  class="invisible" id="fieldset_fields">
+               
+               
+                 <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
+               
+     
+                </fieldset>
+                
+                </form>
+ 
+            
+        </div>
+    </div> 
+    <div id="right_container">
+        
+                
+    </div>
+    
+    
+{% endblock content%}
+
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

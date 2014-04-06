@@ -26,7 +26,8 @@ from django.db.models import Count
 from enersectapp.viewsfunctions import (app_index_module,app_login_module,linkui_spiderweb_module,linkui_spiderweb_viceversa_module,dataentryui_spider_module,
                                         pair_randomqa_spider_module,assign_source_pdfs_module,webcocoons_module,randomqa_spider_module,categorization_tool_module,
                                         blank_or_not_blank_module,sudo_assignsourcepdfsui_by_module,progress_report_module,category_changer_module,
-                                        arabic_memo_edit_module,search_tool_module,legal_discovery_module,transactions_report_module)
+                                        arabic_memo_edit_module,search_tool_module,legal_discovery_module,transactions_report_module,transaction_linking_module,
+                                        show_transaction_module)
 
 from enersectapp.models import *
 
@@ -179,6 +180,13 @@ def transactions_report(request):
     
     return transactions_report_module.transactions_report(request)
 
+def transaction_linking(request):
+    
+    return transaction_linking_module.transaction_linking(request)    
+    
+def show_transaction(request,transaction_pk):
+    
+    return show_transaction_module.show_transaction(request,transaction_pk)  
   
 
 

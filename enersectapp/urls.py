@@ -266,4 +266,19 @@ urlpatterns = patterns('',
     # ex: enersectapp/legalui/transactions_report/
     url(r'^legalui/transactions_report/$', views.transactions_report, name='transactions_report'),
    
+   # Transaction Linking Tool
+    # Allows to link PdfRecord table with TransactionTable elements,
+    # as well as seeing the linked candidates and removing links
+    # ex: enersectapp/linkui/transaction_linking/
+    url(r'^linkui/transaction_linking/$', views.transaction_linking, name='transaction_linking'),
+    
+    # Show Transaction Tool
+    # Allows to see a TransactionTable in a dendrogram.
+    # Used for the iframe in Transaction Linking Tool
+    # ex: enersectapp/linkui/transaction_linking/
+    # ex: /enersectapp/5/show_transaction
+
+    url(r'^(?P<transaction_pk>\d+)/show_transaction/$', views.show_transaction, name='show_transaction'),
+    
+   
 )

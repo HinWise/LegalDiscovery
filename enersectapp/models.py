@@ -109,8 +109,7 @@ class TransactionTable(models.Model):
     def __unicode__(self):
         return str(self.TransactionIndex)
     
-
-        
+      
 class Record(models.Model):
     name = models.CharField(max_length=300, default="None")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
@@ -396,6 +395,17 @@ class CompanyTemplate(models.Model):
     class Meta:
         ordering = ['companyname_base']
 
+
+class EntryLinks(models.Model):
+    
+    entry_pk = models.IntegerField(null=True,blank=True)
+    
+    high_candidates_list = models.ManyToManyField(TransactionTable,related_name='High candidates list', null=True, blank=True, default=None)
+    medium_candidates_list = models.ManyToManyField(TransactionTable,related_name='Medium candidates list', null=True, blank=True, default=None)
+    low_candidates_list = models.ManyToManyField(TransactionTable,related_name='Low candidates list', null=True, blank=True, default=None)
+    
+    excluded_candidates_list = models.ManyToManyField(TransactionTable,related_name='Excluded candidates list', null=True, blank=True, default=None)
+        
 class PdfRecord(models.Model):
     name = models.CharField(max_length=255, default="Pdf Record")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
@@ -420,6 +430,9 @@ class PdfRecord(models.Model):
     sourcedoc_link = models.ForeignKey(SourcePdf)
     ocrrecord_link = models.ForeignKey(OcrRecord)
     companytemplate_link = models.ForeignKey(CompanyTemplate)
+    
+    entrylinks_link = models.ForeignKey(EntryLinks,null=True,blank=True)
+    
     EntryByCompany = models.ForeignKey(Group,null=True,blank=True)
     EntryAuthor = models.ForeignKey(User,null=True,blank=True)
     AssignedLotNumber = models.ForeignKey(LotNumber,null=True,blank=True)

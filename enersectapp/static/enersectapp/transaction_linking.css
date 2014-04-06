@@ -1,0 +1,308 @@
+@charset "UTF-8";
+
+#upper_container{
+
+    position:absolute;
+    
+    width:100%;
+    height:100%;
+    
+    top:0;
+    left:0;
+
+    background: white;
+}
+
+
+#graph_container_left  {
+
+    position:absolute;
+    
+    width:50%;
+    height:90%;
+    
+    top:0;
+    left:0;
+    
+
+    
+}
+
+    #entry_item_container  {
+
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    top: 5%;
+    left: 5%;
+    
+    
+    }
+    
+        #entry_item_element  {
+
+        position: absolute;
+        width: 80%;
+        height: 65%;
+        top: 0;
+        left: 10%;
+        background: rgba(238,238,238,1);
+        border-radius:10%;
+        border:1px solid black;
+        
+        }
+        
+            
+                #entry_item_content  {
+
+                position: absolute;
+                width: 90%;
+                height: 90%;
+                top: 5%;
+                left: 5%;
+                
+                overflow: auto;
+                
+                
+                }
+        
+                    #entry_item_content,table {
+                    
+                        font-family:Georgia;
+                        font-size:90%;
+                        text-align:center;
+                        
+                        color:black;
+                        
+                    }
+                    
+                   
+            
+        #entry_item_candidates  {
+
+        position: absolute;
+        width: 70%;
+        height: 35%;
+        top: 65%;
+        left: 15%;
+        background: white;
+        
+        
+        
+        }
+        
+            
+            .list_description {
+            
+                position: relative;
+                display: block;
+                width: 98%;
+                height: 12%;
+                top: 0;
+                left: 0;
+                margin-left: 0;
+                text-align: center;
+                color: black;
+                border: 1px solid lightgrey;
+                font-size: 70%;
+
+            }
+        
+            .entry_item_candidates_list {
+            
+                position: relative;
+                display: inline-block;
+                width: 23%;
+                height: 100%;
+                top: 0;
+                left: 0.5%;
+                margin-left: 0%;
+                border: 1px solid lightgrey;
+    
+
+            }
+        
+            .ui-state-hover {
+            
+                border:1px solid yellow;
+            
+            }
+        
+            #entry_item_excluded_candidates  {
+
+           
+            /* background:red; */
+            
+            }
+            
+            #entry_item_low_candidates  {
+
+           
+            /* background: orange; */
+            
+            }
+            
+            #entry_item_medium_candidates  {
+
+            
+            /* background:yellow; */
+            
+            }
+            
+            #entry_item_high_candidates  {
+
+            
+            /* background:pink; */
+            
+            }
+
+            .sortable { 
+                list-style-type: none; 
+                margin: 0; 
+                padding: 0; 
+                float: left; 
+                background: #eee; 
+                width: 100%; 
+                height:100%;
+                
+                overflow-y: auto;
+                
+            }
+            
+            .sortable .candidate { 
+                display: inline-block;
+                width: 20%;
+                font-size: 100%;
+                height: 20%;
+                margin: 1%;
+                padding: 0;
+                float: left;
+                border: 1px solid black;
+                border-radius: 100%;
+            }
+            
+
+#graph_container_right  {
+
+    position:absolute;
+    
+    width:50%;
+    height:90%;
+    
+    top:0;
+    left:50%;
+    
+    background:white;
+    
+}
+
+    #transactions_lists_container {
+    
+        position: absolute;
+        width: 90%;
+        height: 90%;
+        top: 5%;
+        left: 5%;
+
+    
+    }
+    
+    
+        #chosen_transaction_element  {
+
+        position: absolute;
+        width: 80%;
+        height: 65%;
+        top: 0;
+        left: 10%;
+        background: rgba(238,238,238,1);
+        border-radius:10%;
+        border:1px solid black;
+        
+        }
+        
+            
+                #chosen_transaction_content  {
+
+                position: absolute;
+                width: 90%;
+                height: 90%;
+                top: 5%;
+                left: 5%;
+                
+                overflow: auto;
+                
+                
+                }
+        
+                    #chosen_transaction_content,table {
+                    
+                        font-family:Georgia;
+                        font-size:90%;
+                        text-align:center;
+                        
+                        color:black;
+                        
+                    }
+                    
+        #transaction_search_candidates  {
+
+        position: absolute;
+        width: 70%;
+        height: 35%;
+        top: 65%;
+        left: 15%;
+        background: white;
+        
+
+        }
+        
+            .transactions_list_description {
+            
+                position: relative;
+                display: block;
+                width: 95%;
+                height: 12%;
+                top: 0;
+                left: 0;
+                margin-left: 0;
+                text-align: center;
+                color: black;
+                border: 1px solid lightgrey;
+                font-size: 70%;
+
+            }
+        
+            .transaction_search_candidates_list {
+            
+                position: relative;
+                display: inline-block;
+                width: 23%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                margin-left: 0%;
+                border: 1px solid lightgrey;
+    
+                display:none;
+
+            }
+            
+#iframe_test {
+
+    position:absolute;
+    
+    width:100%;
+    height:100%;
+    
+    left:0%;
+    top:0%;
+    
+    background-color:#EEE;
+    
+    
+    /*border:2px solid black;*/
+    
+    z-index:200;
+  
+}
