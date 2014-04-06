@@ -123,8 +123,6 @@ def transaction_linking(request):
     
         main_dict["children"] = temp_list
 
-    #print main_dict
-    print entry_item
     
     transactions_dataset = main_dict
     

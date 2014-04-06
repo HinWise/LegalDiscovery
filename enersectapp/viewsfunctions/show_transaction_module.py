@@ -103,10 +103,6 @@ def show_transaction(request,transaction_pk):
     transaction_dict = { "name":"Transaction "+str(transaction_item.pk),"children":main_content_list}
  
     transaction_dict = json.dumps(transaction_dict)
- 
-    print "HAHAAAA"
-    print transaction_dict
-    print "HUHUHUUU"
 
     #print main_dict
    
