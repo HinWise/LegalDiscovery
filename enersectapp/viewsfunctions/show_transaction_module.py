@@ -26,6 +26,7 @@ def show_transaction(request,transaction_pk):
     
     bank_records_list = []
     
+    
     for bank_record in item_bank_records:
     
         helper_dict = {"name":"Bank Record "+ str(bank_record.BankRecordIndex),"children":[
@@ -84,6 +85,15 @@ def show_transaction(request,transaction_pk):
         ]}
         internal_records_list.append(helper_dict)
 
+    if len(internal_records_list) > 0:
+        internal_records_dict = {"name":"Associated Internal Records","children":internal_records_list}
+    else:
+        internal_records_dict = {"name":"Associated Internal Records"}
+        
+    if len(bank_records_list) > 0:
+        bank_records_dict = {"name":"Associated Bank Records","children":bank_records_list}
+    else:
+        bank_records_dict = {"name":"Associated Bank Records"}
         
     main_content_list = [{"name":"Amount = "+transaction_item.Amount},{"name":"Amount Discrepancy= "+str(transaction_item.AmountDiscrepancy)},
         {"name":"PostDate = "+transaction_item.PostDay+"/"+transaction_item.PostMonth+"/"+transaction_item.PostYear},
@@ -95,9 +105,9 @@ def show_transaction(request,transaction_pk):
         {"name":"BankAccount = "+transaction_item.BankAccount},
         {"name":"BankCurrency = "+transaction_item.BankCurrency},
         {"name":"NumberBankRecordIndexes = "+str(transaction_item.NumberBankRecordIndexes)},
-        {"name":"Associated Bank Records","children":bank_records_list},
+        bank_records_dict,
         {"name":"NumberInternalRecordIndexes = "+str(transaction_item.NumberInternalRecordIndexes)},
-        {"name":"Associated Internal Records","children":internal_records_list}
+        internal_records_dict
     ]
     
     transaction_dict = { "name":"Transaction "+str(transaction_item.pk),"children":main_content_list}
