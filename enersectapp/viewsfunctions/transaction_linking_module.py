@@ -57,7 +57,7 @@ def transaction_linking(request):
     if number_of_searchtags>8:
         number_of_searchtags = 8
 
-        
+      
     context = {"the_user":the_user,'entry_item':entry_item,
                 'entry_item_pk':entry_item_pk,
                 'entrylinks_pk':entrylinks_pk,'high_candidates_list':high_candidates_list,'medium_candidates_list':medium_candidates_list,
