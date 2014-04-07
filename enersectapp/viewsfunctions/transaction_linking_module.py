@@ -48,7 +48,8 @@ def transaction_linking(request):
         excluded_candidates_list = []
     
 
-    sample_transactions = TransactionTable.objects.all().order_by()[14698:14705]
+    #sample_transactions = TransactionTable.objects.all().order_by()[14698:14705]
+    sample_transactions = TransactionTable.objects.all().order_by()[14600:14607]
     
     searchtags = ['amount','doctype','date','account','memo','reftran','libelle','account']
     number_of_searchtags = len(searchtags)
