@@ -37,8 +37,7 @@
         {% autoescape off %}
         
         console.log("STARTING PROGRAM");
-        
-        var transactions_dataset = {{transactions_dataset}};
+
         
         var entry_item_pk = {{entry_item_pk}};
         console.log(entry_item_pk);
@@ -398,7 +397,7 @@
                     
                         <ul class="sortable sortable_transaction_search">
                           <li class="list_description transactions_list_description invisible ui-state-default"></li>
-                          {% for candidate in excluded_candidates_list %}
+                          {% for candidate in sample_transactions %}
                             <li class="candidate transaction_search_candidate ui-state-default" candidate_id={{candidate.pk}}></li>
                           {% endfor %}
                           
