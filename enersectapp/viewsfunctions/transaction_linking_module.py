@@ -132,6 +132,11 @@ def transaction_linking(request):
                 coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
 
+            if item["tag_name"] == "Company":
+            
+                coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__contains = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+                
    
     coincident_transactions_dict = {}
    
@@ -156,9 +161,14 @@ def transaction_linking(request):
         temp_dict["score_index"]= str(score);
         final_list_ordered_score.append(temp_dict)
     
+    
+
+    tag_types = ["Amount","NoPiece","Description","Company"]
+    
+    
     context = {"the_user":the_user,'entry_item':entry_item,
                 'entry_item_pk':entry_item_pk,
                 'entrylinks_pk':entrylinks_pk,'high_candidates_list':high_candidates_list,'medium_candidates_list':medium_candidates_list,
                 'low_candidates_list':low_candidates_list,'excluded_candidates_list':excluded_candidates_list,'number_of_searchtags': number_of_searchtags,
-                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score}
+                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags}
     return render(request,'enersectapp/transaction_linking.html',context)

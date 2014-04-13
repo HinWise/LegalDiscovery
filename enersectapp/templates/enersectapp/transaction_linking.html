@@ -151,6 +151,48 @@
             
             });
         
+            $("#searchtag_add_button").click(function(){
+            
+                var actual_searchtags_string = $("#searchtags_string").attr("value");
+                
+                var new_tag_type = $("#select_tagtype_menu").val();
+                var new_tag_content = $("#searchtags_input").val();
+                
+                var s = "";
+                
+                if(actual_searchtags_string.length != 0)
+                {
+                    s+="+";
+                }
+                
+                s+=new_tag_type+":"+new_tag_content;
+                
+                $("#searchtags_string").val(actual_searchtags_string+s);
+                
+                
+                $("#fields_form").submit();
+            
+            });
+            
+            
+            $(".erase_tag_button").click(function(){
+            
+                var tag_text = $(this).attr("tag_text");
+            
+                var actual_searchtags_string = $("#searchtags_string").attr("value");
+                
+                var new_searchtags_string = actual_searchtags_string.replace("+"+tag_text,"");
+                new_searchtags_string = new_searchtags_string.replace(tag_text,"");
+                
+                $("#searchtags_string").attr("value",new_searchtags_string);
+                $("#searchtags_string").val(new_searchtags_string);
+            
+                $(this).parent().remove();
+                
+                $("#fields_form").submit();
+            
+            });
+            
             
         
         }
@@ -426,12 +468,40 @@
                     </div>
                     {% endfor %}
                 
-                    {% if searchtags_string %}
-                    <input type="text" name="searchtags_string" id="searchtags_string" value="{{searchtags_string}}" />
-                    {% else %}
-                    <input type="text" name="searchtags_string" id="searchtags_string" value="Amount:1000+Piece_Number:120+Description:20" />
-                    {% endif %}
                 
+                </div>
+                <div id="search_config_panel">
+                    {% if searchtags_string %}
+                        <input type="text" class="invisible" name="searchtags_string" id="searchtags_string" value="{{searchtags_string}}" />
+                        {% else %}
+                        <!--<input type="text" name="searchtags_string" id="searchtags_string" value="Amount:1000+Piece_Number:120+Description:20" /> -->
+                        <input type="text" class="invisible" name="searchtags_string" id="searchtags_string" value="" />
+                        {% endif %}
+                
+                    <div id="search_tags_show_panel">
+                        
+                        
+                        {% for tag in searchtags %}
+                        
+                        <div class="search_tag_unit">
+                            <input type="button" class="erase_tag_button" value="X" tag_text="{{tag.tag_name}}:{{tag.tag_content}}" />
+                            <div class="tag_text"><span>{{tag.tag_name}}</span>:<span>{{tag.tag_content}}</span></div>
+                        </div>
+                        
+                        {% endfor %}
+                    </div>
+                    <div id="search_tags_create_panel">
+                    
+                        <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
+                            {% for tag in tag_types %}
+                                <option value="{{tag}}">{{tag}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="searchtags_input" id="searchtags_input" value="" />
+                        <input type="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
+                        
+
+                    </div>
                 </div>
                 
                 

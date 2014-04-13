@@ -249,7 +249,7 @@
 
         position: absolute;
         width: 90%;
-        height: 35%;
+        height: 25%;
         top: 70%;
         left: 1%;
 
@@ -287,6 +287,13 @@
                 display:none;
 
             }
+            
+            .transaction_search_candidate { 
+            
+                width: 10% !important;
+                height: 15% !important;
+               
+            }
 
 #fields_container {
 
@@ -301,18 +308,133 @@
 
 }
 
-#searchtags_string {
+
+
+#search_config_panel {
 
     position:absolute;
     
     left:0;
-    top:-10%;
+    top:96%;
+    
+    width: 90%;
+    height: 11%;
+    
+
+
+}
+
+    #search_tags_show_panel {
+    
+    position: absolute;
+    left: 0;
+    top: 0%;
+    width: 100%;
+    height: 30%;
+    overflow: auto;
+
+    
+    
+    }
+    
+        
+        .search_tag_unit {
+        
+        position: relative;
+        display: inline-block;
+        width: 20%;
+        margin-left: 5%;
+        height: 100%;
+        background: lightgrey;
+        }
+        
+        .erase_tag_button {
+        
+        position: relative;
+        display:inline-block;
+        width: 25%;
+        
+        height: 100%;
+
+        }
+        
+        .tag_text
+            {
+        
+        position: relative;
+        display: inline-block;
+        width: 1%;
+        height: 100%;
+        font-family: Georgia;
+        font-size: 50%;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: bold;
+        letter-spacing: 0px;
+        color: black;
+
+        }
+        
+    #search_tags_create_panel {
+    
+    position: absolute;
+    left: 0;
+    top: 35%;
+    width: 100%;
+    height: 65%;
+    background: lightgrey;
+    
+    
+    }
+
+    #select_tagtype_menu {
+    
+    position: absolute;
+    left: 25%;
+    top: 25%;
+        
+    }
+    
+    #searchtags_input {
+    
+    position: absolute;
+    left: 45%;
+    width: 20%;
+    top: 30%;
+    height: 50%;
+        
+    }
+    
+    #searchtag_add_button {
+        
+        position: absolute;
+        left: 68%;
+        width: 5%;
+        top: 30%;
+        height: 50%;
+    
+    
+    }
+    
+    
+    
+       #searchtags_string {
+
+    position:absolute;
+    
+    left:0;
+    top:-900%;
     
     width:50%;
 
 
-}
-            
+    }
+
+    
+     
+    
+    
+      
 #iframe_test {
 
     position:absolute;
