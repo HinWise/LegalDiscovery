@@ -81,7 +81,6 @@ def transaction_linking(request):
     #Example searchtags_string: "Amount:1000,Piece_Number:120"
     
     try:
-    
         searchtags_string = request.POST['searchtags_string']
     except:
         searchtags_string = ""
@@ -121,10 +120,6 @@ def transaction_linking(request):
                 coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
             
-            if item["tag_name"] == "Amount":
-            
-                coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
-                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
             
             if item["tag_name"] == "Piece_Number":
             
@@ -165,5 +160,5 @@ def transaction_linking(request):
                 'entry_item_pk':entry_item_pk,
                 'entrylinks_pk':entrylinks_pk,'high_candidates_list':high_candidates_list,'medium_candidates_list':medium_candidates_list,
                 'low_candidates_list':low_candidates_list,'excluded_candidates_list':excluded_candidates_list,'number_of_searchtags': number_of_searchtags,
-                'searchtags':searchtags,'final_list_ordered_score':final_list_ordered_score}
+                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score}
     return render(request,'enersectapp/transaction_linking.html',context)

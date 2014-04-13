@@ -145,6 +145,14 @@
             
             });
         
+            $("#searchtags_string").blur(function(){
+            
+                $("#fields_form").submit();
+            
+            });
+        
+            
+        
         }
         
 
@@ -418,7 +426,11 @@
                     </div>
                     {% endfor %}
                 
+                    {% if searchtags_string %}
+                    <input type="text" name="searchtags_string" id="searchtags_string" value="{{searchtags_string}}" />
+                    {% else %}
                     <input type="text" name="searchtags_string" id="searchtags_string" value="Amount:1000+Piece_Number:120+Description:20" />
+                    {% endif %}
                 
                 </div>
                 
