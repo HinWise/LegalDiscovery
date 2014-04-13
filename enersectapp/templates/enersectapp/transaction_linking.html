@@ -53,8 +53,8 @@
         var excluded_candidates_list = {{excluded_candidates_list}};
         console.log(excluded_candidates_list);
         
-        var searchtags = {{searchtags}};
-        console.log(searchtags);
+        //var searchtags = {{searchtags}};
+        //console.log(searchtags);
         var number_of_searchtags = {{number_of_searchtags}};
         console.log(number_of_searchtags);
       
@@ -138,6 +138,12 @@
                 $("#iframe_test").append(frame);
                 
             });
+            
+            $("#selected_entry").blur(function(){
+            
+                $("#fields_form").submit();
+            
+            });
         
         }
         
@@ -177,6 +183,9 @@
 
 
 {% block content%}
+    <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:transaction_linking' %}" method="post">
+    {% csrf_token %}
+    
     <div id="upper_container">
         
         <div id="graph_container_left"> 
@@ -187,9 +196,12 @@
                 
                     {% if entry_item %}
                     <div id="entry_item_content">
+                    
+                        <input type="text" name="selected_entry" id="selected_entry" value="{{entry_item_pk}}" />
+                        
                         <table>
                             <thead>
-                            
+                                
                                 <tr>
                                     <th>Document Type</th>
                                     <td>{{entry_item.ocrrecord_link.Document_Type}}</td>
@@ -392,12 +404,12 @@
                 </div>
                 <div id="transaction_search_candidates">
 
-                    {% for tag in searchtags %}
-                    <div class="transaction_search_candidates_list" tag = "{{tag}}">
+                    {% for ordered_list in final_list_ordered_score %}
+                    <div class="transaction_search_candidates_list" score_index = "{{ordered_list.score_index}}">
                     
                         <ul class="sortable sortable_transaction_search">
-                          <li class="list_description transactions_list_description invisible ui-state-default"></li>
-                          {% for candidate in sample_transactions %}
+                          <li class="list_description transactions_list_description ui-state-default">Score: {{ordered_list.score_index}}</li>
+                          {% for candidate in ordered_list.transactions_list %}
                             <li class="candidate transaction_search_candidate ui-state-default" candidate_id={{candidate.pk}}></li>
                           {% endfor %}
                           
@@ -406,34 +418,27 @@
                     </div>
                     {% endfor %}
                 
+                    <input type="text" name="searchtags_string" id="searchtags_string" value="Amount:1000+Piece_Number:120+Description:20" />
+                
                 </div>
                 
                 
             </div>
         </div>
         
-        
-        
-        <div id="fields_container">  
-        
 
-                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:transaction_linking' %}" method="post">
-                {% csrf_token %}
 
                 
-                <fieldset  class="invisible" id="fieldset_fields">
+
                
-               
-                 <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
-               
-     
-                </fieldset>
                 
-                </form>
  
-            
-        </div>
-    </div> 
+    </div>
+        
+        
+        <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
+
+    </form>
     <div id="right_container">
         
                 

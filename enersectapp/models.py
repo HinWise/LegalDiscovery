@@ -470,6 +470,7 @@ class UserProfile(models.Model):
     modifiedpdfs_audit_saved = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_saved', null=True, blank=True, default=None)
     modifiedpdfs_audit_revision = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_revisioned', null=True, blank=True, default=None)
     created_legaldiscovery_templates = models.ManyToManyField(LegalDiscoveryTemplate,related_name='legaldiscovery_templates', null=True, blank=True, default=None)
+    
     #other fields here
 
     

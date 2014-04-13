@@ -287,6 +287,31 @@
                 display:none;
 
             }
+
+#fields_container {
+
+    position:absolute;
+    width:100%;
+    height:100%;
+    
+    left:0;
+    right:0;
+    
+    background:green;
+
+}
+
+#searchtags_string {
+
+    position:absolute;
+    
+    left:0;
+    top:-10%;
+    
+    width:50%;
+
+
+}
             
 #iframe_test {
 
