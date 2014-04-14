@@ -72,14 +72,45 @@
              
         
             $( ".entry_item_candidates_list" ).droppable({
-              accept: ".test_dot",
+              accept: ".candidate",
               activeClass: "ui-state-hover",
               hoverClass: "ui-state-active",
+              out: function( event, ui ) {
+              
+                var transactionId = ui.draggable.attr("candidate_id");
+                var listType = $(this).attr("list_type");
+
+                var entryId = $("#selected_entry").attr("value");
+                
+                var operationType = "remove";
+
+                //$("#helper_add_remove_transaction").remove();
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe class="helper_add_remove_transaction" src="http://localhost:8000/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="1px" height="1px" frameBorder="0"></iframe>'
+                
+                $("body").append(frame);
+                
+                
+              },
               drop: function( event, ui ) {
-                $( this )
-                  .addClass( "ui-state-highlight" )
-                  .find( "p" )
-                    .html( "Dropped!" );
+              
+                var transactionId = ui.draggable.attr("candidate_id");
+                var listType = $(this).attr("list_type");
+
+                var entryId = $("#selected_entry").attr("value");
+                
+                var operationType = "add";
+
+                //$("#helper_add_remove_transaction").remove();
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe class="helper_add_remove_transaction" src="http://localhost:8000/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="1px" height="1px" frameBorder="0"></iframe>'
+                
+                $("body").append(frame);
+                
               }
             });
             
@@ -320,7 +351,7 @@
                 
                 <div id="entry_item_candidates">
 
-                    <div id="entry_item_excluded_candidates" class="entry_item_candidates_list">
+                    <div id="entry_item_excluded_candidates" class="entry_item_candidates_list" list_type = "exclude">
                     
                         <ul class="sortable">
                           <li class="list_description ui-state-default">EXCLUDED</li>
@@ -332,7 +363,7 @@
                 
                     </div>
                     
-                    <div id="entry_item_low_candidates" class="entry_item_candidates_list">
+                    <div id="entry_item_low_candidates" class="entry_item_candidates_list" list_type = "low">
                 
                         <ul class="sortable">
                           <li class="list_description ui-state-default">LOW</li>
@@ -344,7 +375,7 @@
                 
                     </div>
                     
-                    <div id="entry_item_medium_candidates" class="entry_item_candidates_list">
+                    <div id="entry_item_medium_candidates" class="entry_item_candidates_list" list_type = "medium">
                         <ul class="sortable">
                             <li class="list_description ui-state-default">MEDIUM</li>
                             {% for candidate in medium_candidates_list %}
@@ -353,7 +384,7 @@
                         </ul>
                     </div>
                     
-                    <div id="entry_item_high_candidates" class="entry_item_candidates_list">
+                    <div id="entry_item_high_candidates" class="entry_item_candidates_list" list_type = "high">
                         <ul class="sortable">
                             <li class="list_description ui-state-default">HIGH</li>
                             {% for candidate in high_candidates_list %}

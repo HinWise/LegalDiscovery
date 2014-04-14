@@ -29,10 +29,7 @@ def transaction_linking(request):
         if selected_entry !="none":
     
             entry_item = PdfRecord.objects.get(pk = selected_entry)
-            
-        else:
-        
-            entry_item = PdfRecord.objects.exclude(entrylinks_link = None).order_by()[0]
+
             
         entry_item_pk = entry_item.pk
         
@@ -56,14 +53,14 @@ def transaction_linking(request):
     
     except:
     
-        corpus_entries = PdfRecord.objects.all().order_by()
+        corpus_entries = PdfRecord.objects.filter(entrylinks_link = None).order_by()
 
         corpus_entries_length = corpus_entries.count()
 
         entry_item_index = random.randint(0,corpus_entries_length)
         entry_item = corpus_entries[entry_item_index]
         entry_item_pk = entry_item.pk
-        #entry_item = PdfRecord.objects.all().order_by()[0]
+
         entrylinks_pk = 0
         high_candidates_list =[]
         medium_candidates_list = []

@@ -107,7 +107,7 @@ class TransactionTable(models.Model):
     BankCurrency = models.CharField('Bank Currency',max_length=31)
     
     def __unicode__(self):
-        return str(self.TransactionIndex)
+        return str(self.pk)
     
       
 class Record(models.Model):
@@ -405,7 +405,10 @@ class EntryLinks(models.Model):
     low_candidates_list = models.ManyToManyField(TransactionTable,related_name='Low candidates list', null=True, blank=True, default=None)
     
     excluded_candidates_list = models.ManyToManyField(TransactionTable,related_name='Excluded candidates list', null=True, blank=True, default=None)
-        
+    
+    def __unicode__(self):
+        return self.entry_pk
+    
 class PdfRecord(models.Model):
     name = models.CharField(max_length=255, default="Pdf Record")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))

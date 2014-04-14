@@ -275,10 +275,14 @@ urlpatterns = patterns('',
     # Show Transaction Tool
     # Allows to see a TransactionTable in a dendrogram.
     # Used for the iframe in Transaction Linking Tool
-    # ex: enersectapp/linkui/transaction_linking/
     # ex: /enersectapp/5/show_transaction
 
     url(r'^(?P<transaction_pk>\d+)/show_transaction/$', views.show_transaction, name='show_transaction'),
+    
+    # Add or Remove Transaction from Candidate List
+    # ex: /enersectapp/1230/14000/high/add/add_or_remove_transaction
+
+    url(r'^(?P<entryId>\d+)/(?P<transactionId>\d+)/(?P<listType>\w+)/(?P<operationType>\w+)/add_or_remove_transaction/$', views.add_or_remove_transaction, name='add_or_remove_transaction'),
     
    
 )

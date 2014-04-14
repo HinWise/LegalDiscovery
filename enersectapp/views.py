@@ -27,7 +27,7 @@ from enersectapp.viewsfunctions import (app_index_module,app_login_module,linkui
                                         pair_randomqa_spider_module,assign_source_pdfs_module,webcocoons_module,randomqa_spider_module,categorization_tool_module,
                                         blank_or_not_blank_module,sudo_assignsourcepdfsui_by_module,progress_report_module,category_changer_module,
                                         arabic_memo_edit_module,search_tool_module,legal_discovery_module,transactions_report_module,transaction_linking_module,
-                                        show_transaction_module)
+                                        show_transaction_module,add_or_remove_transaction_module)
 
 from enersectapp.models import *
 
@@ -187,7 +187,13 @@ def transaction_linking(request):
 def show_transaction(request,transaction_pk):
     
     return show_transaction_module.show_transaction(request,transaction_pk)  
-  
+
+    
+
+def add_or_remove_transaction(request,entryId,transactionId,listType,operationType):
+    
+    return add_or_remove_transaction_module.add_or_remove_transaction(request,entryId,transactionId,listType,operationType) 
+    
 
 
 ###DEPRECATED FUNCTIONS, STILL IN THE SYSTEM THOUGH (WHEN ACCESSING TO THE ASSIGN BUTTON IN THE ADMIN)
