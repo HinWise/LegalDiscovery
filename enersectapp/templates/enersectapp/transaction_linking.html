@@ -37,7 +37,6 @@
         {% autoescape off %}
         
         console.log("STARTING PROGRAM");
-
         
         var entry_item_pk = {{entry_item_pk}};
         console.log(entry_item_pk);
@@ -88,7 +87,7 @@
                 
                 var candidate_id = $(this).attr("candidate_id");
                 
-                var frame = '<iframe class="helper_add_remove_transaction" src="http://localhost:8000/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="1px" height="1px" frameBorder="0"></iframe>'
+                var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
                 
                 $("body").append(frame);
                 
@@ -107,7 +106,7 @@
                 
                 var candidate_id = $(this).attr("candidate_id");
                 
-                var frame = '<iframe class="helper_add_remove_transaction" src="http://localhost:8000/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="1px" height="1px" frameBorder="0"></iframe>'
+                var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
                 
                 $("body").append(frame);
                 
@@ -164,7 +163,7 @@
                 
                 var candidate_id = $(this).attr("candidate_id");
                 
-                var frame = '<iframe id="transaction_graph" src="http://localhost:8000/enersectapp/'+candidate_id+'/show_transaction/" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
+                var frame = '<iframe id="transaction_graph" src="/enersectapp/'+candidate_id+'/show_transaction/" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
                 
                 $("#iframe_test").append(frame);
                 
