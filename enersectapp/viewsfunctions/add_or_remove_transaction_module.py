@@ -17,8 +17,6 @@ def add_or_remove_transaction(request,entryId,transactionId,listType,operationTy
 
     entry_item = PdfRecord.objects.get(pk = entryId)
     transaction_item = TransactionTable.objects.get(pk=transactionId)
-
-    print "THIS IS PK -->"+str(entry_item.pk)
     
     try:
         entry_links_table = entry_item.entrylinks_link
@@ -72,6 +70,17 @@ def add_or_remove_transaction(request,entryId,transactionId,listType,operationTy
 
             entry_links_table.high_candidates_list.remove(transaction_item)
 
-    print "FINISHED"
+
+    
+            
+    report_type = "transaction_linking"
+    report_subtype = operationType+"_operation"
+    report_memo = "Transaction with PK."+str(transaction_item.pk)+". affected by operation ."+operationType+". from/to list ."+listType+". in entry PdfRecord with PK."+str(entry_item.pk)+"."
+    report_author = the_user
+    report_company = the_user.groups.exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
+
+    new_report = Report(report_type = report_type,report_subtype=report_subtype,report_memo=report_memo,report_author=report_author,report_company=report_company)
+
+    new_report.save()
    
     return HttpResponse("Added/deleted transaction succesfully")
