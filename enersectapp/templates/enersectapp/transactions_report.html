@@ -1,4 +1,3 @@
-
 {% load i18n %}
 {% load staticfiles %}
 
@@ -37,180 +36,191 @@
         
         {% autoescape off %}
         
-        var jsonsample2 = {{json_dataset}};
+        console.log("STARTING PROGRAM");
         
-        console.log(jsonsample2);
+                
+        //var searchtags = {{searchtags}};
+        //console.log(searchtags);
+        var number_of_searchtags = {{number_of_searchtags}};
+        console.log(number_of_searchtags);
+      
+        console.log("-----------------------------");
         
         {% endautoescape %}
+        
+        createLeftGraph();
+        
+        createRightGraph();
     
-        var margin = {top: 10, right: 30, bottom: 10, left: 140},
-            /*width = 960 - margin.right - margin.left,
-            height = 800 - margin.top - margin.bottom;*/
-            width = parseInt($("#graph_container").css("width")),
-            height = parseInt($("#graph_container").css("height"));
+        initiateListeners();
+        
+        function createLeftGraph(){
+             
+        
+            $( ".entry_item_candidates_list" ).droppable({
+              accept: ".candidate",
+              activeClass: "ui-state-hover",
+              hoverClass: "ui-state-active",
+              out: function( event, ui ) {
+              
+                /*var transactionId = ui.draggable.attr("candidate_id");
+                var listType = $(this).attr("list_type");
+
+                var entryId = $("#selected_transaction").attr("value");
+                
+                var operationType = "remove";
+
+                //$("#helper_add_remove_transaction").remove();
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
+                
+                $("body").append(frame);*/
+                
+                
+              },
+              drop: function( event, ui ) {
+              
+                /*var transactionId = ui.draggable.attr("candidate_id");
+                var listType = $(this).attr("list_type");
+
+                var entryId = $("#selected_transaction").attr("value");
+                
+                var operationType = "add";
+
+                //$("#helper_add_remove_transaction").remove();
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
+                
+                $("body").append(frame);*/
+                
+              }
+            });
             
-        var i = 0,
-            duration = 750,
-            root;
-
-        var tree = d3.layout.tree()
-            .size([height, width]);
-
-        var diagonal = d3.svg.diagonal()
-            .projection(function(d) { return [d.y, d.x]; });
-
-        var svg = d3.select("#graph_container").append("svg")
-            .attr("width", width + margin.right + margin.left)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        /*d3.json("jsonsample", function(error, flare) {
-          root = flare;
-          root.x0 = height / 2;
-          root.y0 = 0;
-
-          function collapse(d) {
-            if (d.children) {
-              d._children = d.children;
-              d._children.forEach(collapse);
-              d.children = null;
-            }
-          }
-
-          root.children.forEach(collapse);
-          update(root);
-        });*/
+            $( ".sortable" ).sortable({
+              connectWith: "ul",
+              items: "li:not(.list_description)"
+            });
+            
+            $( ".sortable1, .sortable2, .sortable3" ).disableSelection();
         
-        if(jsonsample2) {
-          root = jsonsample2;
-          root.x0 = height / 2;
-          root.y0 = 0;
-
-          function collapse(d) {
-            if (d.children) {
-              d._children = d.children;
-              d._children.forEach(collapse);
-              d.children = null;
-            }
-          }
-          
-          if(root.children)
-          {
-            root.children.forEach(collapse);
-          }
-          
-          update(root);
+        }
+    
+        function createRightGraph(){
+        
+            var total_width_panel = $("#transaction_search_candidates").css("width");
+            
+            var new_width_panel = Math.floor(parseInt(total_width_panel)/(number_of_searchtags+1));
+            //var new_font_size = $("#transaction_search_candidates").css("font-size",100-(10*(number_of_searchtags/number_of_searchtags))+"%");
+            
+            $(".transaction_search_candidates_list").css("width",new_width_panel+"px");
+            
+            $(".transaction_search_candidates_list").css("display","inline-block");
+            
+            var candidate_width = $(".entry_item_candidates_list .candidate").width();
+            
+            $(".sortable_transaction_search .transaction_search_candidate").each(function(){
+            
+                if($(this).width()!=candidate_width)
+                {
+                    $(this).css("width",candidate_width+"px");
+                }
+                
+            
+            });
+            
+            
+           
         }
         
-        //max_height = $("#graph_container").css("height");
+    
+        function initiateListeners() {
         
-        //d3.select(self.frameElement).style("height", "800px");
+            //When Mouse over one of the Candidates, update the iframe to show that Transaction
+            
+            $(".candidate").mousedown(function(){
+                
+                $("#transaction_graph").remove();
+                
+                var frame_width = $("#iframe_test").width()-10+"px";
+                var frame_height = $("#iframe_test").height()-10+"px";
+                
+                var candidate_id = $(this).attr("candidate_id");
+                
+                var frame = '<iframe id="transaction_graph" src="/enersectapp/'+candidate_id+'/show_transaction/" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
+                
+                $("#iframe_test").append(frame);
+                
+            });
+            
+        
+            $("#searchtag_add_button").click(function(){
+            
+                var actual_searchtags_string = $("#searchtags_string").attr("value");
+                
+                var new_tag_type = $("#select_tagtype_menu").val();
+                var new_tag_content = $("#searchtags_input").val();
+                
+                var s = "";
+                
+                if(actual_searchtags_string.length != 0)
+                {
+                    s+="+";
+                }
+                
+                s+=new_tag_type+":"+new_tag_content;
+                
+                $("#searchtags_string").val(actual_searchtags_string+s);
+                
+                
+                $("#fields_form").submit();
+            
+            });
+            
+            $(".erase_tag_button").click(function(){
+            
+                var tag_text = $(this).attr("tag_text");
+            
+                var actual_searchtags_string = $("#searchtags_string").attr("value");
+                
+                splitted_string = actual_searchtags_string.split("+");
+                
+                var new_searchtags_string = "";
+              
+                for(var i=0; i < splitted_string.length; i++)
+                {
+                    if(splitted_string[i] != tag_text)
+                    {
+                        
+                        if( i != 0)
+                        {
+                            new_searchtags_string+="+";
+                        }
+                        
+                        new_searchtags_string += splitted_string[i];
+                        
+                    }
+                    
+                }
 
-        function update(source) {
-
-          // Compute the new tree layout.
-          var nodes = tree.nodes(root).reverse(),
-              links = tree.links(nodes);
-
-          // Normalize for fixed-depth.
-          nodes.forEach(function(d) { d.y = d.depth * 180; });
-
-          // Update the nodes…
-          var node = svg.selectAll("g.node")
-              .data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-          // Enter any new nodes at the parent's previous position.
-          var nodeEnter = node.enter().append("g")
-              .attr("class", "node")
-              .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-              .on("click", click);
-
-          nodeEnter.append("circle")
-              .attr("r", 1e-6)
-              .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
-          nodeEnter.append("text")
-              .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-              .attr("dy", ".35em")
-              .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-              .text(function(d) { return d.name; })
-              .style("fill-opacity", 1e-6);
-
-          // Transition nodes to their new position.
-          var nodeUpdate = node.transition()
-              .duration(duration)
-              .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-
-          nodeUpdate.select("circle")
-              .attr("r", 4.5)
-              .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
-          nodeUpdate.select("text")
-              .style("fill-opacity", 1);
-
-          // Transition exiting nodes to the parent's new position.
-          var nodeExit = node.exit().transition()
-              .duration(duration)
-              .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-              .remove();
-
-          nodeExit.select("circle")
-              .attr("r", 1e-6);
-
-          nodeExit.select("text")
-              .style("fill-opacity", 1e-6);
-
-          // Update the links…
-          var link = svg.selectAll("path.link")
-              .data(links, function(d) { return d.target.id; });
-
-          // Enter any new links at the parent's previous position.
-          link.enter().insert("path", "g")
-              .attr("class", "link")
-              .attr("d", function(d) {
-                var o = {x: source.x0, y: source.y0};
-                return diagonal({source: o, target: o});
-              });
-
-          // Transition links to their new position.
-          link.transition()
-              .duration(duration)
-              .attr("d", diagonal);
-
-          // Transition exiting nodes to the parent's new position.
-          link.exit().transition()
-              .duration(duration)
-              .attr("d", function(d) {
-                var o = {x: source.x, y: source.y};
-                return diagonal({source: o, target: o});
-              })
-              .remove();
-
-          // Stash the old positions for transition.
-          nodes.forEach(function(d) {
-            d.x0 = d.x;
-            d.y0 = d.y;
-          });
-        }
-
-        // Toggle children on click.
-        function click(d) {
-          if (d.children) {
-            d._children = d.children;
-            d.children = null;
-          } else {
-            d.children = d._children;
-            d._children = null;
-          }
-          update(d);
+                
+                $("#searchtags_string").attr("value",new_searchtags_string);
+                $("#searchtags_string").val(new_searchtags_string);
+            
+                $(this).parent().remove();
+                
+                $("#fields_form").submit();
+            
+            });
+            
+            
+        
         }
         
-        
-        
-        
-        
-        
+
         
     });
         
@@ -244,33 +254,97 @@
 
 <div id="container_body">
 
+
 {% block content%}
-    <div id="left_container">
+    <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:transactions_report' %}" method="post">
+    {% csrf_token %}
+    
+    <div id="upper_container">
         
-        <div id="graph_container"> 
-        
-        </div>
-        
-        <div id="fields_container">  
-        
-
-                <form id="fields_form" autocomplete="off" action="{% url 'enersectapp:transactions_report' %}" method="post">
-                {% csrf_token %}
-
-                
-                <fieldset  class="invisible" id="fieldset_fields">
-               
-               
-                 <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
-               
-     
-                </fieldset>
-                
-                </form>
- 
+        <div id="graph_container_right"> 
             
+            <div id="transactions_lists_container">
+            
+                <div id="chosen_transaction_element">
+                
+                    <div id="chosen_transaction_content">
+                    
+                        <div id="iframe_test">
+     
+                        </div>
+
+                    </div>
+
+                </div>
+                <div id="transaction_search_candidates">
+
+                    {% for ordered_list in final_list_ordered_score %}
+                    <div class="transaction_search_candidates_list" score_index = "{{ordered_list.score_index}}">
+                    
+                        <ul class="sortable sortable_transaction_search">
+                          <li class="list_description transactions_list_description ui-state-default">Score: {{ordered_list.score_index}}</li>
+                          {% for candidate in ordered_list.transactions_list %}
+                            <li class="candidate transaction_search_candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                          {% endfor %}
+                          
+                        </ul>
+                
+                    </div>
+                    {% endfor %}
+                
+                
+                </div>
+                <div id="search_config_panel">
+                    {% if searchtags_string %}
+                        <input type="text" class="invisible" name="searchtags_string" id="searchtags_string" value="{{searchtags_string}}" />
+                        {% else %}
+                        <!--<input type="text" name="searchtags_string" id="searchtags_string" value="Amount:1000+Piece_Number:120+Description:20" /> -->
+                        <input type="text" class="invisible" name="searchtags_string" id="searchtags_string" value="" />
+                        {% endif %}
+                
+                    <div id="search_tags_show_panel">
+                        
+                        
+                        {% for tag in searchtags %}
+                        
+                        <div class="search_tag_unit">
+                            <input type="button" class="erase_tag_button" value="X" tag_text="{{tag.tag_name}}:{{tag.tag_content}}" />
+                            <div class="tag_text"><span>{{tag.tag_name}}</span>:<span>{{tag.tag_content}}</span></div>
+                        </div>
+                        
+                        {% endfor %}
+                    </div>
+                    <div id="search_tags_create_panel">
+                    
+                        <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
+                            {% for tag in tag_types %}
+                                <option value="{{tag}}">{{tag}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="searchtags_input" id="searchtags_input" value="" />
+                        <input type="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
+                        
+
+                    </div>
+                </div>
+                
+                
+            </div>
         </div>
-    </div> 
+        
+
+
+                
+
+               
+                
+ 
+    </div>
+        
+        
+        <input class="invisible" type="text" name="user_type" id="user_type" value="{{user_type}}" />
+
+    </form>
     <div id="right_container">
         
                 
@@ -294,3 +368,4 @@
 
 
 {% block sidebar %}{% endblock %}
+

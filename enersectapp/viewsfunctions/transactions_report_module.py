@@ -1,8 +1,7 @@
 
 from enersectapp.models import *
+from django.db import transaction
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
@@ -18,91 +17,104 @@ def transactions_report(request):
     
     the_user = request.user
    
-    dataset = SourcePdf.objects.all()[10461:10468]
+       
+    #searchtags = ['amount','doctype','date','account','memo','reftran','libelle','account']
     
-    main_dict = {}
+    searchtags = []
     
-    main_dict["name"] = "List of Transactions"
+    #Example searchtags_string: "Amount:1000,Piece_Number:120"
     
-    temp_list = []
+    try:
+        searchtags_string = request.POST['searchtags_string']
+    except:
+        searchtags_string = ""
     
-    count = 0
+    if searchtags_string:
     
-    for item_transaction in dataset:
-    
-        count += 1
+        searchtags_fields = searchtags_string.split("+")
         
+        for searchtag_fields in searchtags_fields:
+        
+            searchtag = searchtag_fields.split(":")
+        
+            searchtags_dict = {}
+            searchtags_dict["tag_name"] = searchtag[0]
+            searchtags_dict["tag_content"] = searchtag[1]
+            searchtags.append(searchtags_dict)
+            
+    #print "THIS IS--->" + str(searchtags)
+    
+    number_of_searchtags = len(searchtags)
+   
+    if number_of_searchtags>8:
+        number_of_searchtags = 8
+
+        
+    coincident_transactions = TransactionTable.objects.none()
+    
+    #Next Segment: Go throught the searchtags list-dictionary and search candidates in the corpus of entries following the chosen tags
+    
+    coincident_transactions_list = []
+    
+    with transaction.commit_on_success():
+        for item in searchtags:
+            
+            if item["tag_name"] == "Unique PK":
+            
+                coincident_transactions = TransactionTable.objects.filter(pk = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+            
+            if item["tag_name"] == "Amount":
+            
+                coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+            
+            
+            if item["tag_name"] == "Piece_Number":
+            
+                coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+            
+    
+            if item["tag_name"] == "Description":
+            
+                coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__contains = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+
+            if item["tag_name"] == "Company":
+            
+                coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__contains = item["tag_content"]).order_by()
+                coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
+                
+   
+    coincident_transactions_dict = {}
+   
+    for item in coincident_transactions_list:
+    
+        coincident_transactions_dict[str(item)] = coincident_transactions_list.count(item)
+
+    final_coincident_transactions_list = []
+    
+    for dict_key in coincident_transactions_dict.keys():
+    
+        temp_dict = {"pk":dict_key,"score":coincident_transactions_dict[dict_key]}
+        final_coincident_transactions_list.append(temp_dict)
+
+        
+    final_list_ordered_score = []
+    
+    for score in range(number_of_searchtags,0,-1):
+    
         temp_dict = {}
-        
-        temp_dict["name"] = "Transaction "+str(count)
-        
-        temp_sublist = []
-        
-        temp_subdict = {}
-        temp_subdict["name"] = "PK = "+str(item_transaction.pk)
-        temp_sublist.append(temp_subdict)
-        temp_subdict = {}
-        temp_subdict["name"] = "Job Directory = "+str(item_transaction.job_directory)
-        temp_sublist.append(temp_subdict)
-        temp_subdict = {}
-        temp_subdict["name"] = "Filename = "+str(item_transaction.filename)
-        temp_sublist.append(temp_subdict)
-        
-        temp_subdict = {}
-        temp_subdict["name"] = "Assigned Handles"
-        
-        temp_assigneddatalist = []
-        
-        count_handles = 0
-
-        for handle in item_transaction.assigndata.all():
-        
-            count_handles += 1
-            
-            temp_handles_subdict = {}
-            temp_handles_subdict["name"] = "Assigned Handle PK "+str(handle.pk)
-        
-            temp_handles_sublist = []
-        
-            temp_assigneddatadict = {}
-            temp_assigneddatadict["name"] = "Lot Number = "+str(handle.lot_number)
-            temp_handles_sublist.append(temp_assigneddatadict)
-        
-            temp_assigneddatadict = {}
-            temp_assigneddatadict["name"] = "Company = "+str(handle.assignedcompany.name)
-            temp_handles_sublist.append(temp_assigneddatadict)
-            
-            temp_assigneddatadict = {}
-            temp_assigneddatadict["name"] = "User = "+str(handle.assigneduser.username)
-            temp_handles_sublist.append(temp_assigneddatadict)
-            
-            temp_assigneddatadict = {}
-            temp_assigneddatadict["name"] = "Checked? = "+str(handle.checked)
-            temp_handles_sublist.append(temp_assigneddatadict)
-            
-            if temp_handles_sublist:
-                temp_handles_subdict["children"] = temp_handles_sublist
-            
-            
-            temp_assigneddatalist.append(temp_handles_subdict)
-            
-        if temp_assigneddatalist:
-            temp_subdict["children"] = temp_assigneddatalist
-        
-        temp_sublist.append(temp_subdict)
-        
-        if temp_sublist:
-            temp_dict["children"] = temp_sublist
-        
-        temp_list.append(temp_dict)
-        
-    if temp_list:
+        temp_dict["transactions_list"] = [d for d in final_coincident_transactions_list if d['score'] == score]
+        temp_dict["score_index"]= str(score);
+        final_list_ordered_score.append(temp_dict)
     
-        main_dict["children"] = temp_list
+    
 
-    #print main_dict
-   
-    json_posts = json.dumps(main_dict)
-   
-    context = {"the_user":the_user,'json_dataset':json_posts}
+    tag_types = ["Amount","NoPiece","Description","Company","Unique PK"]
+    
+    
+    context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
+                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags}
     return render(request,'enersectapp/transactions_report.html',context)
