@@ -211,8 +211,30 @@
             
                 var actual_searchtags_string = $("#searchtags_string").attr("value");
                 
-                var new_searchtags_string = actual_searchtags_string.replace("+"+tag_text,"");
-                new_searchtags_string = new_searchtags_string.replace(tag_text,"");
+                splitted_string = actual_searchtags_string.split("+");
+                
+                //Erase unwanted element from the array
+              
+                var index = splitted_string.indexOf(tag_text);
+                
+                if (index > -1) {
+                    splitted_string.splice(index, 1);
+                }
+
+                var new_searchtags_string = "";
+
+                //Make into a string, adding the necessary "+" symbols between elements
+                for(var i=0; i < splitted_string.length; i++)
+                {
+                    
+                    if(i != 0)
+                    {
+                        new_searchtags_string+="+";
+                    }
+                    
+                    new_searchtags_string += splitted_string[i];
+                    
+                }
                 
                 $("#searchtags_string").attr("value",new_searchtags_string);
                 $("#searchtags_string").val(new_searchtags_string);

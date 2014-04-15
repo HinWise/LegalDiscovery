@@ -188,21 +188,26 @@
                 
                 splitted_string = actual_searchtags_string.split("+");
                 
-                var new_searchtags_string = "";
+                //Erase unwanted element from the array
               
+                var index = splitted_string.indexOf(tag_text);
+                
+                if (index > -1) {
+                    splitted_string.splice(index, 1);
+                }
+
+                var new_searchtags_string = "";
+
+                //Make into a string, adding the necessary "+" symbols between elements
                 for(var i=0; i < splitted_string.length; i++)
                 {
-                    if(splitted_string[i] != tag_text)
+                    
+                    if(i != 0)
                     {
-                        
-                        if( i != 0)
-                        {
-                            new_searchtags_string+="+";
-                        }
-                        
-                        new_searchtags_string += splitted_string[i];
-                        
+                        new_searchtags_string+="+";
                     }
+                    
+                    new_searchtags_string += splitted_string[i];
                     
                 }
 
