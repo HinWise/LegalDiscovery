@@ -20,10 +20,12 @@
 
 {% block special_libs %}
 
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/aristo/css/Aristo/Aristo.css' %}" />
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" /> -->
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" /> -->
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/transactions_report.css' %}" />
+
 
 
 {% endblock special_libs %}
@@ -57,13 +59,13 @@
         function createLeftGraph(){
              
         
-            $( ".entry_item_candidates_list" ).droppable({
+            /*$( ".entry_item_candidates_list" ).droppable({
               accept: ".candidate",
               activeClass: "ui-state-hover",
               hoverClass: "ui-state-active",
               out: function( event, ui ) {
               
-                /*var transactionId = ui.draggable.attr("candidate_id");
+                var transactionId = ui.draggable.attr("candidate_id");
                 var listType = $(this).attr("list_type");
 
                 var entryId = $("#selected_transaction").attr("value");
@@ -76,13 +78,13 @@
                 
                 var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
                 
-                $("body").append(frame);*/
+                $("body").append(frame);
                 
                 
               },
               drop: function( event, ui ) {
               
-                /*var transactionId = ui.draggable.attr("candidate_id");
+                var transactionId = ui.draggable.attr("candidate_id");
                 var listType = $(this).attr("list_type");
 
                 var entryId = $("#selected_transaction").attr("value");
@@ -95,17 +97,17 @@
                 
                 var frame = '<iframe class="helper_add_remove_transaction" src="/enersectapp/'+entryId+'/'+transactionId+'/'+listType+'/'+operationType+'/add_or_remove_transaction/" width="500px" height="500px" frameBorder="0"></iframe>'
                 
-                $("body").append(frame);*/
+                $("body").append(frame);
                 
               }
-            });
+            });*/
             
-            $( ".sortable" ).sortable({
+            /*$( ".sortable" ).sortable({
               connectWith: "ul",
               items: "li:not(.list_description)"
             });
             
-            $( ".sortable1, .sortable2, .sortable3" ).disableSelection();
+            $( ".sortable1, .sortable2, .sortable3" ).disableSelection();*/
         
         }
     
@@ -164,20 +166,28 @@
                 var new_tag_type = $("#select_tagtype_menu").val();
                 var new_tag_content = $("#searchtags_input").val();
                 
-                var s = "";
-                
-                if(actual_searchtags_string.length != 0)
+                if(new_tag_content)
                 {
-                    s+="+";
+                
+                     var s = "";
+                
+                    if(actual_searchtags_string.length != 0)
+                    {
+                        s+="+";
+                    }
+                    
+                    s+=new_tag_type+":"+new_tag_content;
+                    
+                    
+                    
+                    $("#searchtags_string").val(actual_searchtags_string+s);
+                    
+                    
+                    $("#fields_form").submit();
+                
                 }
                 
-                s+=new_tag_type+":"+new_tag_content;
-                
-                $("#searchtags_string").val(actual_searchtags_string+s);
-                
-                
-                $("#fields_form").submit();
-            
+
             });
             
             $(".erase_tag_button").click(function(){
@@ -224,6 +234,8 @@
             
         
         }
+        
+        //$(".button").button();
         
 
         
@@ -321,15 +333,18 @@
                     </div>
                     <div id="search_tags_create_panel">
                     
-                        <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
-                            {% for tag in tag_types %}
-                                <option value="{{tag}}">{{tag}}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="text" name="searchtags_input" id="searchtags_input" value="" />
-                        <input type="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
+                        <div id="search_tags_tools_line">
+                            <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
+                                {% for tag in tag_types %}
+                                    <option value="{{tag}}">{{tag}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="searchtags_input" id="searchtags_input" value="" />
+                            <input type="button" class="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
+                            <input type="button" class="button" name="generate_report_button" id="generate_report_button" value="Report" />
                         
-
+                        </div>
+                        
                     </div>
                 </div>
                 
