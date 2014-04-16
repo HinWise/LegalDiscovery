@@ -118,7 +118,9 @@ def transaction_linking(request):
                 coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
             
             
-            if item["tag_name"] == "Piece_Number":
+            if item["tag_name"] == "NoPiece":
+            
+                print "NOPIECE" + item["tag_content"]
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('pk',flat=True))
