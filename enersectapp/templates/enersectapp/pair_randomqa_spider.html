@@ -723,9 +723,9 @@
             });
             
             $( "#filter_container_lot" ).buttonset();
-            /*$( "#filter_container_author" ).buttonset();
+            /*$( "#filter_container_author" ).buttonset();*/
             $( "#filter_container_doctype" ).buttonset();
-            $( "#filter_container_date" ).buttonset();
+            /*$( "#filter_container_date" ).buttonset();
             $( "#filter_container_modification_author" ).buttonset();
             $( "#filter_container_auditmark" ).buttonset();
             $( "#filter_container_company" ).buttonset();*/
@@ -883,9 +883,9 @@
             
             //For the Doctype Choice
             
-            /*var doctype_choice = $('#selected_doctype').attr("value");
+            var doctype_choice = $('#selected_doctype').attr("value");
         
-            $('#filter_pdf_doctype'+doctype_choice).attr("checked","checked").button("refresh");*/
+            $('#filter_pdf_doctype'+doctype_choice).attr("checked","checked").button("refresh");
             
             //For the Date Choice
             
@@ -1164,12 +1164,12 @@
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
                     </div> -->
-                    <!-- <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
-                            {% for item in pdf_doctype_distinct %}
-                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}" choice_value="{{item.ocrrecord_link__Document_Type}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item.ocrrecord_link__Document_Type}}">{{item.ocrrecord_link__Document_Type}}</label>
+                    <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
+                            {% for item in document_type_list %}
+                            <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item}}" choice_value="{{item}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctypeall" choice_value="all" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctypeall">All Document Types</label>
-                    </div> -->
+                    </div>
                     <!-- <div class="show-option" id="filter_container_date" title="Filter the Search Results by Date of Creation">
                             
                             <input type="radio" class="filter_choice choice_date" id="filter_pdf_datetoday" choice_value="today" name="radio4"  /><label class="filter_choice_label" for="filter_pdf_datetoday">Today</label>
@@ -1237,7 +1237,7 @@
                 <!-- <input class="invisible" type="text" name="selected_auditmark" id="selected_auditmark" value="{{selected_auditmark}}" /> -->
                 <input class="invisible" type="text" name="selected_lot" id="selected_lot" value="{{lot_number}}" />
                 <!-- <input class="invisible" type="text" name="selected_user" id="selected_user" value="{{selected_user}}" /> -->
-                <!-- <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" /> -->
+                <input class="invisible" type="text" name="selected_doctype" id="selected_doctype" value="{{selected_doctype}}" />
                 <!-- {% if company_names_list %}
                 <input class="invisible" type="text" name="selected_company" id="selected_company" value="{{selected_company}}" />
                 {% endif %} -->

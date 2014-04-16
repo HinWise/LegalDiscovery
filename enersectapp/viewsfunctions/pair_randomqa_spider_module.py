@@ -665,7 +665,19 @@ def pair_randomqa_spider(request):
         
             pdf_records_list = PdfRecord.objects.filter(EntryByCompany = user_company,AssignedLotNumber = chosen_lot_number).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber').order_by()
         
+        
+        
+        try:
+            selected_doctype = request.POST['selected_doctype']
+        except (KeyError):
+            selected_doctype =  "all"
+        
+        
+        if selected_doctype != "all":
+            
+            pdf_records_list = pdf_records_list.filter(ocrrecord_link__Document_Type__iexact = selected_doctype)
 
+        
         
         #Getting rid of Duplicates
         
@@ -1066,9 +1078,9 @@ def pair_randomqa_spider(request):
         companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
         #companyname_list = CompanyTemplate.objects.none()
        
-        document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
+        #document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
-        
+        document_type_list = ["cheque","invoice","facture","cheque_stub","receipt"]
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
@@ -1076,7 +1088,7 @@ def pair_randomqa_spider(request):
         'pdf_total_count':pdf_total_count,'pdf_left_to_audit':pdf_left_to_audit,'pdf_audited':pdf_audited,
         'pdf_needs_reentry_confirmation':pdf_needs_reentry_confirmation,
         'pdf_being_reentered':pdf_being_reentered,'pdf_lot_number_distinct':pdf_lot_number_distinct,
-        'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list}
+        'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list,"selected_doctype":selected_doctype}
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
     else:
