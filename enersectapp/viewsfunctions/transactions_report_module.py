@@ -9,6 +9,12 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
+import time
+from django.views import generic
+from django.utils import timezone
+from datetime import timedelta
+import datetime
+
 def transactions_report(request):
     
     if not request.user.is_authenticated():
@@ -24,10 +30,134 @@ def transactions_report(request):
     
     #Example searchtags_string: "Amount:1000,Piece_Number:120"
     
+
+    try:
+        action_button_pressed = request.POST['action_button_pressed']
+    except:
+        action_button_pressed = ""
+    
+    try:
+        selected_template = request.POST['selected_template']
+    except:
+        selected_template = ""
+        
     try:
         searchtags_string = request.POST['searchtags_string']
     except:
         searchtags_string = ""
+        
+    try:
+        selected_transactions_list_string = request.POST['selected_transactions_list_string']
+    except:
+        selected_transactions_list_string = ""
+    
+    user_profile = UserProfile.objects.get(user = the_user);
+    
+    try:
+        chosen_template = user_profile.created_transactionsreport_templates.get(name = selected_template)
+    except:
+        chosen_template = TransactionsReportTemplate.objects.none()
+    
+    selected_candidates_list = []
+    
+    if action_button_pressed == "generate_report":
+    
+        print action_button_pressed
+    
+    elif action_button_pressed == "add_template":
+    
+        #If template already exists
+        if chosen_template:
+            
+            saved_searchtag_string = chosen_template.searchtag_string
+            
+            #If there are searchtags to save
+            if len(searchtags_string):
+            
+                #If there were already search tags saved before
+                if len(saved_searchtag_string):
+                
+                    new_searchtag_string = saved_searchtag_string + "+" + searchtags_string
+                
+                else:
+                
+                    new_searchtag_string = searchtags_string
+                
+                
+                Transactions_Report_Template = chosen_template
+                Transactions_Report_Template.modification_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
+                Transactions_Report_Template.searchtag_string = new_searchtag_string
+                Transactions_Report_Template.save()
+                
+                
+        #Template doesn't exist, create a new template with the chosen name
+        else:
+            #If the name is the default "New Template" name, generate a not used one
+            if selected_template == "New Template":
+            
+                template_names_list = user_profile.created_transactionsreport_templates.all().values_list("name",flat = True)
+                print template_names_list
+            
+                template_exists = True
+                count = 1
+                
+                while template_exists == True:
+                
+                    name = "Unnamed Template "+str(count)
+                    template_exists = name in template_names_list
+                    count += 1
+                
+                selected_template = name
+            #Independently of the name being default or not, create a new Transactions Report Template
+            
+            template_name = selected_template
+      
+            Transactions_Report_Template = TransactionsReportTemplate(name=template_name)
+            Transactions_Report_Template.creation_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
+            Transactions_Report_Template.creation_user = the_user
+            Transactions_Report_Template.searchtag_string = searchtags_string
+            Transactions_Report_Template.save()
+            
+            user_profile.created_transactionsreport_templates.add(Transactions_Report_Template)
+            
+
+        #This block attempts to add all selected Transactions to the Template, independently of it existing before or not
+        #ManyToMany takes care of duplicates by default :)
+        if len(selected_transactions_list_string):
+            
+            selected_transactions_list = selected_transactions_list_string.split(',')
+            
+            for transaction_pk in selected_transactions_list:
+            
+                transaction_item = TransactionTable.objects.get(pk = int(transaction_pk))
+                
+                Transactions_Report_Template.selected_transactions.add(transaction_item)
+                
+        
+        print action_button_pressed
+    
+    elif action_button_pressed == "load_template":
+    
+        if chosen_template:
+    
+            selected_candidates_list = chosen_template.selected_transactions.all().values_list('pk',flat=True)
+            searchtags_string = chosen_template.searchtag_string
+    
+        print action_button_pressed
+        
+        
+        
+    elif action_button_pressed == "remove_template":
+    
+        if chosen_template:
+        
+            chosen_template.delete()
+
+            selected_template = ""
+    
+        print action_button_pressed
+        
+        
     
     if searchtags_string:
     
@@ -41,7 +171,8 @@ def transactions_report(request):
             searchtags_dict["tag_name"] = searchtag[0]
             searchtags_dict["tag_content"] = searchtag[1]
             searchtags.append(searchtags_dict)
-            
+    
+
     #print "THIS IS--->" + str(searchtags)
     
     number_of_searchtags = len(searchtags)
@@ -116,7 +247,9 @@ def transactions_report(request):
 
     tag_types = ["Amount","NoPiece","Description","Company","Unique PK"]
     
+    user_templates_list = user_profile.created_transactionsreport_templates.all().values_list('name',flat=True)
     
     context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
-                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags}
+                'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,
+                'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
     return render(request,'enersectapp/transactions_report.html',context)

@@ -544,14 +544,15 @@
                     </div>
                     <div id="search_tags_create_panel">
                     
-                        <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
-                            {% for tag in tag_types %}
-                                <option value="{{tag}}">{{tag}}</option>
-                            {% endfor %}
-                        </select>
-                        <input type="text" name="searchtags_input" id="searchtags_input" value="" />
-                        <input type="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
-                        
+                        <div id="search_tags_tools_line">
+                            <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
+                                {% for tag in tag_types %}
+                                    <option value="{{tag}}">{{tag}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="searchtags_input" id="searchtags_input" value="" />
+                            <input type="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
+                        </div>
 
                     </div>
                 </div>

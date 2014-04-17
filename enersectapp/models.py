@@ -460,6 +460,18 @@ class Report(models.Model):
     def __unicode__(self):
         return self.report_memo
 
+
+class TransactionsReportTemplate(models.Model):
+
+    name = models.CharField(max_length=63,default="")
+    searchtag_string = models.CharField(max_length=511,default="")
+    selected_transactions = models.ManyToManyField(TransactionTable,related_name='selected_transaction_tables', null=True, blank=True, default=None)
+    creation_date = models.DateTimeField('creation time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    modification_date = models.DateTimeField('modification time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+    creation_user = models.ForeignKey(User,null=True,blank=True)
+    
+    def __unicode__(self):
+        return self.name
         
 class UserProfile(models.Model):  
     user = models.OneToOneField(User)
@@ -473,6 +485,7 @@ class UserProfile(models.Model):
     modifiedpdfs_audit_saved = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_saved', null=True, blank=True, default=None)
     modifiedpdfs_audit_revision = models.ManyToManyField(PdfRecord,related_name='pdfs_audit_revisioned', null=True, blank=True, default=None)
     created_legaldiscovery_templates = models.ManyToManyField(LegalDiscoveryTemplate,related_name='legaldiscovery_templates', null=True, blank=True, default=None)
+    created_transactionsreport_templates = models.ManyToManyField(TransactionsReportTemplate,related_name='transactionsreport_templates', null=True, blank=True, default=None)
     
     #other fields here
 

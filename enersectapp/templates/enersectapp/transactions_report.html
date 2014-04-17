@@ -46,6 +46,9 @@
         var number_of_searchtags = {{number_of_searchtags}};
         console.log(number_of_searchtags);
       
+        var selected_candidates_list = {{selected_candidates_list}};
+        console.log(selected_candidates_list);
+      
         console.log("-----------------------------");
         
         {% endautoescape %}
@@ -55,7 +58,7 @@
         createRightGraph();
     
         initiateListeners();
-        
+
         function createLeftGraph(){
              
         
@@ -186,7 +189,6 @@
                     $("#fields_form").submit();
                 
                 }
-                
 
             });
             
@@ -231,14 +233,174 @@
             
             });
             
+            $("#generate_report_button").click(function(){
+           
+            
+                $("#action_button_pressed").attr("value","generate_report");
+            
+                $("#fields_form").submit();
+            
+            });
+            
+            $("#add_to_template_button").click(function(){
+            
+                $("#action_button_pressed").attr("value","add_template");
+                
+                //var selected_transactions_list_string = $("#selected_transactions_list_string").attr("value");
+                var selected_transactions_list_string = "";
+               
+
+                $(".ui-selected").each(function(){
+                
+                    $element = $(this);
+                    
+
+                    if($element.hasClass("transaction_search_candidate"))
+                    {
+                    
+                        if(selected_transactions_list_string.length != 0)
+                        {
+                            selected_transactions_list_string += ",";
+                        }
+                        
+                        selected_transactions_list_string += $element.attr("candidate_id");
+                    }
+                
+                });
+                
+                $("#selected_transactions_list_string").attr("value",selected_transactions_list_string);
+                
+            
+                $("#fields_form").submit();
+            
+            });
+            
+            $("#load_template_button").click(function(){
+            
+            
+                $("#action_button_pressed").attr("value","load_template");
+            
+                $("#fields_form").submit();
+            
+            });
+            
+            $("#remove_template_button").click(function(){
+            
+            
+                $("#action_button_pressed").attr("value","remove_template");
+            
+                $("#fields_form").submit();
+            
+            });
             
         
         }
         
         //$(".button").button();
+        $( ".sortable_transaction_search" ).selectable({
         
+            selected: function( event, ui ) {
+            
+                if($(ui.selected ).hasClass("transactions_list_description"))
+                {
+                    var score_id = $(ui.selected).attr("score_id");
+                    
+                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
+                    
+                        if($(this).hasClass("ui-selected") == false)
+                        {
+                            $(this).addClass("ui-selected");
+                        }
+                        
+                    });
+                    
+                    
+                }
+                
+            },
+            unselected: function( event, ui ) {
+            
+                if($(ui.unselected ).hasClass("transactions_list_description"))
+                {
+                    var score_id = $(ui.unselected).attr("score_id");
+                    
+                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
+                    
+                        if($(this).hasClass("ui-selected") == true)
+                        {
+                            $(this).removeClass("ui-selected");
+                        }
+                        
+                    });
+                    
+                    
+                }
+                
+            }
+        });
+        
+       $( "#select_saved_template_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+            select: function( event, ui ) {
+                                    
+                var first_elem = ui.item.parent().is($( "#select_saved_template_menu" ));
+                
+                if(!first_elem)
+                {
+                    
+                    var new_text = ui.item.text();
+                    $(".selectoption[value='"+new_text+"']").click();
+                } 
+            } 
+        });
+        
+        $('.selectoption').click(function(){
+        
+            var new_text = $(this).text();
+        
+            $('#selected_template').unbind('copy paste', function (e) {
+                            
+            });
+              
+              $('#selected_template_link').text(new_text);
+              $('#selected_template').attr("value",new_text);
+              $('#selected_template').val(new_text);
+              
+                
+            $('#selected_template').bind('copy paste', function (e) {
+                    e.preventDefault();
+            });
+            
+                $('#selected_template').click();
+        });
+        
+        $('#select_saved_template_menu').removeClass('ui-menu-divider');
+        
+        $('#selected_template').unbind('click').click(function(event) {
+        event.stopPropagation();
+        $(this).unbind('focus').focus();
+        $("#select_saved_template_menu").unbind('keydown');
+        $(this).unbind('focusout').focusout(function(event) {
+                                      
+                var new_value = event.currentTarget.value;
+                
+                $('#selected_template_link').text(new_value);
+                $(this).attr("value",new_value);
+                
+        
+            }); 
+        });
+       
+        loadCandidateSelection(selected_candidates_list);
+        
+        function loadCandidateSelection(selected_candidates){
+        
+            for(i=0;i<selected_candidates.length;i++)
+            {
+                $(".transaction_search_candidate[candidate_id='"+selected_candidates[i]+"']").addClass("ui-selected");
 
+            }
         
+        }
     });
         
 </script>
@@ -299,9 +461,9 @@
                     <div class="transaction_search_candidates_list" score_index = "{{ordered_list.score_index}}">
                     
                         <ul class="sortable sortable_transaction_search">
-                          <li class="list_description transactions_list_description ui-state-default">Score: {{ordered_list.score_index}}</li>
+                          <li class="list_description transactions_list_description ui-state-default" score_id={{ordered_list.score_index}}>Score: {{ordered_list.score_index}}</li>
                           {% for candidate in ordered_list.transactions_list %}
-                            <li class="candidate transaction_search_candidate ui-state-default" candidate_id={{candidate.pk}}></li>
+                            <li class="candidate transaction_search_candidate ui-state-default" score_id={{ordered_list.score_index}} candidate_id={{candidate.pk}}></li>
                           {% endfor %}
                           
                         </ul>
@@ -335,16 +497,42 @@
                     
                         <div id="search_tags_tools_line">
                             <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
-                                {% for tag in tag_types %}
-                                    <option value="{{tag}}">{{tag}}</option>
+                                {% for tag_type in tag_types %}
+                                    <option value="{{tag_type}}">{{tag_type}}</option>
                                 {% endfor %}
                             </select>
                             <input type="text" name="searchtags_input" id="searchtags_input" value="" />
                             <input type="button" class="button" name="searchtag_add_button" id="searchtag_add_button" value="+" />
-                            <input type="button" class="button" name="generate_report_button" id="generate_report_button" value="Report" />
+                            <input type="button" class="button" name="generate_report_button" id="generate_report_button" value="Generate Report" />
+                            <div id="search_panel_separation"></div>
+                            
+                                <input type="button" class="button" name="add_to_template_button" id="add_to_template_button" value="Add to Template" />
+                                <input type="button" class="button" name="load_template_button" id="load_template_button" value="Load Template" />
+                                <div id="template_select_section">
+                                <ul name="select_saved_template_menu" id="select_saved_template_menu" value="">
+                                    <li>
+                                        <a id="selected_template_link" href="#">{% if selected_template %}{{selected_template}}{%else%}Select{%endif%}</a>
+                                        <ul>
+                                            {% if selected_template %}
+                                            <li><a href="#"><input type="text" id="selected_template" name="selected_template" value="{{selected_template}}" /></a></li>
+                                            {%else%}
+                                            <li><a href="#"><input type="text" id="selected_template" name="selected_template" value="New Template"/></a></li>
+                                            {%endif%}
+                                                                  
+                                    {% for template in user_templates_list %}
+                                        <li><a class="selectoption" value="{{template}}" href="#">{{template}}</a></li>
+                                    {% endfor %}
+                                        </ul>
+                                    </li>  
+                                </ul>
+                                </div>
+                                <input type="button" class="button" name="remove_template_button" id="remove_template_button" value="Remove Template" />
+                                
+                            </div>
                         
-                        </div>
-                        
+                            <input type="text" class="invisible" name="action_button_pressed" id="action_button_pressed" value="" />
+                            <input type="text" class="invisible" name="selected_transactions_list_string" id="selected_transactions_list_string" value="" />
+
                     </div>
                 </div>
                 

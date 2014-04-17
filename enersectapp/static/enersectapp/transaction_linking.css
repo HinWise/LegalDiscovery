@@ -342,8 +342,9 @@
         
         position: relative;
         display: inline-block;
-        width: 20%;
-        margin-left: 5%;
+        width: auto;
+        margin-left: 1%;
+        padding-right: 0.5%;
         height: 100%;
         background: lightgrey;
         }
@@ -352,7 +353,7 @@
         
         position: relative;
         display:inline-block;
-        width: 25%;
+        width: auto;
         
         height: 100%;
 
@@ -363,10 +364,10 @@
         
         position: relative;
         display: inline-block;
-        width: 1%;
+        width: auto;
         height: 100%;
         font-family: Georgia;
-        font-size: 50%;
+        font-size: 70%;
         text-align: center;
         vertical-align: middle;
         font-weight: bold;
@@ -378,42 +379,54 @@
     #search_tags_create_panel {
     
     position: absolute;
-    left: 0;
+    left: 24%;
     top: 35%;
-    width: 100%;
+    width: 52%;
     height: 65%;
     background: lightgrey;
     
     
-    }
-
-    #select_tagtype_menu {
+    }    
+        
+        
+    #search_tags_tools_line {
     
     position: absolute;
-    left: 25%;
-    top: 25%;
+    left: 0;
+    top: 20%;
+    width: 100%;
+    height: 60%;
+
+    
+    
+    }
+    
+    
+    
+    #select_tagtype_menu {
+    
+    position: relative;
+    height: 100%;
+    width: 30%;
+    margin-left: 8%;
         
     }
     
     #searchtags_input {
     
-    position: absolute;
-    left: 45%;
-    width: 20%;
-    top: 30%;
-    height: 50%;
-        
+    position: relative;
+    width: 28%;
+    margin-left: 4%;
+    height: 100%;
+    font-weight: bold;
     }
     
     #searchtag_add_button {
         
-        position: absolute;
-        left: 68%;
-        width: 5%;
-        top: 30%;
-        height: 50%;
-    
-    
+        position: relative;
+        width: 8%;
+        margin-left: 6%;
+        font-weight: bold;
     }
     
     
