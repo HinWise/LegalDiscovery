@@ -184,9 +184,9 @@ def transaction_linking(request):
     
     return transaction_linking_module.transaction_linking(request)    
     
-def show_transaction(request,transaction_pk):
+def show_transaction(request,transaction_index):
     
-    return show_transaction_module.show_transaction(request,transaction_pk)  
+    return show_transaction_module.show_transaction(request,transaction_index)  
 
     
 

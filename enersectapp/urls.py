@@ -277,7 +277,7 @@ urlpatterns = patterns('',
     # Used for the iframe in Transaction Linking Tool
     # ex: /enersectapp/5/show_transaction
 
-    url(r'^(?P<transaction_pk>\d+)/show_transaction/$', views.show_transaction, name='show_transaction'),
+    url(r'^(?P<transaction_index>\d+)/show_transaction/$', views.show_transaction, name='show_transaction'),
     
     # Add or Remove Transaction from Candidate List
     # ex: /enersectapp/1230/14000/high/add/add_or_remove_transaction

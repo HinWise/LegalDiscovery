@@ -146,8 +146,16 @@
         
             //When Mouse over one of the Candidates, update the iframe to show that Transaction
             
-            $(".candidate").mousedown(function(){
+            $(".candidate").click(function(){
                 
+                if($(this).hasClass("been-clicked4")) { $(this).addClass("been-clicked5");  $(this).removeClass("been-clicked4");}
+                if($(this).hasClass("been-clicked3")) { $(this).addClass("been-clicked4"); $(this).removeClass("been-clicked3"); }
+                if($(this).hasClass("been-clicked2")) { $(this).addClass("been-clicked3"); $(this).removeClass("been-clicked2");}
+                if($(this).hasClass("been-clicked1")) { $(this).addClass("been-clicked2"); $(this).removeClass("been-clicked1");}
+                
+                $(this).addClass("been-clicked1");
+                
+
                 $("#transaction_graph").remove();
                 
                 var frame_width = $("#iframe_test").width()-10+"px";
@@ -463,7 +471,7 @@
                         <ul class="sortable sortable_transaction_search">
                           <li class="list_description transactions_list_description ui-state-default" score_id={{ordered_list.score_index}}>Score: {{ordered_list.score_index}}</li>
                           {% for candidate in ordered_list.transactions_list %}
-                            <li class="candidate transaction_search_candidate ui-state-default" score_id={{ordered_list.score_index}} candidate_id={{candidate.pk}}></li>
+                            <li class="candidate transaction_search_candidate ui-state-default" score_id={{ordered_list.score_index}} candidate_id={{candidate.TransactionIndex}}></li>
                           {% endfor %}
                           
                         </ul>

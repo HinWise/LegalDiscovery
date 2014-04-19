@@ -107,7 +107,7 @@ class TransactionTable(models.Model):
     BankCurrency = models.CharField('Bank Currency',max_length=31)
     
     def __unicode__(self):
-        return str(self.pk)
+        return str(self.TransactionIndex)
     
       
 class Record(models.Model):

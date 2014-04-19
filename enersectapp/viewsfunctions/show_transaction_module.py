@@ -10,7 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
-def show_transaction(request,transaction_pk):
+def show_transaction(request,transaction_index):
     
     if not request.user.is_authenticated():
         
@@ -19,7 +19,7 @@ def show_transaction(request,transaction_pk):
     the_user = request.user
    
   
-    transaction_item = TransactionTable.objects.get(pk=transaction_pk)
+    transaction_item = TransactionTable.objects.get(TransactionIndex=transaction_index)
     
     
     item_bank_records = transaction_item.bank_records_list.all()
@@ -56,7 +56,7 @@ def show_transaction(request,transaction_pk):
         helper_dict = {"name":"Internal Record "+ str(internal_record.InternalRecordIndex),"children":[
             {"name":"Credit = "+str(internal_record.Credit)},
             {"name":"Debit = "+str(internal_record.Debit)},
-            {"name":"Date = "+internal_record.Day+"/"+internal_record.Month+"/"+internal_record.Year},
+            {"name":"Complete Date = "+internal_record.Day+"/"+internal_record.Month+"/"+internal_record.Year},
             {"name":"DateDiscrepancy = "+str(internal_record.DateDiscrepancy)},
             {"name":"LedgerYear = "+internal_record.LedgerYear},
             {"name":"Company = "+internal_record.Company},
@@ -110,7 +110,7 @@ def show_transaction(request,transaction_pk):
         internal_records_dict
     ]
     
-    transaction_dict = { "name":"Transaction "+str(transaction_item.pk),"children":main_content_list}
+    transaction_dict = { "name":"Transaction "+str(transaction_item.TransactionIndex),"children":main_content_list}
  
     transaction_dict = json.dumps(transaction_dict)
 
