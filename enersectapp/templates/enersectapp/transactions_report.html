@@ -150,10 +150,12 @@
                 
                 if($(this).hasClass("been-clicked4")) { $(this).addClass("been-clicked5");  $(this).removeClass("been-clicked4");}
                 if($(this).hasClass("been-clicked3")) { $(this).addClass("been-clicked4"); $(this).removeClass("been-clicked3"); }
-                if($(this).hasClass("been-clicked2")) { $(this).addClass("been-clicked3"); $(this).removeClass("been-clicked2");}
-                if($(this).hasClass("been-clicked1")) { $(this).addClass("been-clicked2"); $(this).removeClass("been-clicked1");}
+                if($(this).hasClass("been-clicked2")) { $(this).addClass("been-clicked3"); $(this).removeClass("been-clicked2"); }
+                if($(this).hasClass("been-clicked1")) { $(this).addClass("been-clicked2"); $(this).removeClass("been-clicked1"); }
                 
-                $(this).addClass("been-clicked1");
+                if($(this).hasClass("been-clicked") == false) { $(this).addClass("been-clicked1"); $(this).addClass("been-clicked"); }
+                
+                
                 
 
                 $("#transaction_graph").remove();
