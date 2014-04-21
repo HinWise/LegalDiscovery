@@ -247,9 +247,35 @@
            
             
                 $("#action_button_pressed").attr("value","generate_report");
-            
+    
+                
+                //var selected_transactions_list_string = $("#selected_transactions_list_string").attr("value");
+                var selected_transactions_list_string = "";
+               
+
+                $(".ui-selected").each(function(){
+                
+                    $element = $(this);
+                    
+
+                    if($element.hasClass("transaction_search_candidate"))
+                    {
+                    
+                        if(selected_transactions_list_string.length != 0)
+                        {
+                            selected_transactions_list_string += ",";
+                        }
+                        
+                        selected_transactions_list_string += $element.attr("candidate_id");
+                    }
+                
+                });
+
+                $("#selected_transactions_list_string").attr("value",selected_transactions_list_string);
+                
                 $("#fields_form").submit();
             
+                $("#action_button_pressed").attr("value","");
             });
             
             $("#add_to_template_button").click(function(){

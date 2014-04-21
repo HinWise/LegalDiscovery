@@ -9,6 +9,15 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect,render_to_response
 
+from pyPdf import PdfFileWriter, PdfFileReader
+from urllib2 import Request, urlopen
+from StringIO import StringIO
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
+from reportlab.pdfgen import canvas
+import tempfile
+
 import time
 from django.views import generic
 from django.utils import timezone
@@ -61,8 +70,151 @@ def transactions_report(request):
     selected_candidates_list = []
     
     if action_button_pressed == "generate_report":
+  
+        #Make a list with the searchtags
     
-        print action_button_pressed
+        searchtags_fields = []
+    
+        if searchtags_string:
+    
+            searchtags_fields = searchtags_string.split("+")
+
+        #Making the query that includes all selected candidate TransactionTables, then write the Report PDF
+
+        selected_transactions = TransactionTable.objects.none()
+        
+        if len(selected_transactions_list_string):
+        
+            selected_transactions_list = selected_transactions_list_string.split(',')
+            
+            for transaction_index in selected_transactions_list:
+            
+                selected_transactions = selected_transactions | TransactionTable.objects.filter(TransactionIndex = int(transaction_index))
+    
+        #Initialize the Pdf to be written
+        
+        output = PdfFileWriter()
+    
+        title_string = "Transactions Report ; Contains "+str(len(selected_transactions))+" elements.\n\n"
+        
+        # Build the string for the searchtags:
+       
+        searchtags_line = "Search tags used: "
+        
+        for searchtag in searchtags_fields:
+        
+            try:
+                                                    
+                try:
+                    
+                    if (len(searchtags_line.split("\n")[-1]) + len(" "+str(searchtag)+" ")) > 80:
+                        test_string = "\n"
+                        test_string2 = ".              -"
+                    else:
+                        test_string = ""
+                        test_string2 = ""
+                      
+                    searchtags_line += " "+test_string+test_string2+str(searchtag)+" "
+                      
+                except:
+                    test_string = ""
+                
+            except:
+                searchtags_line += " "
+        
+        title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+    
+        response = HttpResponse(mimetype="application/pdf")
+        response['Content-Disposition'] = 'attachment; filename=transactions_report_%s.pdf' %(title_date)
+    
+        
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+                
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+        string_to_pdf(the_canvas,title_string+searchtags_line)
+               
+        the_canvas.save()
+                        
+        input1 = PdfFileReader(tmpfile)
+                
+        output.addPage(input1.getPage(0))
+        
+    
+        #Ready to make the writing to the PDF loop
+                                
+        #Exhibit Title Pages + Pdfs Loop
+        
+        pdf_string = ""
+        
+        for transaction_item in selected_transactions:
+                                
+            pdf_string += "Transaction "+str(transaction_item.TransactionIndex)+": "
+                                                            
+            pdf_string = add_to_string_or_split(pdf_string,"Number Linked Bank Records: "+str(transaction_item.NumberBankRecordIndexes));
+            pdf_string = add_to_string_or_split(pdf_string,"Number Linked Internal Records: "+str(transaction_item.NumberInternalRecordIndexes));
+            pdf_string = add_to_string_or_split(pdf_string,"Amount: "+str(transaction_item.Amount));
+            pdf_string = add_to_string_or_split(pdf_string,"Amount Discrepancy: "+str(transaction_item.AmountDiscrepancy));
+            pdf_string = add_to_string_or_split(pdf_string,"PostDay: "+str(transaction_item.PostDay));
+            pdf_string = add_to_string_or_split(pdf_string,"PostMonth: "+str(transaction_item.PostMonth));
+            pdf_string = add_to_string_or_split(pdf_string,"PostYear: "+str(transaction_item.PostYear));
+            pdf_string = add_to_string_or_split(pdf_string,"ValueDay: "+str(transaction_item.ValueDay));
+            pdf_string = add_to_string_or_split(pdf_string,"ValueMonth: "+str(transaction_item.ValueMonth));
+            pdf_string = add_to_string_or_split(pdf_string,"ValueYear: "+str(transaction_item.ValueYear));
+            pdf_string = add_to_string_or_split(pdf_string,"Date Discrepancy: "+str(transaction_item.DateDiscrepancy));
+            pdf_string = add_to_string_or_split(pdf_string,"Libdesc: "+str(transaction_item.Libdesc));
+            pdf_string = add_to_string_or_split(pdf_string,"Reftran: "+str(transaction_item.Reftran));
+            pdf_string = add_to_string_or_split(pdf_string,"BankAccount: "+str(transaction_item.BankAccount));
+            pdf_string = add_to_string_or_split(pdf_string,"BankName: "+str(transaction_item.BankName));
+            pdf_string = add_to_string_or_split(pdf_string,"BankCurrency: "+str(transaction_item.BankCurrency));
+
+                   
+            pdf_string += '\n'
+            pdf_string += '\n'
+            
+            if pdf_string.count('\n') > 37:
+            
+                tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                tmpfile.rollover()
+                
+                the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                string_to_pdf(the_canvas,pdf_string)
+                       
+                the_canvas.save()
+                        
+                input1 = PdfFileReader(tmpfile)
+                
+                output.addPage(input1.getPage(0))
+                
+                pdf_string = ""
+            
+            
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+        
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+        string_to_pdf(the_canvas,pdf_string)
+               
+        the_canvas.save()
+                
+        input1 = PdfFileReader(tmpfile)
+        
+        output.addPage(input1.getPage(0))
+        
+        
+        #Finalize the report document
+            
+        outputStream = StringIO()
+        output.write(outputStream)
+        
+
+        response.write(outputStream.getvalue())
+        return response 
+            
+
     
     elif action_button_pressed == "add_template":
     
@@ -331,3 +483,51 @@ def transactions_report(request):
                 'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,
                 'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
     return render(request,'enersectapp/transactions_report.html',context)
+    
+def string_to_pdf(canvas,string):
+
+    splited_string = string.split("\n")
+                            
+    times = 0
+    
+    for item in splited_string:
+        
+        canvas.drawString(2,800-(14*times),item)
+    
+        times +=1
+                            
+
+    '''textobject = canvas.beginText()
+    textobject.setTextOrigin(2, 800)
+    textobject.setFont("Helvetica-Oblique", 14)
+    
+    # for line in lyrics:
+    # textobject.textOut(line)
+    # textobject.moveCursor(14,14) # POSITIVE Y moves down!!!
+    # textobject.setFillColorRGB(0.4,0,1)
+    textobject.textLines(string)
+    
+    canvas.drawText(textobject)'''
+    
+def add_to_string_or_split(pdf_string_origin,string_to_add):
+
+    try:
+                
+        try:
+            
+            if (len(pdf_string_origin.split("\n")[-1]) + len(" "+str(string_to_add)+" ")) > 80:
+                test_string = "\n"
+                test_string2 = ".              -"
+            else:
+                test_string = ""
+                test_string2 = ""
+              
+            pdf_string_origin += " "+test_string+test_string2+str(string_to_add)+" "
+              
+        except:
+            test_string = ""
+        
+    except:
+        pdf_string_origin += " "
+        
+    return pdf_string_origin
