@@ -497,7 +497,7 @@
                     <div class="transaction_search_candidates_list" score_index = "{{ordered_list.score_index}}">
                     
                         <ul class="sortable sortable_transaction_search">
-                          <li class="list_description transactions_list_description ui-state-default" score_id={{ordered_list.score_index}}>Score: {{ordered_list.score_index}}</li>
+                          <li class="list_description transactions_list_description ui-state-default" score_id={{ordered_list.score_index}}>Score: {{ordered_list.score_index}} ; Nº: {{ordered_list.transactions_list|length}} </li>
                           {% for candidate in ordered_list.transactions_list %}
                             <li class="candidate transaction_search_candidate ui-state-default" score_id={{ordered_list.score_index}} candidate_id={{candidate.TransactionIndex}}></li>
                           {% endfor %}

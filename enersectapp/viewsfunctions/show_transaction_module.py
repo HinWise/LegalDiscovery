@@ -54,8 +54,8 @@ def show_transaction(request,transaction_index):
     for internal_record in item_internal_records:
     
         helper_dict = {"name":"Internal Record "+ str(internal_record.InternalRecordIndex),"children":[
-            {"name":"Credit = "+str(internal_record.Credit)},
-            {"name":"Debit = "+str(internal_record.Debit)},
+            {"name":"Credit = "+str(internal_record.Credit) + " Dinars"},
+            {"name":"Debit = "+str(internal_record.Debit) + " Dinars"},
             {"name":"Complete Date = "+internal_record.Day+"/"+internal_record.Month+"/"+internal_record.Year},
             {"name":"DateDiscrepancy = "+str(internal_record.DateDiscrepancy)},
             {"name":"LedgerYear = "+internal_record.LedgerYear},
