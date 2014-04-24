@@ -235,6 +235,28 @@ def transactions_report(request):
                 
                     new_searchtag_string = searchtags_string
                 
+                #Getting rid of duplicates by converting it into a set, then back to a list
+                
+                splitted_searchtags_fields = new_searchtag_string.split("+")
+                print splitted_searchtags_fields
+                splitted_searchtags_fields = set(splitted_searchtags_fields)
+                print splitted_searchtags_fields
+                splitted_searchtags_fields = list(splitted_searchtags_fields)      
+                print splitted_searchtags_fields               
+                
+                index = 0
+                new_searchtag_string = ""
+                
+                for searchtag_field in splitted_searchtags_fields:
+                
+                    if index != 0:
+                        new_searchtag_string += "+"
+                    
+                    new_searchtag_string += str(searchtag_field)
+                    
+                    index +=1
+                
+                print new_searchtag_string 
                 
                 Transactions_Report_Template = chosen_template
                 Transactions_Report_Template.modification_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
@@ -314,6 +336,11 @@ def transactions_report(request):
     if searchtags_string:
     
         searchtags_fields = searchtags_string.split("+")
+        
+        #Getting rid of duplicates by converting it into a set, then back to a list
+                
+        searchtags_fields = set(searchtags_fields)
+        searchtags_fields = list(searchtags_fields)        
         
         for searchtag_fields in searchtags_fields:
         
