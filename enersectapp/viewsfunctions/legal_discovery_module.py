@@ -804,9 +804,9 @@ def legal_discovery(request):
             sequential_order = 0
         
             for item in used_document_types_dictionary_list:
-            
+                print item['modified_document_type__clean_name']
                 doctype = SourceDocType.objects.get(clean_name = item['modified_document_type__clean_name'] )
-                
+                print "------------"
                 new_element = {}
                 new_element.update({"clean_name":str(doctype.clean_name)})
                 new_element.update({"name":str(doctype.pretty_name)})
