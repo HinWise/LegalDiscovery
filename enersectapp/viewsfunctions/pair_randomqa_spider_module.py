@@ -1078,9 +1078,9 @@ def pair_randomqa_spider(request):
         companyname_list = CompanyTemplate.objects.all().order_by('companyname_base').values_list('companyname_base',flat=True).distinct()
         #companyname_list = CompanyTemplate.objects.none()
        
-        #document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
+        document_type_list = SourceDocType.objects.all().order_by('name').values_list('name',flat=True).distinct()
         
-        document_type_list = ["cheque","invoice","facture","cheque_stub","receipt"]
+        document_type_tags_list = ["cheque","invoice","facture","cheque_stub","receipt"]
         
         context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,'show_progress_mark':show_progress_mark,
@@ -1088,7 +1088,8 @@ def pair_randomqa_spider(request):
         'pdf_total_count':pdf_total_count,'pdf_left_to_audit':pdf_left_to_audit,'pdf_audited':pdf_audited,
         'pdf_needs_reentry_confirmation':pdf_needs_reentry_confirmation,
         'pdf_being_reentered':pdf_being_reentered,'pdf_lot_number_distinct':pdf_lot_number_distinct,
-        'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list,"selected_doctype":selected_doctype}
+        'company_name':user_company.name,'companyname_list':companyname_list,'document_type_list':document_type_list,
+        'document_type_tags_list':document_type_tags_list,"selected_doctype":selected_doctype}
         return render(request,'enersectapp/pair_randomqa_spider.html',context)
     
     else:

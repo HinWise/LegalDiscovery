@@ -1165,7 +1165,7 @@
                             <input type="radio" class="filter_choice choice_author" id="filter_pdf_authorall" choice_value="all" name="radio2"  /><label class="filter_choice_label" for="filter_pdf_authorall">All Users</label>
                     </div> -->
                     <div class="show-option" id="filter_container_doctype" title="Filter the Search Results by Document Type">
-                            {% for item in document_type_list %}
+                            {% for item in document_type_tags_list %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctype{{item}}" choice_value="{{item}}" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctype{{item}}">{{item}}</label>
                             {% endfor %}
                             <input type="radio" class="filter_choice choice_doctype" id="filter_pdf_doctypeall" choice_value="all" name="radio3"  /><label class="filter_choice_label" for="filter_pdf_doctypeall">All Document Types</label>
