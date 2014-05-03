@@ -493,7 +493,7 @@ def legal_discovery(request):
                                     
                                     access_list_ocr_names = []
                                     
-                                    print access_list_ocr_names
+                                    #print access_list_ocr_names
                                     
                                     for name_value in corpus_include_fields:
                                     
@@ -560,8 +560,9 @@ def legal_discovery(request):
                                                     else:
                                                         test_string = ""
                                                         test_string2 = ""
-                                                      
-                                                    pdf_string += " "+test_string+test_string2+str(cute_name)+" "+(record[ocr_name])
+                                                    
+                                                    if record[ocr_name] != "MISSING" and record[ocr_name] != "UNREADABLE" and "Field" not in record[ocr_name] !="" :
+                                                        pdf_string += " "+test_string+test_string2+str(cute_name)+" "+(record[ocr_name])
                                                       
                                                 except:
                                                     test_string = ""
@@ -682,7 +683,7 @@ def legal_discovery(request):
                                     
                                     access_list_ocr_names = []
                                     
-                                    print access_list_ocr_names
+                                    #print access_list_ocr_names
                                     
                                     for name_value in corpus_include_fields:
                                     
