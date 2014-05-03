@@ -371,8 +371,17 @@ def legal_discovery(request):
                     
                     else:
  
-                        
-                    
+                        try:
+                            override_sorting = request.POST['override_sorting']
+                            
+                        except:
+                            override_sorting = "no_override"
+                            
+                        #Temporally set to override_by_date for developing purposes    
+                        override_sorting = "override_by_date"
+                        print "SORTING TIIIME"
+                        print override_sorting
+                        print "SORTING TIIIME"
                         
                         Legal_Discovery_object = new_Legal_Discovery_Template
                         
@@ -408,386 +417,817 @@ def legal_discovery(request):
                             output.addPage(input1.getPage(0))
                             
                             
-                            #Start looping through the SourceDocTypeTemplates, making the consequent actions:
-                            #
-                            #-Make a variable for all  the SourceDocTypeTemplates contained in this Template
-                            #   -Catch the equivalent SourceDocType
-                            #   -Keep the min_selected and max_selected in two variables: start_range and end_range
-                            #   -Force the end_range to start_range + max_limit_to_print_of_each
-                            #   -Make a variable for all the extraction fields
-                        
-                            all_sourcedoctypestemplate = Legal_Discovery_object.sourcedoctypes_list.filter(checked = "checked").order_by('sequential_order')
-                        
+                            ###
+                            ## If override_sorting is "no_override", it means that there is no global sorting selected, so it follows the normal
+                            ## sorting rules, and prints the report based on the order of Document Types.
+                            ###
                             
-                            exhibit_count = 1
-                            pdf_string = ""
+                            if override_sorting == "no_override":
                             
-                            '''Iteration of all the DocTypes to produce the Index (which gives the values of the OcrEntries in DocType Groups'''
+                                #Start looping through the SourceDocTypeTemplates, making the consequent actions:
+                                #
+                                #-Make a variable for all  the SourceDocTypeTemplates contained in this Template
+                                #   -Catch the equivalent SourceDocType
+                                #   -Keep the min_selected and max_selected in two variables: start_range and end_range
+                                #   -Force the end_range to start_range + max_limit_to_print_of_each
+                                #   -Make a variable for all the extraction fields
                             
-                            with transaction.commit_on_success():
-                                for doctype_template in all_sourcedoctypestemplate:
+                                all_sourcedoctypestemplate = Legal_Discovery_object.sourcedoctypes_list.filter(checked = "checked").order_by('sequential_order')
+                            
                                 
-                                    equivalent_doctype = SourceDocType.objects.get(clean_name = doctype_template.clean_name)
-                                    pretty_name = doctype_template.pretty_name
-                                    start_range = doctype_template.min_selected
-                                    end_range = doctype_template.max_selected
-                                    #Edit, forcing the maximum amount of records per type. Delete to erase
-                                    end_range = start_range + max_limit_to_print_of_each
+                                exhibit_count = 1
+                                pdf_string = ""
+                                
+                                '''Iteration of all the DocTypes to produce the Index (which gives the values of the OcrEntries in DocType Groups'''
+                                
+                                with transaction.commit_on_success():
+                                    for doctype_template in all_sourcedoctypestemplate:
                                     
-                                    all_extraction_field_templates = doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
-                                    
-                                    #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
-                                    
-                                    corpus_include_fields = []
-                                    corpus_sorting_fields = []
-                                    
-                                    
-                                    for field in all_extraction_field_templates:
+                                        equivalent_doctype = SourceDocType.objects.get(clean_name = doctype_template.clean_name)
+                                        pretty_name = doctype_template.pretty_name
+                                        start_range = doctype_template.min_selected
+                                        end_range = doctype_template.max_selected
+                                        #Edit, forcing the maximum amount of records per type. Delete to erase
+                                        end_range = start_range + max_limit_to_print_of_each
                                         
-                                        corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
-                                    
-                                        sorting_element = field["field_sorting"]
+                                        all_extraction_field_templates = doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
+                                        
+                                        #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+                                        
+                                        corpus_include_fields = []
+                                        corpus_sorting_fields = []
+                                        
+                                        
+                                        for field in all_extraction_field_templates:
                                             
-                                        if sorting_element == "down":
+                                            corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                        
+                                            sorting_element = field["field_sorting"]
                                                 
-                                            corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
+                                            if sorting_element == "down":
+                                                    
+                                                corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
+                                                
+                                            elif sorting_element == "up":
                                             
-                                        elif sorting_element == "up":
+                                                corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                            
+                                            
+
+                                        #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
                                         
-                                            corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                        corpus_include_fields_additional = corpus_include_fields
                                         
+                                        corpus_include_fields_additional.append('sourcedoc_link__filename')
+                                        corpus_include_fields_additional.append('sourcedoc_link__job_directory')
+                                        
+                                        #Takes the ones that fit with the doctype we are searching for
+                                        
+                                        corpus_base = corpus_pdfs_to_export.filter(modified_document_type = equivalent_doctype)
+                                        
+                                        #Takes only the values defined in corpus_include_fields
+                                        
+                                        if len(corpus_include_fields_additional):
+                                            corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
+                                        else:
+                                            corpus_include_fields_base = corpus_base
+                                        
+                                        #Orders the records by the fields defined in corpus_sorting_fields
+                                        
+                                        if len(corpus_sorting_fields):
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
+                                        else:
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by()
                                         
 
-                                    #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
-                                    
-                                    corpus_include_fields_additional = corpus_include_fields
-                                    
-                                    corpus_include_fields_additional.append('sourcedoc_link__filename')
-                                    corpus_include_fields_additional.append('sourcedoc_link__job_directory')
-                                    
-                                    #Takes the ones that fit with the doctype we are searching for
-                                    
-                                    corpus_base = corpus_pdfs_to_export.filter(modified_document_type = equivalent_doctype)
-                                    
-                                    #Takes only the values defined in corpus_include_fields
-                                    
-                                    if len(corpus_include_fields_additional):
-                                        corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
-                                    else:
-                                        corpus_include_fields_base = corpus_base
-                                    
-                                    #Orders the records by the fields defined in corpus_sorting_fields
-                                    
-                                    if len(corpus_sorting_fields):
-                                        corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
-                                    else:
-                                        corpus_ordered_fields_base = corpus_include_fields_base.order_by()
-                                    
-
-                                    #Making the cut, based on the start_range and end_range
-                                    
-                                    corpus_final = corpus_ordered_fields_base[start_range:end_range]
-                                     
-                                    
-                                    #Cleaning the access lists to be used later
-                                    
-                                    access_list_ocr_names = []
-                                    
-                                    #print access_list_ocr_names
-                                    
-                                    for name_value in corpus_include_fields:
-                                    
-                                        if "ocrrecord_link__" in name_value:
+                                        #Making the cut, based on the start_range and end_range
                                         
-                                            name_value = name_value.replace("ocrrecord_link__","")
-                                            
-                                            access_list_ocr_names.append(name_value)
-                                    
-                                    
-                                    access_list_sourcepdf_names = ["job_directory","filename"]
-                                    
-                                    
-                                    #Cleaning loop of the corpus_final
-                                    
-                                    for record in corpus_final:
-                                    
-                                        for key in record.items():
-                                            
-                                            if "ocrrecord_link__" in key[0]:
-                                                
-                                                new_key = key[0].replace("ocrrecord_link__","")
-                                                 
-                                                record[new_key] = key[1]
-                                                
-                                                record.pop(key[0])
-                                        
-                                            elif "sourcedoc_link__" in key[0]:
-                                                
-                                                new_key = key[0].replace("sourcedoc_link__","")
-                                        
-                                                record[new_key] = key[1]
-                                                
-                                                record.pop(key[0])
-
+                                        corpus_final = corpus_ordered_fields_base[start_range:end_range]
                                          
-                                    
-                                    #Ready to make the writing to the PDF loop
-                                    
-                                    
-                                    
-                                    #Index Loop
-                                    
-                                    
-                                    '''Write command to begin outputing to a new page'''
-                                    
-                                    
-                                    
-                                    for record in corpus_final:
-                                    
-                                        pdf_string += "Exhibit "+str(exhibit_count)+": "+str(pretty_name)
                                         
-                                        for ocr_name in access_list_ocr_names:
+                                        #Cleaning the access lists to be used later
+                                        
+                                        access_list_ocr_names = []
+                                        
+                                        #print access_list_ocr_names
+                                        
+                                        for name_value in corpus_include_fields:
+                                        
+                                            if "ocrrecord_link__" in name_value:
                                             
-                                            cute_name = ExtractionField.objects.filter(real_field_name = ocr_name)[0].pretty_name
-                                                                                        
-                                            try:
+                                                name_value = name_value.replace("ocrrecord_link__","")
                                                 
+                                                access_list_ocr_names.append(name_value)
+                                        
+                                        
+                                        access_list_sourcepdf_names = ["job_directory","filename"]
+                                        
+                                        
+                                        #Cleaning loop of the corpus_final
+                                        
+                                        for record in corpus_final:
+                                        
+                                            for key in record.items():
+                                                
+                                                if "ocrrecord_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("ocrrecord_link__","")
+                                                     
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+                                            
+                                                elif "sourcedoc_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("sourcedoc_link__","")
+                                            
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+
+                                             
+                                        
+                                        #Ready to make the writing to the PDF loop
+                                        
+                                        
+                                        
+                                        #Index Loop
+                                        
+                                        
+                                        '''Write command to begin outputing to a new page'''
+                                        
+                                        
+                                        
+                                        for record in corpus_final:
+                                        
+                                            pdf_string += "Exhibit "+str(exhibit_count)+": "+str(pretty_name)
+                                            
+                                            for ocr_name in access_list_ocr_names:
+                                                
+                                                cute_name = ExtractionField.objects.filter(real_field_name = ocr_name)[0].pretty_name
+                                                                                            
                                                 try:
                                                     
-                                                    if (len(pdf_string.split("\n")[-1]) + len(" "+str(cute_name)+" "+(record[ocr_name]))) > 80:
-                                                        test_string = "\n"
-                                                        test_string2 = ".              -"
-                                                    else:
+                                                    try:
+                                                        
+                                                        if (len(pdf_string.split("\n")[-1]) + len(" "+str(cute_name)+" "+(record[ocr_name]))) > 80:
+                                                            test_string = "\n"
+                                                            test_string2 = ".              -"
+                                                        else:
+                                                            test_string = ""
+                                                            test_string2 = ""
+                                                        
+                                                        if record[ocr_name] != "MISSING" and record[ocr_name] != "UNREADABLE" and "Field" not in record[ocr_name] !="" :
+                                                            pdf_string += " "+test_string+test_string2+str(cute_name)+" "+(record[ocr_name])
+                                                          
+                                                    except:
                                                         test_string = ""
-                                                        test_string2 = ""
                                                     
-                                                    if record[ocr_name] != "MISSING" and record[ocr_name] != "UNREADABLE" and "Field" not in record[ocr_name] !="" :
-                                                        pdf_string += " "+test_string+test_string2+str(cute_name)+" "+(record[ocr_name])
-                                                      
                                                 except:
-                                                    test_string = ""
+                                                    pdf_string += " "
+                                                    
+                                            
+                                            '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                                            
+                                            pdf_string += '\n'
+                                            pdf_string += '\n'
+                                            
+                                            if pdf_string.count('\n') > 37:
+                                            
+                                                tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                                # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                                tmpfile.rollover()
                                                 
-                                            except:
-                                                pdf_string += " "
+                                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                                string_to_pdf(the_canvas,pdf_string)
+                                                       
+                                                the_canvas.save()
+                                                        
+                                                input1 = PdfFileReader(tmpfile)
                                                 
+                                                output.addPage(input1.getPage(0))
+                                                
+                                                pdf_string = ""
+
+                                            exhibit_count += 1
                                         
-                                        '''Write command to output the existing pdf_string variable as a new row, then line break'''
                                         
-                                        pdf_string += '\n'
-                                        pdf_string += '\n'
                                         
-                                        if pdf_string.count('\n') > 37:
+                                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                    tmpfile.rollover()
+                                    
+                                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                    string_to_pdf(the_canvas,pdf_string)
+                                           
+                                    the_canvas.save()
+                                            
+                                    input1 = PdfFileReader(tmpfile)
+                                    
+                                    output.addPage(input1.getPage(0))
+                                    '''Write command to finish and save new page'''
+                            
+                            
+                                exhibit_count = 1
+                            
+                                with transaction.commit_on_success():
+                                    for doctype_template in all_sourcedoctypestemplate:
+                                    
+                                        equivalent_doctype = SourceDocType.objects.get(clean_name = doctype_template.clean_name)
+                                        pretty_name = doctype_template.pretty_name
+                                        start_range = doctype_template.min_selected
+                                        end_range = doctype_template.max_selected
+                                        #Edit, forcing the maximum amount of records per type. Delete to erase
+                                        end_range = start_range + max_limit_to_print_of_each
                                         
+                                        all_extraction_field_templates = doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
+                                        
+                                        #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+                                        
+                                        corpus_include_fields = []
+                                        corpus_sorting_fields = []
+                                        
+                                        
+                                        for field in all_extraction_field_templates:
+                                            
+                                            corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                        
+                                            sorting_element = field["field_sorting"]
+                                                
+                                            if sorting_element == "down":
+                                                    
+                                                corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
+                                                
+                                            else:
+                                            
+                                                corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                            
+                                            
+
+                                        #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
+                                        
+                                        corpus_include_fields_additional = corpus_include_fields
+                                        
+                                        corpus_include_fields_additional.append('sourcedoc_link__filename')
+                                        corpus_include_fields_additional.append('sourcedoc_link__job_directory')
+                                        
+                                        #Takes the ones that fit with the doctype we are searching for
+                                        
+                                        corpus_base = corpus_pdfs_to_export.filter(modified_document_type = equivalent_doctype)
+                                        
+                                        #Takes only the values defined in corpus_include_fields
+                                        
+                                        if len(corpus_include_fields_additional):
+                                            corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
+                                        else:
+                                            corpus_include_fields_base = corpus_base
+                                        
+                                        #Orders the records by the fields defined in corpus_sorting_fields
+                                        
+                                        if len(corpus_sorting_fields):
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
+                                        else:
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by()
+                                        
+
+                                        #Making the cut, based on the start_range and end_range
+                                        
+                                        corpus_final = corpus_ordered_fields_base[start_range:end_range]
+                                         
+                                        
+                                        #Cleaning the access lists to be used later
+                                        
+                                        access_list_ocr_names = []
+                                        
+                                        #print access_list_ocr_names
+                                        
+                                        for name_value in corpus_include_fields:
+                                        
+                                            if "ocrrecord_link__" in name_value:
+                                            
+                                                name_value = name_value.replace("ocrrecord_link__","")
+                                                
+                                                access_list_ocr_names.append(name_value)
+                                        
+                                        
+                                        access_list_sourcepdf_names = ["job_directory","filename"]
+                                        
+                                        
+                                        #Cleaning loop of the corpus_final
+                                        
+                                        for record in corpus_final:
+                                        
+                                            for key in record.items():
+                                                
+                                                if "ocrrecord_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("ocrrecord_link__","")
+                                                     
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+                                            
+                                                elif "sourcedoc_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("sourcedoc_link__","")
+                                            
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+
+                                             
+                                        
+                                        #Ready to make the writing to the PDF loop
+                                        
+                                        
+                                        #Exhibit Title Pages + Pdfs Loop
+                                        
+                                        
+                                        for record in corpus_final:
+                                        
+                                            '''Write command to begin outputing to a new page'''
+                                        
+                                            pdf_string = "Exhibit "+str(exhibit_count)
+                                            
+                                            '''Write command to finish and save new page'''
+                                            
                                             tmpfile = tempfile.SpooledTemporaryFile(1048576)
                                             # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
                                             tmpfile.rollover()
                                             
                                             the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                                             string_to_pdf(the_canvas,pdf_string)
-                                                   
+                                               
                                             the_canvas.save()
-                                                    
+                                                
                                             input1 = PdfFileReader(tmpfile)
-                                            
+                                        
                                             output.addPage(input1.getPage(0))
                                             
-                                            pdf_string = ""
-
-                                        exhibit_count += 1
-                                    
-                                    
-                                    
-                                tmpfile = tempfile.SpooledTemporaryFile(1048576)
-                                # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                tmpfile.rollover()
-                                
-                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
-                                string_to_pdf(the_canvas,pdf_string)
-                                       
-                                the_canvas.save()
-                                        
-                                input1 = PdfFileReader(tmpfile)
-                                
-                                output.addPage(input1.getPage(0))
-                                '''Write command to finish and save new page'''
-                        
-                        
-                            exhibit_count = 1
-                        
-                            with transaction.commit_on_success():
-                                for doctype_template in all_sourcedoctypestemplate:
-                                
-                                    equivalent_doctype = SourceDocType.objects.get(clean_name = doctype_template.clean_name)
-                                    pretty_name = doctype_template.pretty_name
-                                    start_range = doctype_template.min_selected
-                                    end_range = doctype_template.max_selected
-                                    #Edit, forcing the maximum amount of records per type. Delete to erase
-                                    end_range = start_range + max_limit_to_print_of_each
-                                    
-                                    all_extraction_field_templates = doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
-                                    
-                                    #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
-                                    
-                                    corpus_include_fields = []
-                                    corpus_sorting_fields = []
-                                    
-                                    
-                                    for field in all_extraction_field_templates:
-                                        
-                                        corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
-                                    
-                                        sorting_element = field["field_sorting"]
+                                            '''Write command to begin outputing to a new page'''
                                             
-                                        if sorting_element == "down":
+                                            job_directory = ""
+                                            filename = ""
+                                            
+                                            for sourcedoc_name in access_list_sourcepdf_names:
                                                 
-                                            corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
-                                            
-                                        else:
-                                        
-                                            corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
-                                        
-                                        
-
-                                    #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
-                                    
-                                    corpus_include_fields_additional = corpus_include_fields
-                                    
-                                    corpus_include_fields_additional.append('sourcedoc_link__filename')
-                                    corpus_include_fields_additional.append('sourcedoc_link__job_directory')
-                                    
-                                    #Takes the ones that fit with the doctype we are searching for
-                                    
-                                    corpus_base = corpus_pdfs_to_export.filter(modified_document_type = equivalent_doctype)
-                                    
-                                    #Takes only the values defined in corpus_include_fields
-                                    
-                                    if len(corpus_include_fields_additional):
-                                        corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
-                                    else:
-                                        corpus_include_fields_base = corpus_base
-                                    
-                                    #Orders the records by the fields defined in corpus_sorting_fields
-                                    
-                                    if len(corpus_sorting_fields):
-                                        corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
-                                    else:
-                                        corpus_ordered_fields_base = corpus_include_fields_base.order_by()
-                                    
-
-                                    #Making the cut, based on the start_range and end_range
-                                    
-                                    corpus_final = corpus_ordered_fields_base[start_range:end_range]
-                                     
-                                    
-                                    #Cleaning the access lists to be used later
-                                    
-                                    access_list_ocr_names = []
-                                    
-                                    #print access_list_ocr_names
-                                    
-                                    for name_value in corpus_include_fields:
-                                    
-                                        if "ocrrecord_link__" in name_value:
-                                        
-                                            name_value = name_value.replace("ocrrecord_link__","")
-                                            
-                                            access_list_ocr_names.append(name_value)
-                                    
-                                    
-                                    access_list_sourcepdf_names = ["job_directory","filename"]
-                                    
-                                    
-                                    #Cleaning loop of the corpus_final
-                                    
-                                    for record in corpus_final:
-                                    
-                                        for key in record.items():
-                                            
-                                            if "ocrrecord_link__" in key[0]:
+                                                if sourcedoc_name == "job_directory":
                                                 
-                                                new_key = key[0].replace("ocrrecord_link__","")
-                                                 
-                                                record[new_key] = key[1]
+                                                    job_directory = record[sourcedoc_name]
                                                 
-                                                record.pop(key[0])
-                                        
-                                            elif "sourcedoc_link__" in key[0]:
+                                                if sourcedoc_name == "filename":
                                                 
-                                                new_key = key[0].replace("sourcedoc_link__","")
-                                        
-                                                record[new_key] = key[1]
+                                                    filename = record[sourcedoc_name]
                                                 
-                                                record.pop(key[0])
+                                                
+                                            source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(job_directory, filename)
+                                                
 
-                                         
+                                            remoteFile = urlopen(Request(source_url)).read()
+                                            memoryFile = StringIO(remoteFile)
+                                            input_pdf = PdfFileReader(memoryFile)
+                                            output.addPage(input_pdf.getPage(0))
                                     
-                                    #Ready to make the writing to the PDF loop
-                                    
-                                    
-                                    #Exhibit Title Pages + Pdfs Loop
-                                    
-                                    
-                                    for record in corpus_final:
-                                    
-                                        '''Write command to begin outputing to a new page'''
-                                    
-                                        pdf_string = "Exhibit "+str(exhibit_count)
-                                        
-                                        '''Write command to finish and save new page'''
-                                        
-                                        tmpfile = tempfile.SpooledTemporaryFile(1048576)
-                                        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                        tmpfile.rollover()
-                                        
-                                        the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
-                                        string_to_pdf(the_canvas,pdf_string)
-                                           
-                                        the_canvas.save()
-                                            
-                                        input1 = PdfFileReader(tmpfile)
-                                    
-                                        output.addPage(input1.getPage(0))
-                                        
-                                        '''Write command to begin outputing to a new page'''
-                                        
-                                        job_directory = ""
-                                        filename = ""
-                                        
-                                        for sourcedoc_name in access_list_sourcepdf_names:
-                                            
-                                            if sourcedoc_name == "job_directory":
-                                            
-                                                job_directory = record[sourcedoc_name]
-                                            
-                                            if sourcedoc_name == "filename":
-                                            
-                                                filename = record[sourcedoc_name]
-                                            
-                                            
-                                        source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(job_directory, filename)
-                                            
+                                            '''Write command to finish and save new page'''
+                                            exhibit_count += 1
 
-                                        remoteFile = urlopen(Request(source_url)).read()
-                                        memoryFile = StringIO(remoteFile)
-                                        input_pdf = PdfFileReader(memoryFile)
-                                        output.addPage(input_pdf.getPage(0))
-                                
-                                        '''Write command to finish and save new page'''
-                                        exhibit_count += 1
-
-                                
-                                
-                                outputStream = StringIO()
-                                output.write(outputStream)
-                                
-                                
-                                
-                                response.write(outputStream.getvalue())
-                                return response
+                                    
+                                    
+                                    outputStream = StringIO()
+                                    output.write(outputStream)
+                                    
+                                    
+                                    
+                                    response.write(outputStream.getvalue())
+                                    return response
                         
                         
                             
-                    
+                            ###
+                            ## If override_sorting is "override_by_date", it means that the global sorting method selected is By Date, which overrides
+                            ## the normal, general sorting instructions, and presents the records in the report orderer by date, not taking into account the
+                            ## ordering of the document types. It does take into account the amount of each indicated in the document type configurations panels.
+                            ###
+                            
+                            elif override_sorting == "override_by_date":
+                            
+                                print "SORTING BY DAAATE"
+                                #Creates a variable that will join all the selected documents from the different SourceDocTypes selected
+                                #
+                                #Start looping through the SourceDocTypeTemplates, making the consequent actions:
+                                #
+                                #   -Make a variable storing the length of the list of the selected documents by that type
+                                #   -Add the selected documents in the appropriate number to the common list
+                                #
+                                #Take the joined list of documents selected and order it by Date
+                                #Start looping through the ordered by Date joined list of documents selected, making the consequent actions:
+                                #
+                                #   -Keep the min_selected and max_selected in two variables: start_range and end_range
+                                #   -Force the end_range to start_range + max_limit_to_print_of_each
+                                #   -Make a variable for all the extraction fields
+                                
+                                try:
+                                    max_documents = request.POST['max_documents']
+                                    
+                                except:
+                                    max_documents = 10
+                                
+                                
+                                corpus_common_final = PdfRecord.objects.none()
+                                
+                                exhibit_count = 1
+                                pdf_string = ""
+                                
+                                all_sourcedoctypestemplate = Legal_Discovery_object.sourcedoctypes_list.filter(checked = "checked")
+                                                            
+                                '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
+                                
+                                with transaction.commit_on_success():
+                                    for doctype_template in all_sourcedoctypestemplate:
+                                    
+                                        equivalent_doctype = SourceDocType.objects.get(clean_name = doctype_template.clean_name)
+
+                                        start_range = doctype_template.min_selected
+                                        end_range = doctype_template.max_selected
+                                        #Edit, forcing the maximum amount of records per type. Delete to erase
+                                        end_range = start_range + max_limit_to_print_of_each
+                                        
+
+                                        #Takes the ones that fit with the doctype we are searching for
+                                        
+                                        corpus_base = corpus_pdfs_to_export.filter(modified_document_type = equivalent_doctype)
+                                        
+                                        corpus_include_fields_base = corpus_base
+                                        
+                                        corpus_ordered_fields_base = corpus_include_fields_base.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
+                                        
+                                        corpus_final = corpus_ordered_fields_base
+                                        
+                                        corpus_common_final = corpus_common_final | corpus_final
+                                
+                                
+                                corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
+                                corpus_common_final = corpus_common_final[:max_documents]      
+                                
+                                with transaction.commit_on_success():
+                                    for selected_entry_item in corpus_common_final:
+                                    
+                                        equivalent_doctype_template = Legal_Discovery_object.sourcedoctypes_list.get(clean_name = selected_entry_item.modified_document_type.clean_name)
+
+                                        pretty_name = equivalent_doctype_template.pretty_name
+                                        
+                                        all_extraction_field_templates = equivalent_doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
+                                        
+                                        #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+                                        
+                                        corpus_include_fields = []
+                                        corpus_sorting_fields = []
+                                        
+                                        
+                                        for field in all_extraction_field_templates:
+                                            
+                                            corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                        
+                                            sorting_element = field["field_sorting"]
+                                                
+                                            if sorting_element == "down":
+                                                    
+                                                corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
+                                                
+                                            elif sorting_element == "up":
+                                            
+                                                corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                            
+                                            
+
+                                        #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
+                                        
+                                        corpus_include_fields_additional = corpus_include_fields
+                                        
+                                        corpus_include_fields_additional.append('sourcedoc_link__filename')
+                                        corpus_include_fields_additional.append('sourcedoc_link__job_directory')
+                                        
+                                        #Takes the ones that fit with the doctype we are searching for
+                                        
+                                        selected_with_values = PdfRecord.objects.filter(pk = selected_entry_item.pk)
+                                        
+                                        corpus_base = selected_with_values
+                                        
+                                        #Takes only the values defined in corpus_include_fields
+                                        
+                                        if len(corpus_include_fields_additional):
+                                            corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
+                                        else:
+                                            corpus_include_fields_base = corpus_base
+                                        
+                                        #Orders the records by the fields defined in corpus_sorting_fields
+                                        
+                                        if len(corpus_sorting_fields):
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
+                                        else:
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by()
+                                        
+
+                                        #Not making cut, because the entry is already decided upon
+                                        
+                                        corpus_final = corpus_ordered_fields_base
+                                         
+                                        
+                                        #Cleaning the access lists to be used later
+                                        
+                                        access_list_ocr_names = []
+                                        
+                                        #print access_list_ocr_names
+                                        
+                                        for name_value in corpus_include_fields:
+                                        
+                                            if "ocrrecord_link__" in name_value:
+                                            
+                                                name_value = name_value.replace("ocrrecord_link__","")
+                                                
+                                                access_list_ocr_names.append(name_value)
+                                        
+                                        
+                                        access_list_sourcepdf_names = ["job_directory","filename"]
+                                        
+                                        
+                                        #Cleaning loop of the corpus_final
+                                        
+                                        for record in corpus_final:
+                                        
+                                            for key in record.items():
+                                                
+                                                if "ocrrecord_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("ocrrecord_link__","")
+                                                     
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+                                            
+                                                elif "sourcedoc_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("sourcedoc_link__","")
+                                            
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+
+                                             
+                                        
+                                        #Ready to make the writing to the PDF loop
+                                        
+                                        
+                                        
+                                        #Index Loop
+                                        
+                                        
+                                        '''Write command to begin outputing to a new page'''
+                                        
+                                        
+                                        
+                                        for record in corpus_final:
+                                        
+                                            pdf_string += "Exhibit "+str(exhibit_count)+": "+str(pretty_name)
+                                            
+                                            for ocr_name in access_list_ocr_names:
+                                                
+                                                cute_name = ExtractionField.objects.filter(real_field_name = ocr_name)[0].pretty_name
+                                                                                            
+                                                try:
+                                                    
+                                                    try:
+                                                        
+                                                        if (len(pdf_string.split("\n")[-1]) + len(" "+str(cute_name)+" "+(record[ocr_name]))) > 80:
+                                                            test_string = "\n"
+                                                            test_string2 = ".              -"
+                                                        else:
+                                                            test_string = ""
+                                                            test_string2 = ""
+                                                        
+                                                        if record[ocr_name] != "MISSING" and record[ocr_name] != "UNREADABLE" and "Field" not in record[ocr_name] !="" :
+                                                            pdf_string += " "+test_string+test_string2+str(cute_name)+" "+(record[ocr_name])
+                                                          
+                                                    except:
+                                                        test_string = ""
+                                                    
+                                                except:
+                                                    pdf_string += " "
+                                                    
+                                            
+                                            '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                                            
+                                            pdf_string += '\n'
+                                            pdf_string += '\n'
+                                            
+                                            if pdf_string.count('\n') > 37:
+                                            
+                                                tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                                # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                                tmpfile.rollover()
+                                                
+                                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                                string_to_pdf(the_canvas,pdf_string)
+                                                       
+                                                the_canvas.save()
+                                                        
+                                                input1 = PdfFileReader(tmpfile)
+                                                
+                                                output.addPage(input1.getPage(0))
+                                                
+                                                pdf_string = ""
+
+                                            exhibit_count += 1
+                                        
+                                        
+                                        
+                                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                    tmpfile.rollover()
+                                    
+                                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                    string_to_pdf(the_canvas,pdf_string)
+                                           
+                                    the_canvas.save()
+                                            
+                                    input1 = PdfFileReader(tmpfile)
+                                    
+                                    output.addPage(input1.getPage(0))
+                                    '''Write command to finish and save new page'''
+                            
+                            
+                                exhibit_count = 1
+                            
+                                with transaction.commit_on_success():
+                                    for selected_entry_item in corpus_common_final:
+                                    
+                                        equivalent_doctype_template = Legal_Discovery_object.sourcedoctypes_list.get(clean_name = selected_entry_item.modified_document_type.clean_name)
+
+                                        pretty_name = equivalent_doctype_template.pretty_name
+                                        
+                                        all_extraction_field_templates = equivalent_doctype_template.extraction_fields.filter(checked = "checked").values('real_field_name','sequential_order','field_sorting','checked').order_by('sequential_order')
+                                        
+                                        #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+                                        
+                                        corpus_include_fields = []
+                                        corpus_sorting_fields = []
+                                        
+                                        
+                                        for field in all_extraction_field_templates:
+                                            
+                                            corpus_include_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                        
+                                            sorting_element = field["field_sorting"]
+                                                
+                                            if sorting_element == "down":
+                                                    
+                                                corpus_sorting_fields.append("-ocrrecord_link__"+(field["real_field_name"]))
+                                                
+                                            else:
+                                            
+                                                corpus_sorting_fields.append("ocrrecord_link__"+(field["real_field_name"]))
+                                            
+                                            
+
+                                        #Dictionary of Pdf information to Report, with relevant fields, sorted by fields
+                                        
+                                        corpus_include_fields_additional = corpus_include_fields
+                                        
+                                        corpus_include_fields_additional.append('sourcedoc_link__filename')
+                                        corpus_include_fields_additional.append('sourcedoc_link__job_directory')
+                                        
+                                        #Takes the ones that fit with the doctype we are searching for
+                                        
+                                        selected_with_values = PdfRecord.objects.filter(pk = selected_entry_item.pk)
+                                        
+                                        corpus_base = selected_with_values
+                                        
+                                        #Takes only the values defined in corpus_include_fields
+                                        
+                                        if len(corpus_include_fields_additional):
+                                            corpus_include_fields_base = corpus_base.values(*corpus_include_fields_additional)
+                                        else:
+                                            corpus_include_fields_base = corpus_base
+                                        
+                                        #Orders the records by the fields defined in corpus_sorting_fields
+                                        
+                                        if len(corpus_sorting_fields):
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by(*corpus_sorting_fields)
+                                        else:
+                                            corpus_ordered_fields_base = corpus_include_fields_base.order_by()
+                                        
+
+                                        #Not making cut, because the entry is already decided upon
+                                        
+                                        corpus_final = corpus_ordered_fields_base
+                                         
+                                        
+                                        #Cleaning the access lists to be used later
+                                        
+                                        access_list_ocr_names = []
+                                        
+                                        #print access_list_ocr_names
+                                        
+                                        for name_value in corpus_include_fields:
+                                        
+                                            if "ocrrecord_link__" in name_value:
+                                            
+                                                name_value = name_value.replace("ocrrecord_link__","")
+                                                
+                                                access_list_ocr_names.append(name_value)
+                                        
+                                        
+                                        access_list_sourcepdf_names = ["job_directory","filename"]
+                                        
+                                        
+                                        #Cleaning loop of the corpus_final
+                                        
+                                        for record in corpus_final:
+                                        
+                                            for key in record.items():
+                                                
+                                                if "ocrrecord_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("ocrrecord_link__","")
+                                                     
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+                                            
+                                                elif "sourcedoc_link__" in key[0]:
+                                                    
+                                                    new_key = key[0].replace("sourcedoc_link__","")
+                                            
+                                                    record[new_key] = key[1]
+                                                    
+                                                    record.pop(key[0])
+
+                                             
+                                        
+                                        #Ready to make the writing to the PDF loop
+                                        
+                                        
+                                        #Exhibit Title Pages + Pdfs Loop
+                                        
+                                        
+                                        for record in corpus_final:
+                                        
+                                            '''Write command to begin outputing to a new page'''
+                                        
+                                            pdf_string = "Exhibit "+str(exhibit_count)
+                                            
+                                            '''Write command to finish and save new page'''
+                                            
+                                            tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                            # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                            tmpfile.rollover()
+                                            
+                                            the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                            string_to_pdf(the_canvas,pdf_string)
+                                               
+                                            the_canvas.save()
+                                                
+                                            input1 = PdfFileReader(tmpfile)
+                                        
+                                            output.addPage(input1.getPage(0))
+                                            
+                                            '''Write command to begin outputing to a new page'''
+                                            
+                                            job_directory = ""
+                                            filename = ""
+                                            
+                                            for sourcedoc_name in access_list_sourcepdf_names:
+                                                
+                                                if sourcedoc_name == "job_directory":
+                                                
+                                                    job_directory = record[sourcedoc_name]
+                                                
+                                                if sourcedoc_name == "filename":
+                                                
+                                                    filename = record[sourcedoc_name]
+                                                
+                                                
+                                            source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(job_directory, filename)
+                                                
+
+                                            remoteFile = urlopen(Request(source_url)).read()
+                                            memoryFile = StringIO(remoteFile)
+                                            input_pdf = PdfFileReader(memoryFile)
+                                            output.addPage(input_pdf.getPage(0))
+                                    
+                                            '''Write command to finish and save new page'''
+                                            exhibit_count += 1
+
+                                    
+                                    
+                                    outputStream = StringIO()
+                                    output.write(outputStream)
+                                    
+                                    
+                                    
+                                    response.write(outputStream.getvalue())
+                                    return response
+                                
                     
         else:
 
