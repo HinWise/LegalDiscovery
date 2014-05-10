@@ -291,12 +291,12 @@ if DEBUG:
         INTERNAL_IPS = ('92.206.74.118',)
        
     MIDDLEWARE_CLASSES += (
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
+       # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 	
     )
 
     INSTALLED_APPS += (
-        'debug_toolbar',
+       # 'debug_toolbar',
        # 'template_timings_panel',
     )
 
