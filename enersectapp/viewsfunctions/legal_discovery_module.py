@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db import connection
+from django import db
 
 from enersectapp.models import *
 
@@ -431,6 +432,8 @@ def legal_discovery(request):
                             
                             output_temp_documents_created.append(temp_filename)
                             
+                            output = PdfFileMerger()
+                            
                             ###
                             ## If override_sorting is "no_override", it means that there is no global sorting selected, so it follows the normal
                             ## sorting rules, and prints the report based on the order of Document Types.
@@ -769,14 +772,16 @@ def legal_discovery(request):
                                             # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
                                             tmpfile.rollover()
                                             
+                                            
                                             the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
                                             string_to_pdf(the_canvas,pdf_string)
                                                
                                             the_canvas.save()
                                                 
                                             input1 = PdfFileReader(tmpfile)
-                                        
+                                            
                                             output.append(input1)
+                                            
                                             
                                             '''Write command to begin outputing to a new page'''
                                             
@@ -846,7 +851,7 @@ def legal_discovery(request):
                                 except:
                                     max_documents = 10
                                 
-                                max_documents = 1000000
+                                max_documents = 10000000
                                 
                                 try:
                                     report_type = request.POST['report_type']
@@ -888,23 +893,25 @@ def legal_discovery(request):
                                 
                                 
                                 corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
-                                #corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Amount')
+                                #corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Notes')
                                 corpus_common_final = corpus_common_final[:max_documents]   
                                 print "----z  "+str(len(corpus_common_final))
-                                
-                                output = PdfFileMerger()
                                 
                                 with transaction.commit_on_success():
                                     for selected_entry_item in corpus_common_final:
                                     
                                         if exhibit_count % 5000 == 0:
-                                            gc.collect()
                                             
-                                            temp_filename = "tempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                           
+                                            print "<-------------------------- ---------------------->"
+                                            
+                                            temp_filename = "legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
                                             output.write(temp_filename)
                                             output_temp_documents_created.append(temp_filename)
                                             
                                             output = PdfFileMerger()
+                                            
+                                            db.reset_queries()
 
                                         
                                         print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
@@ -1062,14 +1069,15 @@ def legal_discovery(request):
                                             if pdf_string.count('\n') > 53:
                                             
                                                 tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                    
                                                 # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
                                                 tmpfile.rollover()
-                                                
-                                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+                                              
+                                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
                                                 string_to_pdf(the_canvas,pdf_string)
                                                        
                                                 the_canvas.save()
-                                                        
+                                                
                                                 input1 = PdfFileReader(tmpfile)
                                                 
                                                 output.append(input1)
@@ -1094,13 +1102,14 @@ def legal_discovery(request):
                                     
                                     output.append(input1)
                                    
+                                    
                                     '''Write command to finish and save new page'''
                                 
-                                temp_filename = "tempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                '''temp_filename = "tempdocument"+str(len(output_temp_documents_created))+".pdf"
                                 output.write(temp_filename)
                                 output_temp_documents_created.append(temp_filename)
                                 
-                                output = PdfFileMerger()
+                                output = PdfFileMerger()'''
                             
                                 exhibit_count = 1
                                 
@@ -1270,11 +1279,14 @@ def legal_discovery(request):
 
                                 
                                 
-                                '''temp_output.write(temp_outputStream)
-                                output_streams_files_list.append(temp_outputStream)
-                                
-                                temp_outputStream = StringIO()
-                                temp_output = PdfFileMerger()'''
+                                try:
+                                    temp_output.write(temp_outputStream)
+                                    output_streams_files_list.append(temp_outputStream)
+                                    
+                                    temp_outputStream = StringIO()
+                                    temp_output = PdfFileMerger()
+                                except:
+                                    tried = ""
                                 
                                 final_output = PdfFileMerger()
                                  
@@ -1290,10 +1302,12 @@ def legal_discovery(request):
                                
 
 
+                                final_output.write("legaltempdocument-final.pdf")
+                                
                                 final_output.write(outputStream)
                                 
-                                
                                 response.write(outputStream.getvalue())
+                                response.write(final_output)
                                 return response
                                 
                     

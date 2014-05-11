@@ -32,7 +32,7 @@ if socket.gethostname() == 'Nemot1' or socket.gethostname() == 'Marios-PC' or so
 else:
     DEBUG = TEMPLATE_DEBUG = True
 
-#DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -232,6 +232,7 @@ DEFAULT_FROM_EMAIL = 'Developers <enersect.developers@gmail.com>'
 
 if DEBUG == False:
 
+    pass_this_section = True
     '''LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -264,7 +265,9 @@ if DEBUG == False:
             },
         }
     }'''
-    LOGGING = {
+    
+    
+    '''LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
@@ -281,7 +284,7 @@ if DEBUG == False:
                 'propagate': True,
             },
         },
-    }
+    }'''
 
 # debug_toolbar settings
 if DEBUG:

@@ -415,31 +415,31 @@
 
 .been-clicked1 {
 
-    background:#FFD1D1;
+    background:#FFD1D1 !important;
 
 }
 
 .been-clicked2 {
 
-    background:#FF8F8F;
+    background:#FF8F8F !important;
 
 }
 
 .been-clicked3 {
 
-    background:#FF5252;
+    background:#FF5252 !important;
 
 }
 
 .been-clicked4 {
 
-    background:#FF3B3B;
+    background:#FF3B3B !important;
 
 }
 
 .been-clicked5 {
 
-    background:#FF1F1F;
+    background:#FF1F1F !important;
 
 }
 
@@ -451,14 +451,14 @@
 
 .ui-selected {
 
-    background: #F39814;
+    background: #F39814 !important;
     
 
 }
 
 .ui-selecting {
 
-    background: #FECA40;
+    background: #FECA40 !important;
     
 
 }
