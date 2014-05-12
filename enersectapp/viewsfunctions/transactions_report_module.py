@@ -2,6 +2,7 @@
 from enersectapp.models import *
 from django.db import transaction
 
+from django.db.models import Count
 
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
@@ -377,12 +378,13 @@ def transactions_report(request):
             
                 coincident_transactions = TransactionTable.objects.filter(TransactionIndex = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
-                
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
             
             if item["tag_name"] == "Amount":
             
                 coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex', flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Amount")
             
             
@@ -392,18 +394,21 @@ def transactions_report(request):
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Piece Number")
     
             if item["tag_name"] == "Libdesc":
             
                 coincident_transactions = TransactionTable.objects.filter(Libdesc__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Libdesc")
 
             if item["tag_name"] == "Company":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Company")
             
             if item["tag_name"] == "Day":
@@ -411,6 +416,7 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(PostDay = item["tag_content"]).order_by()
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Day")
         
                 
@@ -420,6 +426,7 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(PostMonth = item["tag_content"]).order_by()
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Month")
  
    
@@ -428,6 +435,7 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(PostYear = item["tag_content"]).order_by()
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Year")
 
    
@@ -438,186 +446,163 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(PostDay = divided_date[0],PostMonth = divided_date[1],PostYear = divided_date[2] ).order_by()
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = divided_date[0],ValueMonth = divided_date[1],ValueYear = divided_date[2] ).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Complete Date")
    
             if item["tag_name"] == "Reftran":
             
                 coincident_transactions = TransactionTable.objects.filter(Reftran = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Reftran")
                 
             if item["tag_name"] == "Description":
             
                 coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Description")
                 
             if item["tag_name"] == "Bank Name":
             
                 coincident_transactions = TransactionTable.objects.filter(BankName__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Bank Name")
                 
             if item["tag_name"] == "Bank Account":
             
                 coincident_transactions = TransactionTable.objects.filter(BankAccount__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Bank Account")
                 
             if item["tag_name"] == "Bank Currency":
             
                 coincident_transactions = TransactionTable.objects.filter(BankCurrency__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Bank Currency")
                 
             if item["tag_name"] == "INT Account Number":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("INT Account Number")
                 
             if item["tag_name"] == "Exchange Rate":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Exchange Rate")
                 
             if item["tag_name"] == "Memo":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Memo")
                 
             if item["tag_name"] == "Movement Number":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Movement Number")
                 
             if item["tag_name"] == "Lett":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True)) 
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 fields_searched.append("Lett")
-                
+    
+
+    ## Prepares a dictionary that counts the number of duplicates in the list "coincident_transactions_list" made before
+    #It is important to have this dictionary as it keeps duplicates, that we will use later to add the Relevance Score to the dicts
+    
     coincident_transactions_dict = {}
    
     for item in coincident_transactions_list:
     
         coincident_transactions_dict[str(item)] = coincident_transactions_list.count(item)
 
+       
+    ## Prepares the results of the Queryset in objects that contain all the information
+    
+    coincident_transactions_complete_dict = {}
+    
+    #Create a copy of the selected Queryset, as well as a ValuesQueryset
+    #Original queryset keeps the base info (TransactionTable table) as well as the manytomany relationships (InternalRecord and BankRecord)
+    #ValuesQuerySet only keep the base info (TransactionTable table)
+    
+    coincident_transactions_complete = all_coincident_transactions
+    coincident_transactions_complete_values = coincident_transactions_complete.values()
+    
+    #Create a dictionary to convert the ValuesQuerySet into a dict, accesible by keys
+    
+    coincident_transactions_dict_complete_values = {}
+    
+    #Loop that takes the id of every item in the queryset and makes it's own searchable dict item that contains that info to be accesed later
+    
+    for transaction_dict_queryset in coincident_transactions_complete_values:
+    
+        element_dict = {}
+        
+        element_dict["complete_info"] = transaction_dict_queryset
+        
+        coincident_transactions_dict_complete_values[str(transaction_dict_queryset["TransactionIndex"])] = element_dict
+        
+    
+    #Loop that takes the base info from the previous dictionary, and builds a new dictionary adding the internal records and bank records to it
+    #Basically, it's like a QuerySet, but in a dictionary with keys, to allow for instant access by ID later, instead of using a shit ton of "get" Queries
+    ## This is THE BIG TIME SAVER
+    
+    for transaction_temp_item in coincident_transactions_complete:
+    
+        element_dict = {}
+
+        element_dict["complete_item"] = coincident_transactions_dict_complete_values[str(transaction_temp_item.TransactionIndex)]["complete_info"]
+        element_dict["internal_records"] = transaction_temp_item.internal_records_list.all().values()
+        element_dict["bank_records"] = transaction_temp_item.bank_records_list.all().values()
+    
+        coincident_transactions_complete_dict[str(transaction_temp_item.TransactionIndex)] = element_dict
+
+
     final_coincident_transactions_list = []
     
     final_fields_values_list = []
     
-    '''if "Amount" in fields_searched:
+    # Last loop; Takes the previously built complete dictionary, and adds the Relevance Score, obtained thanks to the separate list/dictionary in which
+    # duplicates are conserved.
     
-        final_fields_values_list.append('Amount')
-    
-    if "Piece Number" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__NoPiece')
-    
-    if "Libdesc" in fields_searched:
-    
-        final_fields_values_list.append('Libdesc')
-    
-    if "Company" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__Company')
-    
-    if "Day" in fields_searched:
-    
-        final_fields_values_list.append('ValueDay')
-        final_fields_values_list.append('PostDay')
-    
-    if "Month" in fields_searched:
-    
-        final_fields_values_list.append('ValueMonth')
-        final_fields_values_list.append('PostMonth')
-    
-    if "Year" in fields_searched:
-    
-        final_fields_values_list.append('ValueYear')
-        final_fields_values_list.append('PostYear')
-    
-    if "Complete Date" in fields_searched:
-    
-        if "Day" not in fields_searched:
-            final_fields_values_list.append('ValueDay')
-            final_fields_values_list.append('PostDay')
-        if "Month" not in fields_searched:
-            final_fields_values_list.append('ValueMonth')
-            final_fields_values_list.append('PostMonth')
-        if "Year" not in fields_searched:
-            final_fields_values_list.append('ValueYear')
-            final_fields_values_list.append('PostYear')
-    
-    if "Reftran" in fields_searched:
-    
-        final_fields_values_list.append('Reftran')
-    
-    if "Description" in fields_searched:
-    
-        final_fields_values_list.append('bank_records_list__Description')
-    
-    if "Bank Name" in fields_searched:
-    
-        final_fields_values_list.append('BankName')
-    
-    if "Bank Account" in fields_searched:
-    
-        final_fields_values_list.append('BankAccount')
-    
-    if "Bank Currency" in fields_searched:
-    
-        final_fields_values_list.append('BankCurrency')
-    
-    if "INT Account Number" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__AccountNum')
-    
-    if "Exchange Rate" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__ExchangeRate')
-    
-    if "Memo" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__Memo')
-    
-    if "Movement Number" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__NoMvt')
-    
-    if "Lett" in fields_searched:
-    
-        final_fields_values_list.append('internal_records_list__Lett')'''
-    
-
     for dict_key in coincident_transactions_dict.keys():
     
-        transaction_item = TransactionTable.objects.get(TransactionIndex=dict_key)
+        transaction_item = coincident_transactions_complete_dict[dict_key]
     
         temp_dict = {}
         temp_dict["TransactionIndex"] = dict_key
         temp_dict["score"] = coincident_transactions_dict[dict_key]
-        temp_dict["complete_item"] = transaction_item
-        temp_dict["internal_records"] = transaction_item.internal_records_list.all()
-        temp_dict["bank_records"] = transaction_item.bank_records_list.all()
-               
-        
+        temp_dict["complete_item"] = transaction_item["complete_item"]
+        temp_dict["internal_records"] = transaction_item["internal_records"]
+        temp_dict["bank_records"] = transaction_item["bank_records"]
+                
         final_coincident_transactions_list.append(temp_dict)
 
         
     final_list_ordered_score = []
     
+    max_range_per_relevance_set = 100
+    
     for score in range(number_of_searchtags,0,-1):
     
         temp_dict = {}
-        temp_dict["transactions_list"] = [d for d in final_coincident_transactions_list if d['score'] == score]
+        
+        temp_dict["transactions_list"] = [d for d in final_coincident_transactions_list if d['score'] == score][:max_range_per_relevance_set]
         temp_dict["score_index"]= str(score)
         final_list_ordered_score.append(temp_dict)
-    
     
 
     tag_types = ["Amount","Piece Number","Company","Day","Month","Year","Complete Date","Libdesc","Description","Reftran",
