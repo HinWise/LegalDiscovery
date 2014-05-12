@@ -367,7 +367,9 @@ def transactions_report(request):
     
     coincident_transactions_list = []
     
-    fields_searched = []
+    base_fields_searched = ["TransactionIndex"]
+    internal_fields_searched = []
+    bank_fields_searched = []
     
     all_coincident_transactions = TransactionTable.objects.none()
     
@@ -385,7 +387,8 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex', flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Amount")
+                if "Amount" not in base_fields_searched:
+                    base_fields_searched.append("Amount")
             
             
             if item["tag_name"] == "Piece Number":
@@ -395,21 +398,24 @@ def transactions_report(request):
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Piece Number")
+                if "NoPiece" not in internal_fields_searched:
+                    internal_fields_searched.append("NoPiece")
     
             if item["tag_name"] == "Libdesc":
             
                 coincident_transactions = TransactionTable.objects.filter(Libdesc__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Libdesc")
+                if "Libdesc" not in base_fields_searched:
+                    base_fields_searched.append("Libdesc")
 
             if item["tag_name"] == "Company":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Company")
+                if "Company" not in internal_fields_searched:
+                    internal_fields_searched.append("Company")
             
             if item["tag_name"] == "Day":
             
@@ -417,7 +423,10 @@ def transactions_report(request):
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Day")
+                if "ValueDay" not in base_fields_searched:
+                    base_fields_searched.append("ValueDay")
+                if "PostDay" not in base_fields_searched:    
+                    base_fields_searched.append("PostDay")
         
                 
             
@@ -427,7 +436,10 @@ def transactions_report(request):
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Month")
+                if "ValueMonth" not in base_fields_searched:
+                    base_fields_searched.append("ValueMonth")
+                if "PostMonth" not in base_fields_searched:
+                    base_fields_searched.append("PostMonth")
  
    
             if item["tag_name"] == "Year":
@@ -436,7 +448,10 @@ def transactions_report(request):
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Year")
+                if "ValueYear" not in base_fields_searched:
+                    base_fields_searched.append("ValueYear")
+                if "PostYear" not in base_fields_searched:
+                    base_fields_searched.append("PostYear")
 
    
             if item["tag_name"] == "Complete Date":
@@ -447,77 +462,98 @@ def transactions_report(request):
                 coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = divided_date[0],ValueMonth = divided_date[1],ValueYear = divided_date[2] ).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Complete Date")
+                if "ValueDay" not in base_fields_searched:
+                    base_fields_searched.append("ValueDay")
+                if "PostDay" not in base_fields_searched:
+                    base_fields_searched.append("PostDay")
+                if "ValueMonth" not in base_fields_searched:
+                    base_fields_searched.append("ValueMonth")
+                if "PostMonth" not in base_fields_searched:
+                    base_fields_searched.append("PostMonth")
+                if "ValueYear" not in base_fields_searched:
+                    base_fields_searched.append("ValueYear")
+                if "PostYear" not in base_fields_searched:
+                    base_fields_searched.append("PostYear")
    
             if item["tag_name"] == "Reftran":
             
                 coincident_transactions = TransactionTable.objects.filter(Reftran = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Reftran")
+                if "Reftran" not in base_fields_searched:
+                    base_fields_searched.append("Reftran")
                 
             if item["tag_name"] == "Description":
             
                 coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Description")
+                if "Description" not in bank_fields_searched:
+                    bank_fields_searched.append("Description")
                 
             if item["tag_name"] == "Bank Name":
             
                 coincident_transactions = TransactionTable.objects.filter(BankName__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Bank Name")
+                if "Bank Name" not in base_fields_searched:
+                    base_fields_searched.append("BankName")
                 
             if item["tag_name"] == "Bank Account":
             
                 coincident_transactions = TransactionTable.objects.filter(BankAccount__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Bank Account")
+                if "BankAccount" not in base_fields_searched:
+                    base_fields_searched.append("BankAccount")
                 
             if item["tag_name"] == "Bank Currency":
             
                 coincident_transactions = TransactionTable.objects.filter(BankCurrency__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Bank Currency")
+                if "BankCurrency" not in base_fields_searched:
+                    base_fields_searched.append("BankCurrency")
                 
             if item["tag_name"] == "INT Account Number":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("INT Account Number")
+                if "AccountNum" not in internal_fields_searched:
+                    internal_fields_searched.append("AccountNum")
                 
             if item["tag_name"] == "Exchange Rate":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Exchange Rate")
+                if "ExchangeRate" not in internal_fields_searched:
+                    internal_fields_searched.append("ExchangeRate")
                 
             if item["tag_name"] == "Memo":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Memo")
+                if "Memo" not in internal_fields_searched:
+                    internal_fields_searched.append("Memo")
                 
             if item["tag_name"] == "Movement Number":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Movement Number")
+                if "NoMvt" not in internal_fields_searched:
+                    internal_fields_searched.append("NoMvt")
                 
             if item["tag_name"] == "Lett":
             
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True)) 
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                fields_searched.append("Lett")
+                if "Lett" not in internal_fields_searched:
+                    internal_fields_searched.append("Lett")
     
 
     ## Prepares a dictionary that counts the number of duplicates in the list "coincident_transactions_list" made before
@@ -534,12 +570,13 @@ def transactions_report(request):
     
     coincident_transactions_complete_dict = {}
     
+    
     #Create a copy of the selected Queryset, as well as a ValuesQueryset
     #Original queryset keeps the base info (TransactionTable table) as well as the manytomany relationships (InternalRecord and BankRecord)
     #ValuesQuerySet only keep the base info (TransactionTable table)
     
     coincident_transactions_complete = all_coincident_transactions
-    coincident_transactions_complete_values = coincident_transactions_complete.values()
+    coincident_transactions_complete_values = coincident_transactions_complete.values(*base_fields_searched) #Values limited to chosen search tags
     
     #Create a dictionary to convert the ValuesQuerySet into a dict, accesible by keys
     
@@ -565,9 +602,9 @@ def transactions_report(request):
         element_dict = {}
 
         element_dict["complete_item"] = coincident_transactions_dict_complete_values[str(transaction_temp_item.TransactionIndex)]["complete_info"]
-        element_dict["internal_records"] = transaction_temp_item.internal_records_list.all().values()
-        element_dict["bank_records"] = transaction_temp_item.bank_records_list.all().values()
-    
+        element_dict["internal_records"] = transaction_temp_item.internal_records_list.all().values(*internal_fields_searched)
+        element_dict["bank_records"] = transaction_temp_item.bank_records_list.all().values(*bank_fields_searched)
+
         coincident_transactions_complete_dict[str(transaction_temp_item.TransactionIndex)] = element_dict
 
 
@@ -594,6 +631,7 @@ def transactions_report(request):
         
     final_list_ordered_score = []
     
+    #Change this variable to modify the final number of elements of the table
     max_range_per_relevance_set = 100
     
     for score in range(number_of_searchtags,0,-1):
