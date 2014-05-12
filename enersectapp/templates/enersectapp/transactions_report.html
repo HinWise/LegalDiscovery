@@ -729,7 +729,7 @@
                             
                                 {% for tag in searchtags %}
                                    <th><div class="tableInner">{{tag.tag_name}}</div></th>
-                                 {% endfor %}
+                                {% endfor %}
                         </tr>
                         </thead>
                         
@@ -741,12 +741,118 @@
                             <!-- here we have to list all the tags and relevant data -->
                             <td><span class="star{{ordered_list.score_index}}"></span><span class="starNumber">{{ordered_list.score_index}}</span></td>
                             <td>{{candidate.TransactionIndex}}</td>
-                        
+                            
+                            <!-- Filling column content depending on the chosen search tags -->
+                            
+                            {% for tag in searchtags %}
+                               
+                               {% if tag.tag_name == "Amount" %} <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Piece Number" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.NoPiece%}{{record.NoPiece}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.NoPiece%}{{record.NoPiece}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Company" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Company%}{{record.Company}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Company%}{{record.Company}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Day" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Month" %} <td>{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Year" %} <td>{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Complete Date" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Libdesc" %} <td>{% if candidate.complete_item.Libdesc %}{{candidate.complete_item.Libdesc}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Description" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.bank_records %}{% if record.Description%}{{record.Description}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.bank_records %}{% if record.Description%}{{record.Description}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Reftran" %} <td>{% if candidate.complete_item.Reftran %}{{candidate.complete_item.Reftran}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Bank Name" %} <td>{% if candidate.complete_item.BankName %}{{candidate.complete_item.BankName}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Bank Account" %} <td>{% if candidate.complete_item.BankAccount %}{{candidate.complete_item.BankAccount}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Bank Currency" %} <td>{% if candidate.complete_item.BankCurrency %}{{candidate.complete_item.BankCurrency}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag.tag_name == "Movement Number" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.NoMvt%}{{record.NoMvt}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.NoMvt%}{{record.NoMvt}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "INT Account Number" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.AccountNum%}{{record.AccountNum}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.AccountNum%}{{record.AccountNum}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Exchange Rate" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.ExchangeRate%}{{record.ExchangeRate}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.ExchangeRate%}{{record.ExchangeRate}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Memo" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Memo%}{{record.Memo}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Memo%}{{record.Memo}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               {% if tag.tag_name == "Lett" %}
+                                    <td>
+                                    {% if candidate.internal_records|length == 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Lett%}{{record.Lett}}{%else%}-{%endif%}{% endfor %}
+                                    {% elif candidate.internal_records|length > 1 %}
+                                    {% for record in candidate.internal_records %}{% if record.Lett%}{{record.Lett}}{%else%}-{%endif%} | {% endfor %}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                    </td>
+                               {%endif%}
+                               
+                            {% endfor %}
+                            
                         </tr>
                         
                             {% endfor %}
                         {% endfor %}
-
+    
+                        <!-- End of table content -->
                         
                         </tbody>
                      
@@ -880,44 +986,16 @@
                                 
                             </select><select name="operator_menu" id="operator_menu" value="">
                                 
-                                    <option value="Amount">Operator</option>
+                                    <option value="equals"> = (Exact) </option>
                                 
-                                    <option value="Piece Number">Piece Number</option>
+                                    <option value="contains">&#8715 (Contains)</option>
                                 
-                                    <option value="Company">Company</option>
+                                    <option value="greater_than">> (Greater than)</option>
                                 
-                                    <option value="Day">Day</option>
+                                    <option value="less_than">< (Less than)</option>
                                 
-                                    <option value="Month">Month</option>
-                                
-                                    <option value="Year">Year</option>
-                                
-                                    <option value="Complete Date">Complete Date</option>
-                                
-                                    <option value="Libdesc">Libdesc</option>
-                                
-                                    <option value="Description">Description</option>
-                                
-                                    <option value="Reftran">Reftran</option>
-                                
-                                    <option value="Bank Name">Bank Name</option>
-                                
-                                    <option value="Bank Account">Bank Account</option>
-                                
-                                    <option value="Bank Currency">Bank Currency</option>
-                                
-                                    <option value="Unique Transaction Index">Unique Transaction Index</option>
-                                
-                                    <option value="Movement Number">Movement Number</option>
-                                
-                                    <option value="INT Account Number">INT Account Number</option>
-                                
-                                    <option value="Exchange Rate">Exchange Rate</option>
-                                
-                                    <option value="Memo">Memo</option>
-                                
-                                    <option value="Lett">Lett</option>
-                                
+                                    <option value="not"> &#8855 (Exclude)</option>
+
                             </select>
                             <input type="text" name="searchtags_input" id="searchtags_input" value="" placeholder="search...">
                             <input type="button" class="button" name="searchtag_add_button" id="searchtag_add_button" value="Search">
