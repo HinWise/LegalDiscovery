@@ -98,6 +98,9 @@ class TransactionTable(models.Model):
     ValueMonth = models.CharField('Value Month',max_length=7)
     ValueYear =  models.CharField('Value Year',max_length=7)
     
+    CompletePostDate = models.CharField('Complete Post Date',max_length=15)
+    CompleteValueDate = models.CharField('Complete Value Date',max_length=15)
+    
     DateDiscrepancy = models.IntegerField('Days between Post Date and Value Date',default=0)
 
     Libdesc = models.CharField('Lib Description',max_length=63)

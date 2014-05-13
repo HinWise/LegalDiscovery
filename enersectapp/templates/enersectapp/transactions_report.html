@@ -308,6 +308,8 @@
                 
                 var new_tag_type = $("#select_tagtype_menu").val();
                 var new_tag_content = $("#searchtags_input").val();
+                var new_tag_operator = $("#operator_menu").val();
+                
                 
                 if(new_tag_content)
                 {
@@ -320,6 +322,7 @@
                     }
                     
                     s+=new_tag_type+":"+new_tag_content;
+                    s+=":"+new_tag_operator;
                     
                     
                     
@@ -713,8 +716,7 @@
                         
                       
                                      
-                        </tr>
-                        </thead>
+                        
                         
                     <img id ="tableLoader"  src ="/static/enersectapp/images/ajax-loader.gif"/>
                     <div style="overflow:auto;height:99.9%;" class="wrapper" >
@@ -727,8 +729,8 @@
                             <th><div class="tableInner">Relevance</div></th>
                             <th><div class="tableInner">Transaction ID</div></th>
                             
-                                {% for tag in searchtags %}
-                                   <th><div class="tableInner">{{tag.tag_name}}</div></th>
+                                {% for tag_name in non_repeated_searchtags %}
+                                   <th><div class="tableInner">{{tag_name}}</div></th>
                                 {% endfor %}
                         </tr>
                         </thead>
@@ -744,10 +746,10 @@
                             
                             <!-- Filling column content depending on the chosen search tags -->
                             
-                            {% for tag in searchtags %}
+                            {% for tag_name in non_repeated_searchtags %}
                                
-                               {% if tag.tag_name == "Amount" %} <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Piece Number" %}
+                               {% if tag_name == "Amount" %} <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Piece Number" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.NoPiece%}{{record.NoPiece}}{%else%}-{%endif%}{% endfor %}
@@ -758,7 +760,7 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Company" %}
+                               {% if tag_name == "Company" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.Company%}{{record.Company}}{%else%}-{%endif%}{% endfor %}
@@ -769,12 +771,12 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Day" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Month" %} <td>{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Year" %} <td>{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Complete Date" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Libdesc" %} <td>{% if candidate.complete_item.Libdesc %}{{candidate.complete_item.Libdesc}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Description" %}
+                               {% if tag_name == "Day" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Month" %} <td>{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Year" %} <td>{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Complete Date" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Libdesc" %} <td>{% if candidate.complete_item.Libdesc %}{{candidate.complete_item.Libdesc}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Description" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.bank_records %}{% if record.Description%}{{record.Description}}{%else%}-{%endif%}{% endfor %}
@@ -785,11 +787,11 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Reftran" %} <td>{% if candidate.complete_item.Reftran %}{{candidate.complete_item.Reftran}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Bank Name" %} <td>{% if candidate.complete_item.BankName %}{{candidate.complete_item.BankName}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Bank Account" %} <td>{% if candidate.complete_item.BankAccount %}{{candidate.complete_item.BankAccount}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Bank Currency" %} <td>{% if candidate.complete_item.BankCurrency %}{{candidate.complete_item.BankCurrency}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag.tag_name == "Movement Number" %}
+                               {% if tag_name == "Reftran" %} <td>{% if candidate.complete_item.Reftran %}{{candidate.complete_item.Reftran}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Bank Name" %} <td>{% if candidate.complete_item.BankName %}{{candidate.complete_item.BankName}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Bank Account" %} <td>{% if candidate.complete_item.BankAccount %}{{candidate.complete_item.BankAccount}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Bank Currency" %} <td>{% if candidate.complete_item.BankCurrency %}{{candidate.complete_item.BankCurrency}}{%else%}-{%endif%}</td> {%endif%}
+                               {% if tag_name == "Movement Number" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.NoMvt%}{{record.NoMvt}}{%else%}-{%endif%}{% endfor %}
@@ -800,7 +802,7 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "INT Account Number" %}
+                               {% if tag_name == "INT Account Number" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.AccountNum%}{{record.AccountNum}}{%else%}-{%endif%}{% endfor %}
@@ -811,7 +813,7 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Exchange Rate" %}
+                               {% if tag_name == "Exchange Rate" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.ExchangeRate%}{{record.ExchangeRate}}{%else%}-{%endif%}{% endfor %}
@@ -822,7 +824,7 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Memo" %}
+                               {% if tag_name == "Memo" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.Memo%}{{record.Memo}}{%else%}-{%endif%}{% endfor %}
@@ -833,7 +835,7 @@
                                     {% endif %}
                                     </td>
                                {%endif%}
-                               {% if tag.tag_name == "Lett" %}
+                               {% if tag_name == "Lett" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
                                     {% for record in candidate.internal_records %}{% if record.Lett%}{{record.Lett}}{%else%}-{%endif%}{% endfor %}
@@ -935,8 +937,23 @@
                         {% for tag in searchtags %}
                         
                         <div class="search_tag_unit">
-                            <input type="button" class="erase_tag_button" value="X" tag_text="{{tag.tag_name}}:{{tag.tag_content}}" />
-                            <div class="tag_text"><span>{{tag.tag_name}}</span>:<span>{{tag.tag_content}}</span></div>
+                            <input type="button" class="erase_tag_button" value="X" tag_text="{{tag.tag_name}}:{{tag.tag_content}}:{{tag.tag_operator}}" />
+                            <div class="tag_text"><span>{{tag.tag_name}}</span>:<span>{{tag.tag_content}}</span>:
+                            <span>
+                            {% if tag.tag_operator == "exact"%}
+                             =
+                            {% elif tag.tag_operator == "contains"%}
+                             &#8715
+                            {% elif tag.tag_operator == "greater_than"%}
+                             >
+                            {% elif tag.tag_operator == "less_than"%}
+                             <
+                            {% elif tag.tag_operator == "exclude"%}
+                             &#8855
+                            {% else %}
+                            {% endif %}
+                            </span>
+                            </div>
                         </div>
                         
                         {% endfor %}
@@ -986,7 +1003,7 @@
                                 
                             </select><select name="operator_menu" id="operator_menu" value="">
                                 
-                                    <option value="equals"> = (Exact) </option>
+                                    <option value="exact"> = (Exact) </option>
                                 
                                     <option value="contains">&#8715 (Contains)</option>
                                 
@@ -994,7 +1011,7 @@
                                 
                                     <option value="less_than">< (Less than)</option>
                                 
-                                    <option value="not"> &#8855 (Exclude)</option>
+                                    <option value="exclude"> &#8855 (Exclude)</option>
 
                             </select>
                             <input type="text" name="searchtags_input" id="searchtags_input" value="" placeholder="search...">

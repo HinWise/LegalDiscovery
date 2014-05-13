@@ -350,6 +350,7 @@ def transactions_report(request):
             searchtags_dict = {}
             searchtags_dict["tag_name"] = searchtag[0]
             searchtags_dict["tag_content"] = searchtag[1]
+            searchtags_dict["tag_operator"] = searchtag[2]
             searchtags.append(searchtags_dict)
     
 
@@ -375,7 +376,7 @@ def transactions_report(request):
     
     with transaction.commit_on_success():
         for item in searchtags:
-
+            
             if item["tag_name"] == "Unique Transaction Index":
             
                 coincident_transactions = TransactionTable.objects.filter(TransactionIndex = item["tag_content"]).order_by()
@@ -384,7 +385,17 @@ def transactions_report(request):
             
             if item["tag_name"] == "Amount":
             
-                coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(Amount__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(Amount__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(Amount__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(Amount__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(Amount__contains = item["tag_content"]).order_by()
+                
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex', flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Amount" not in base_fields_searched:
@@ -393,9 +404,17 @@ def transactions_report(request):
             
             if item["tag_name"] == "Piece Number":
             
-                print "NOPIECE" + item["tag_content"]
-            
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoPiece__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__NoPiece__contains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "NoPiece" not in internal_fields_searched:
@@ -403,7 +422,17 @@ def transactions_report(request):
     
             if item["tag_name"] == "Libdesc":
             
-                coincident_transactions = TransactionTable.objects.filter(Libdesc__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(Libdesc__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(Libdesc__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(Libdesc__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(Libdesc__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(Libdesc__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Libdesc" not in base_fields_searched:
@@ -411,7 +440,17 @@ def transactions_report(request):
 
             if item["tag_name"] == "Company":
             
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Company__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__Company__icontains = item["tag_content"]).order_by()
+
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Company" not in internal_fields_searched:
@@ -419,8 +458,22 @@ def transactions_report(request):
             
             if item["tag_name"] == "Day":
             
-                coincident_transactions = TransactionTable.objects.filter(PostDay = item["tag_content"]).order_by()
-                coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__exact = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__gt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__lt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(PostDay__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(ValueDay__contains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ValueDay" not in base_fields_searched:
@@ -432,8 +485,23 @@ def transactions_report(request):
             
             if item["tag_name"] == "Month":
             
-                coincident_transactions = TransactionTable.objects.filter(PostMonth = item["tag_content"]).order_by()
-                coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(PostMonth__exact = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(PostMonth__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostMonth__gt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostMonth__lt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(PostMonth__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(ValueMonth__contains = item["tag_content"]).order_by()
+            
+
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ValueMonth" not in base_fields_searched:
@@ -444,8 +512,22 @@ def transactions_report(request):
    
             if item["tag_name"] == "Year":
             
-                coincident_transactions = TransactionTable.objects.filter(PostYear = item["tag_content"]).order_by()
-                coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(PostYear__exact = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(PostYear__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostYear__gt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostYear__lt = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(PostYear__contains = item["tag_content"]).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(ValueYear__contains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ValueYear" not in base_fields_searched:
@@ -458,8 +540,29 @@ def transactions_report(request):
             
                 divided_date = item["tag_content"].split("/")
             
-                coincident_transactions = TransactionTable.objects.filter(PostDay = divided_date[0],PostMonth = divided_date[1],PostYear = divided_date[2] ).order_by()
-                coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay = divided_date[0],ValueMonth = divided_date[1],ValueYear = divided_date[2] ).order_by()
+
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__exact = divided_date[0],PostMonth__exact = divided_date[1],PostYear__exact = divided_date[2] ).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__exact = divided_date[0],ValueMonth__exact = divided_date[1],ValueYear__exact = divided_date[2] ).order_by()
+                    
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__contains = divided_date[0])
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(PostMonth__contains = divided_date[1])
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(PostYear__contains = divided_date[2])
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__contains = divided_date[0])
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueMonth__contains = divided_date[1])
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__contains = divided_date[2])
+                   
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__gt = divided_date[0],PostMonth__gt = divided_date[1],PostYear__gt = divided_date[2] ).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__gt = divided_date[0],ValueMonth__gt = divided_date[1],ValueYear__gt = divided_date[2] ).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(PostDay__lt = divided_date[0],PostMonth__lt = divided_date[1],PostYear__lt = divided_date[2] ).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__lt = divided_date[0],ValueMonth__lt = divided_date[1],ValueYear__lt = divided_date[2] ).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(PostDay__contains = divided_date[0],PostMonth__contains = divided_date[1],PostYear__contains = divided_date[2] ).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(ValueDay__contains = divided_date[0],ValueMonth__contains = divided_date[1],ValueYear__contains = divided_date[2] ).order_by()
+                
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ValueDay" not in base_fields_searched:
@@ -477,7 +580,17 @@ def transactions_report(request):
    
             if item["tag_name"] == "Reftran":
             
-                coincident_transactions = TransactionTable.objects.filter(Reftran = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(Reftran__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(Reftran__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(Reftran__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(Reftran__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(Reftran__icontains = item["tag_content"]).order_by()
+            
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Reftran" not in base_fields_searched:
@@ -485,7 +598,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Description":
             
-                coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(bank_records_list__Description__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(bank_records_list__Description__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Description" not in bank_fields_searched:
@@ -493,7 +616,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Bank Name":
             
-                coincident_transactions = TransactionTable.objects.filter(BankName__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(BankName__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(BankName__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankName__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankName__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(BankName__icontains = item["tag_content"]).order_by()
+            
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Bank Name" not in base_fields_searched:
@@ -501,7 +634,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Bank Account":
             
-                coincident_transactions = TransactionTable.objects.filter(BankAccount__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(BankAccount__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(BankAccount__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankAccount__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankAccount__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(BankAccount__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "BankAccount" not in base_fields_searched:
@@ -509,7 +652,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Bank Currency":
             
-                coincident_transactions = TransactionTable.objects.filter(BankCurrency__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(BankCurrency__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(BankCurrency__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankCurrency__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(BankCurrency__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(BankCurrency__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "BankCurrency" not in base_fields_searched:
@@ -517,7 +670,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "INT Account Number":
             
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__AccountNum__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__AccountNum__icontains = item["tag_content"]).order_by()
+    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "AccountNum" not in internal_fields_searched:
@@ -525,7 +688,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Exchange Rate":
             
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__ExchangeRate__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__ExchangeRate__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ExchangeRate" not in internal_fields_searched:
@@ -533,6 +706,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Memo":
             
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__Memo__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions = TransactionTable.objects.filter(internal_records_list__Memo__contains = item["tag_content"]).order_by()
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
@@ -541,7 +725,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Movement Number":
             
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__NoMvt__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__NoMvt__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))  
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "NoMvt" not in internal_fields_searched:
@@ -549,7 +743,17 @@ def transactions_report(request):
                 
             if item["tag_name"] == "Lett":
             
-                coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__contains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Lett__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__Lett__icontains = item["tag_content"]).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True)) 
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "Lett" not in internal_fields_searched:
@@ -648,9 +852,19 @@ def transactions_report(request):
     
     user_templates_list = user_profile.created_transactionsreport_templates.all().values_list('name',flat=True)
     
+    #Making a copy of the tag names used without duplicates, for the html table column titles
+    
+    non_repeated_searchtags = []
+    
+    for tag in searchtags:
+        
+        non_repeated_searchtags.append(tag["tag_name"])
+    
+    non_repeated_searchtags = list(set(non_repeated_searchtags))
+    
     context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
                 'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,
-                'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
+                'non_repeated_searchtags':non_repeated_searchtags,'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
     return render(request,'enersectapp/transactions_report.html',context)
     
 def string_to_pdf(canvas,string):
