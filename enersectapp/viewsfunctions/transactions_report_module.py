@@ -554,15 +554,24 @@ def transactions_report(request):
                     coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueYear__contains = divided_date[2])
                    
                 if item["tag_operator"] == "greater_than":
-                    coincident_transactions = TransactionTable.objects.filter(PostDay__gt = divided_date[0],PostMonth__gt = divided_date[1],PostYear__gt = divided_date[2] ).order_by()
-                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__gt = divided_date[0],ValueMonth__gt = divided_date[1],ValueYear__gt = divided_date[2] ).order_by()
-                if item["tag_operator"] == "less_than":
-                    coincident_transactions = TransactionTable.objects.filter(PostDay__lt = divided_date[0],PostMonth__lt = divided_date[1],PostYear__lt = divided_date[2] ).order_by()
-                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(ValueDay__lt = divided_date[0],ValueMonth__lt = divided_date[1],ValueYear__lt = divided_date[2] ).order_by()
-                if item["tag_operator"] == "exclude":
-                    coincident_transactions = TransactionTable.objects.exclude(PostDay__contains = divided_date[0],PostMonth__contains = divided_date[1],PostYear__contains = divided_date[2] ).order_by()
-                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(ValueDay__contains = divided_date[0],ValueMonth__contains = divided_date[1],ValueYear__contains = divided_date[2] ).order_by()
+                    
+                    date = divided_date[0]+"/"+divided_date[1]+"/"+divided_date[2]
                 
+                    coincident_transactions = TransactionTable.objects.filter(CompletePostDate__gt = date).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(CompleteValueDate__gt = date).order_by()
+                if item["tag_operator"] == "less_than":
+                
+                    date = divided_date[0]+"/"+divided_date[1]+"/"+divided_date[2]
+                
+                    coincident_transactions = TransactionTable.objects.filter(CompletePostDate__lt = date).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.filter(CompleteValueDate__lt = date).order_by()
+                if item["tag_operator"] == "exclude":
+                
+                    date = divided_date[0]+"/"+divided_date[1]+"/"+divided_date[2]
+                
+                    coincident_transactions = TransactionTable.objects.exclude(CompletePostDate__exact = date).order_by()
+                    coincident_transactions = coincident_transactions | TransactionTable.objects.exclude(CompleteValueDate__exact = date).order_by()
+                    
                 coincident_transactions_list.extend(coincident_transactions.values_list('TransactionIndex',flat=True))
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
                 if "ValueDay" not in base_fields_searched:
