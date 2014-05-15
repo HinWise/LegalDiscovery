@@ -409,7 +409,7 @@ def legal_discovery(request):
                             title_date = str(Legal_Discovery_object.modification_date)
                         
                             response = HttpResponse(mimetype="application/pdf")
-                            response['Content-Disposition'] = 'attachment; filename=legal_discovery_report_%s.pdf' %(title_date)
+                            response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/legal_discovery_report_%s.pdf' %(title_date)
                         
                             
                             tmpfile = tempfile.SpooledTemporaryFile(1048576)
@@ -426,7 +426,7 @@ def legal_discovery(request):
                             output.append(input1)
                             #output.append(input1)
                             
-                            temp_filename = "tempdocument"+str(len(output_temp_documents_created))+".pdf"
+                            temp_filename = "legaldiscoverytemp/tempdocument"+str(len(output_temp_documents_created))+".pdf"
                             
                             output.write(temp_filename)
                             
@@ -905,7 +905,7 @@ def legal_discovery(request):
                                            
                                             print "<-------------------------- ---------------------->"
                                             
-                                            temp_filename = "legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                            temp_filename = "legaldiscoverytemp/legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
                                             output.write(temp_filename)
                                             output_temp_documents_created.append(temp_filename)
                                             
@@ -1105,11 +1105,20 @@ def legal_discovery(request):
                                     
                                     '''Write command to finish and save new page'''
                                 
-                                '''temp_filename = "tempdocument"+str(len(output_temp_documents_created))+".pdf"
-                                output.write(temp_filename)
-                                output_temp_documents_created.append(temp_filename)
+                                try:
                                 
-                                output = PdfFileMerger()'''
+                                    temp_filename = "legaldiscoverytemp/legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                    output.write(temp_filename)
+                                    output_temp_documents_created.append(temp_filename)
+                                    
+                                    output = PdfFileMerger()
+                                    
+                                    db.reset_queries()
+                                    
+                                except:
+                                
+                                    print "empty"
+                                
                             
                                 exhibit_count = 1
                                 
@@ -1302,7 +1311,7 @@ def legal_discovery(request):
                                
 
 
-                                final_output.write("legaltempdocument-final.pdf")
+                                final_output.write("legaldiscoverytemp/legaltempdocument-final.pdf")
                                 
                                 final_output.write(outputStream)
                                 
