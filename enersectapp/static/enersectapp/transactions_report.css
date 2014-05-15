@@ -93,7 +93,7 @@
 
         position: absolute;
         width: 45%;
-        height: 88%;
+        height: 419px !important;/*431px*/
         z-index: 200;
         overflow: auto;
 

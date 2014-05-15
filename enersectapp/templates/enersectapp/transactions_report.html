@@ -14,7 +14,9 @@
 <script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
 <script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
 <script type="text/javascript" src="{% static 'enersectapp/d3/d3.min.js' %}" ></script>
-<script type="text/javascript" src="http://tablesorter.com/__jquery.tablesorter.min.js"></script> 
+<script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/js/jquery.tablesorter.min.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/js/jquery.tablesorter.widgets.js' %}"></script>
+<script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/addons/pager/jquery.tablesorter.pager.min.js' %}"></script>
 <script  type="text/javascript" src="{% static 'enersectapp/floatThead.js' %}" ></script>
 
 
@@ -30,115 +32,6 @@
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/transactions_report.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jacob.css' %}" />
 <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-
-<style type="text/css" id="jacobs">
-
-        /* tables */
-    table.tablesorter {
-        font-family:arial;
-        margin:10px 0pt 15px;
-        font-size: 8pt;
-        width: 100%;
-        text-align: left;
-    }
-    table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-        background-color: #e6EEEE;
-        border: 1px solid #FFF;
-        font-size: 8pt;
-        padding: 4px;
-    }
-    table.tablesorter thead tr .header {
-        background-image: url(http://tablesorter.com/themes/blue/bg.gif);
-        background-repeat: no-repeat;
-        background-position: center right;
-        cursor: pointer;
-    }
-    table.tablesorter tbody td {
-        color: #3D3D3D;
-        padding: 4px;
-        vertical-align: top;
-    
-    }
-    
-    table.tablesorter thead tr {
-    
-    color:black;
-    
-    }
-    
-    tr:nth-child(2n) {
-        background: rgba(0,0,0,0.05);
-    }
-    table.tablesorter tr.candidate:hover {
-        cursor:pointer;
-    }
-    table.tablesorter tr:hover {
-        border:1px solid black;
-        
-    }
-    
-    
-    
-    table.tablesorter tbody tr.odd td {
-        background-color:#F0F0F6;
-    }
-    table.tablesorter thead tr .headerSortUp {
-        background-image: url(http://tablesorter.com/themes/blue/asc.gif);
-    }
-    table.tablesorter thead tr .headerSortDown {
-        background-image: url(http://tablesorter.com/themes/blue/desc.gif);
-    }
-    table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-    background-color: #8dbdd8;
-    }
-    
-    table.tablesorter .starNumber {
-    display:none;
-    }
-    
-    table.tablesorter .star1:after {
-        content:'★';
-    }
-    
-    table.tablesorter .star2:after {
-        content:'★★';
-    }
-    table.tablesorter .star3:after {
-        content:'★★★';
-    }
-    table.tablesorter .star4:after {
-        content:'★★★★';
-    }
-    table.tablesorter .star5:after {
-        content:'★★★★★';
-    }
-    table.tablesorter .star6:after {
-        content:'★★★★★★';
-    }
-        table.tablesorter .star7:after {
-        content:'★★★★★★★';
-    }
-        table.tablesorter .star8:after {
-        content:'★★★★★★★★';
-    }
-    #tableLoader {
-    position:absolute;
-    top:100px;
-    left:50%;
-    margin-left:-50px;
-    max-width:40px;
-    background:rgba(255,255,255,0.6);
-    padding:10px;
-    border-radius:8px;
-    display:none;
-    }
-
-    
-    
-
-
-</style>
-
 
 
 {% endblock special_libs %}
@@ -573,11 +466,117 @@
         
         // JACOB ADDED 
         
-        $("#transaction_search_candidates .tablesorter").tablesorter().bind("sortStart",function() { 
+        var tablesorter_options = {
+            widthFixed : true,
+            showProcessing: true,
+            headerTemplate : '{content} {icon}', // Add icon for jui theme; new in v2.7!
+
+            widgets: ['stickyHeaders', 'filter','pager' ],
+
+            widgetOptions: {
+
+              // extra class name added to the sticky header row
+              stickyHeaders : '',
+              // number or jquery selector targeting the position:fixed element
+              stickyHeaders_offset : 0,
+              // added to table ID, if it exists
+              stickyHeaders_cloneId : '-sticky',
+              // trigger "resize" event on headers
+              stickyHeaders_addResizeEvent : true,
+              // if false and a caption exist, it won't be included in the sticky header
+              stickyHeaders_includeCaption : true,
+              // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
+              stickyHeaders_zIndex : 2,
+              // jQuery selector or object to attach sticky header to
+              stickyHeaders_attachTo : null,
+              // scroll table top into view after filtering
+              stickyHeaders_filteredToTop: true,
+
+              // adding zebra striping, using content and default styles - the ui css removes the background from default
+              // even and odd class names included for this demo to allow switching themes
+              zebra   : ["ui-widget-content even", "ui-state-default odd"],
+              // use uitheme widget to apply defauly jquery ui (jui) class names
+              // see the uitheme demo for more details on how to change the class names
+              uitheme : 'black'
+            }
+          };
+        
+        tablesorter_options.widgetOptions.stickyHeaders_attachTo = $('.wrapper'); // or $('.wrapper')
+        
+        $("#transaction_search_candidates .tablesorter").tablesorter(tablesorter_options).bind("sortStart",function() { 
             $("#tableLoader").show(); 
            }).bind("sortEnd",function() { 
             $("#tableLoader").hide(); 
-        }); 
+        })
+        .tablesorterPager({
+
+            // target the pager markup - see the HTML block below
+            container: $(".pager"),
+
+            // use this url format "http:/mydatabase.com?page={page}&size={size}" 
+            ajaxUrl: null,
+
+            // process ajax so that the data object is returned along with the
+            // total number of rows; example:
+            // {
+            //   "data" : [{ "ID": 1, "Name": "Foo", "Last": "Bar" }],
+            //   "total_rows" : 100 
+            // } 
+            ajaxProcessing: function(ajax) {
+                if (ajax && ajax.hasOwnProperty('data')) {
+                    // return [ "data", "total_rows" ]; 
+                    return [ajax.data, ajax.total_rows];
+                }
+            },
+
+            // output string - default is '{page}/{totalPages}';
+            // possible variables:
+            // {page}, {totalPages}, {startRow}, {endRow} and {totalRows}
+            output: '{startRow} to {endRow} ({totalRows})',
+
+            // apply disabled classname to the pager arrows when the rows at
+            // either extreme is visible - default is true
+            updateArrows: true,
+
+            // starting page of the pager (zero based index)
+            page: 0,
+
+            // Number of visible rows - default is 10
+            size: 10,
+
+            // if true, the table will remain the same height no matter how many
+            // records are displayed. The space is made up by an empty 
+            // table row set to a height to compensate; default is false 
+            fixedHeight: true,
+
+            // remove rows from the table to speed up the sort of large tables.
+            // setting this to false, only hides the non-visible rows; needed
+            // if you plan to add/remove rows with the pager enabled.
+            removeRows: false,
+
+            // css class names of pager arrows
+            // next page arrow
+            cssNext: '.next',
+            // previous page arrow
+            cssPrev: '.prev',
+            // go to first page arrow
+            cssFirst: '.first',
+            // go to last page arrow
+            cssLast: '.last',
+            // select dropdown to allow choosing a page
+            cssGoto: '.gotoPage',
+            // location of where the "output" is displayed
+            cssPageDisplay: '.pagedisplay',
+            // dropdown that sets the "size" option
+            cssPageSize: '.pagesize',
+            // class added to arrows when at the extremes 
+            // (i.e. prev/first arrows are "disabled" when on the first page)
+            // Note there is no period "." in front of this class name
+            cssDisabled: 'disabled'
+
+        });
+        
+
         
         $('tr').on('click', function(){
 
@@ -647,11 +646,11 @@
             }
         });
         
-        $('table.tablesorter').floatThead({
+        /*$('table.tablesorter').floatThead({
     scrollContainer: function($table){
 		return $table.closest('.wrapper');
 	}
-})
+})*/
         // END JACOB ADDED
         
         
@@ -733,6 +732,7 @@
                                    <th><div class="tableInner">{{tag_name}}</div></th>
                                 {% endfor %}
                         </tr>
+
                         </thead>
                         
                         <tbody>
@@ -857,10 +857,29 @@
                         <!-- End of table content -->
                         
                         </tbody>
-                     
-                     
+                        
                     </table>
+                    
+                    <div id="pager" class="pager">
+                                <form>
+                                    <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/first.png" class="first">
+                                    <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/prev.png" class="prev">
+                                    <input type="text" class="pagedisplay" readonly>
+                                    <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/next.png" class="next">
+                                    <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/last.png" class="last">
+                                    <select class="pagesize">
+                                        <option value="5">5</option>
+                                        <option selected="selected" value="10">10</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                    <select class="gotoPage" title="Select page number"></select>
+                                </form>
                     </div>
+                    
+                    
+                    </div>
+                   
                 
                 
                     <!-- {% for ordered_list in final_list_ordered_score %}
@@ -959,7 +978,7 @@
                         {% endfor %}
                         <a href="{% url 'enersectapp:transactions_report' %}" id="clearSearch">Clear All</a>
                     </div>
-                    <div id="search_tags_create_panel"><img id="logo" src="http://subsumo.com/enersect-transaction-explorer.png" search_tags_tools_line"="">
+                    <div id="search_tags_create_panel"><img id="logo" src="/static/enersectapp/images/enersect-transaction-explorer.png" search_tags_tools_line"="">
                             
 <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
                                 

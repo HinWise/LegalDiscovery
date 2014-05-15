@@ -322,3 +322,160 @@ margin-left:3px
 
 overflow: hidden !important;
 }
+
+/* tables */
+    table.tablesorter {
+        font-family:arial;
+        margin:10px 0pt 15px;
+        font-size: 8pt;
+        width: 100%;
+        text-align: left;
+    }
+    table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+        background-color: #e6EEEE;
+        border-top: 1px solid #FFF;
+        border-bottom: 1px solid #FFF;
+        border-left: 1px solid #FFF;
+        border-right: 1px solid #FFF;
+        font-size: 8pt;
+        padding: 4px;
+    }
+    
+    table.tablesorter thead tr td {
+        background-color: #e6EEEE;
+        border-top: 1px solid #FFF;
+        border-bottom: 1px solid #FFF;
+        border-left: 1px solid #FFF;
+        border-right: 1px solid #FFF;
+        font-size: 8pt;
+        padding: 4px;
+    }
+    
+    
+    table.tablesorter thead tr .tablesorter-header {
+
+        cursor: pointer;
+    }
+    table.tablesorter tbody td {
+        color: #3D3D3D;
+        padding: 4px;
+        vertical-align: top;
+    
+    }
+    
+    table.tablesorter thead tr {
+    
+    color:black;
+    
+    }
+    
+    tr:nth-child(2n) {
+        background: rgba(0,0,0,0.05);
+    }
+    table.tablesorter tr.candidate:hover {
+        cursor:pointer;
+    }
+    table.tablesorter tr:hover {
+        border:1px solid black;
+        
+    }
+    
+    
+    
+    table.tablesorter tbody tr.odd td {
+        background-color:#F0F0F6;
+    }
+    table.tablesorter thead tr th.tablesorter-headerAsc {
+    
+        background-image: url("tablesorter-master/css/images/black-asc.gif");
+        
+        background-repeat: no-repeat;
+        background-position: 95% center;
+    }
+    table.tablesorter thead tr .tablesorter-headerDesc {
+        background-image: url("tablesorter-master/css/images/black-desc.gif");
+        background-repeat: no-repeat;
+        background-position: 95% center;
+    }
+    
+    table.tablesorter thead tr .tablesorter-headerUnsorted {
+        background-image: url("tablesorter-master/css/images/black-unsorted.gif");
+        background-repeat: no-repeat;
+        background-position: 95% center;
+    }
+    
+    table.tablesorter thead tr th.tablesorter-headerAsc, table.headerUnsorted thead tr .tablesorter-headerDesc {
+    background-color: #8dbdd8;
+    }
+    
+    table.tablesorter .starNumber {
+    display:none;
+    }
+    
+    table.tablesorter .star1:after {
+        content:'★';
+    }
+    
+    table.tablesorter .star2:after {
+        content:'★★';
+    }
+    table.tablesorter .star3:after {
+        content:'★★★';
+    }
+    table.tablesorter .star4:after {
+        content:'★★★★';
+    }
+    table.tablesorter .star5:after {
+        content:'★★★★★';
+    }
+    table.tablesorter .star6:after {
+        content:'★★★★★★';
+    }
+        table.tablesorter .star7:after {
+        content:'★★★★★★★';
+    }
+        table.tablesorter .star8:after {
+        content:'★★★★★★★★';
+    }
+    #tableLoader {
+    position:absolute;
+    top:100px;
+    left:50%;
+    margin-left:-50px;
+    max-width:40px;
+    background:rgba(255,255,255,0.6);
+    padding:10px;
+    border-radius:8px;
+    display:none;
+    }
+    
+    
+    .wrapper {
+      position: relative;
+      padding: 0 5px;
+      height: 250px;
+      overflow-y: auto;
+    }
+
+.tablesorter-filter-row {
+
+    background-color: #e6EEEE !important;
+    border: 1px solid #FFF !important;
+    
+
+}
+
+table.tablesorter.tablesorter-default.hasFilters.containsStickyHeaders.tablesorter-sticky-visible {
+
+    background-color: #e6EEEE !important;
+
+}
+
+#pager {
+
+    position:fixed;
+    
+    top: 571px;
+    left: 122px;
+
+}

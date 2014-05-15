@@ -25,6 +25,9 @@ from django.utils import timezone
 from datetime import timedelta
 import datetime
 
+import io
+import django.utils.simplejson as json
+
 def transactions_report(request):
     
     if not request.user.is_authenticated():
@@ -791,9 +794,18 @@ def transactions_report(request):
     coincident_transactions_complete = all_coincident_transactions
     coincident_transactions_complete_values = coincident_transactions_complete.values(*base_fields_searched) #Values limited to chosen search tags
     
+    
+    
+    
     #Create a dictionary to convert the ValuesQuerySet into a dict, accesible by keys
     
     coincident_transactions_dict_complete_values = {}
+    
+    #Transforming the "coincident_transactions_complete_values" dictionary into json
+    
+    with io.open('jsondata.txt', 'w', encoding='utf-8') as f:
+        f.write(unicode(coincident_transactions_complete_values))
+        #f.write(unicode(json.dumps(coincident_transactions_complete_values, ensure_ascii=False)))
     
     #Loop that takes the id of every item in the queryset and makes it's own searchable dict item that contains that info to be accesed later
     
@@ -829,7 +841,7 @@ def transactions_report(request):
     # duplicates are conserved.
     
     for dict_key in coincident_transactions_dict.keys():
-    
+
         transaction_item = coincident_transactions_complete_dict[dict_key]
     
         temp_dict = {}
@@ -845,7 +857,7 @@ def transactions_report(request):
     final_list_ordered_score = []
     
     #Change this variable to modify the final number of elements of the table
-    max_range_per_relevance_set = 100
+    max_range_per_relevance_set = 1000000
     
     for score in range(number_of_searchtags,0,-1):
     
@@ -871,6 +883,8 @@ def transactions_report(request):
     
     non_repeated_searchtags = list(set(non_repeated_searchtags))
     
+    
+
     context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
                 'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,
                 'non_repeated_searchtags':non_repeated_searchtags,'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
