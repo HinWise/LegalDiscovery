@@ -1189,19 +1189,18 @@ def legal_discovery(request):
                                     
                                             
                                                                                     
-                                            source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
-                                            
-                                            print "----<> <<>----"
-                                            
-                                            
                                             if "/srv/" in os.path.dirname(__file__):
                                                 
-                                                source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
+                                                file_url = "%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
                                                 
-                                            
+                                                source_url = os.path.join(os.path.abspath(enersectapp.__path__[0]),os.pardir,os.pardir,"/var/www/evs",file_url)
+                                                
                                             else :
-                                                print str(os.path.abspath(enersectapp.__path__[0]))
-                                            print "----<> <<>----"
+                                                #print str(os.path.abspath(enersectapp.__path__[0]))
+                                                file_url = "source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
+                                                
+                                                source_url = os.path.join(os.path.abspath(enersectapp.__path__[0]), os.pardir ,"legaldiscoverytemp/source_pdfs",file_url)
+                                                
                                             
                                             output.append(PdfFileReader(file(source_url, 'rb')))
                                             
