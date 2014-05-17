@@ -1,4 +1,6 @@
 
+import enersectapp
+
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db import connection
@@ -1190,11 +1192,15 @@ def legal_discovery(request):
                                             source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
                                             
                                             print "----<> <<>----"
-                                            if 'REQUEST_METHOD' in os.environ :
-                                                print "This is a webpage"
+                                            
+                                            
+                                            if "/srv/" in os.path.dirname(__file__):
+                                                
                                                 source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
+                                                
+                                            
                                             else :
-                                                print "This is not a webpage"
+                                                print str(os.path.abspath(enersectapp.__path__[0]))
                                             print "----<> <<>----"
                                             
                                             output.append(PdfFileReader(file(source_url, 'rb')))
