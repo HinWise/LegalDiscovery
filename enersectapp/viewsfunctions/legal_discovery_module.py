@@ -1187,12 +1187,12 @@ def legal_discovery(request):
                                     
                                             
                                                                                     
-                                            source_url = "/legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
+                                            source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
                                             
                                             print "----<> <<>----"
                                             if 'REQUEST_METHOD' in os.environ :
                                                 print "This is a webpage"
-                                                source_url = "/legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
+                                                source_url = "legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
                                             else :
                                                 print "This is not a webpage"
                                             print "----<> <<>----"
