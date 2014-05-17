@@ -35,6 +35,8 @@ from django.utils import timezone
 from datetime import timedelta
 import datetime
 
+import os
+
 
 import random
 
@@ -851,7 +853,7 @@ def legal_discovery(request):
                                 except:
                                     max_documents = 10
                                 
-                                max_documents = 100
+                                max_documents = 10
                                 
                                 try:
                                     report_type = request.POST['report_type']
@@ -1127,7 +1129,7 @@ def legal_discovery(request):
                                     with transaction.commit_on_success():
                                         for selected_entry_item in corpus_common_final:
                                         
-                                            if exhibit_count % 50 == 0 or exhibit_count == 1:
+                                            if exhibit_count % 5000 == 0 or exhibit_count == 1:
                                             
                                                 
                                                 print "<-------------------------- ---------------------->"
@@ -1185,14 +1187,19 @@ def legal_discovery(request):
                                     
                                             
                                                                                     
-                                            source_url = "legaldiscoverytemp//source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
+                                            source_url = "/legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
+                                            
+                                            print "----<> <<>----"
+                                            if 'REQUEST_METHOD' in os.environ :
+                                                print "This is a webpage"
+                                                source_url = "/legaldiscoverytemp/source_pdfs/%s/%s" %("job0", "scan1~2013_06_07_14_47_10_57.pdf")
+                                            else :
+                                                print "This is not a webpage"
+                                            print "----<> <<>----"
                                             
                                             output.append(PdfFileReader(file(source_url, 'rb')))
                                             
-                                            
-                                            
-                                    
-                                    
+
                                             '''Write command to finish and save new page'''
                                             exhibit_count += 1
 
