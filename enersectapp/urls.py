@@ -284,5 +284,17 @@ urlpatterns = patterns('',
 
     url(r'^(?P<entryId>\d+)/(?P<transactionId>\d+)/(?P<listType>\w+)/(?P<operationType>\w+)/add_or_remove_transaction/$', views.add_or_remove_transaction, name='add_or_remove_transaction'),
     
+    
+    # Affidavit Creation Tool
+    # Allows to create Affidavit of Records,
+    # you choose the corpus you want to create. It is by default sorted by date (And probably won't allow to change that).
+    # It must freeze/save a selection of all documents at a certain point, so it won't happen that someone creates new entries while you
+    # print one of the corpuses, then the next one won't relate to it.
+    # Probable implementation: Freeze State button
+    # ex: enersectapp/linkui/transaction_linking/
+    url(r'^legalui/affidavit_create/$', views.affidavit_create, name='affidavit_create'),
+    
+    
+    
    
 )

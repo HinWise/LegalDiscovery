@@ -38,7 +38,7 @@ import datetime
 
 import random
 
-def legal_discovery(request):
+def affidavit_create(request):
     
     the_user = request.user
     
@@ -851,7 +851,7 @@ def legal_discovery(request):
                                 except:
                                     max_documents = 10
                                 
-                                max_documents = 100
+                                max_documents = 1000
                                 
                                 try:
                                     report_type = request.POST['report_type']
@@ -1123,7 +1123,7 @@ def legal_discovery(request):
                                 documents_to_include_in_output = ["icr","sourcedoc_pdfs"]
                                 
                                 if "sourcedoc_pdfs" in documents_to_include_in_output:
-                                    print "------------- STARTING SOURCE PDFS ----------------"
+                                    print "fgrgergergggggggggggggggggggggggg----------------"
                                     with transaction.commit_on_success():
                                         for selected_entry_item in corpus_common_final:
                                         
@@ -1171,27 +1171,14 @@ def legal_discovery(request):
                                             job_directory = selected_entry_item.sourcedoc_link.job_directory
                                             filename = selected_entry_item.sourcedoc_link.filename
                                             
-                                            job_directory = "job0"
-                                            filename = "scan1~2013_06_06_18_50_12_19.pdf"
-                                            
                                             source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(job_directory, filename)
                                                 
 
-                                            '''remoteFile = urlopen(Request(source_url)).read()
+                                            remoteFile = urlopen(Request(source_url)).read()
                                             memoryFile = StringIO(remoteFile)
                                             input_pdf = PdfFileReader(memoryFile)
                                             output.append(input_pdf)
-                                            '''
-                                    
-                                            
-                                                                                    
-                                            source_url = "legaldiscoverytemp//source_pdfs/%s/%s" %("job0", "scan1~2013_06_06_18_50_12_19.pdf")
-                                            
-                                            output.append(PdfFileReader(file(source_url, 'rb')))
-                                            
-                                            
-                                            
-                                    
+                                            #output.addPage(input_pdf.getPage(0))
                                     
                                             '''Write command to finish and save new page'''
                                             exhibit_count += 1
@@ -1200,7 +1187,7 @@ def legal_discovery(request):
                                 
                                     try:
                                     
-                                        temp_filename = "legaldiscoverytemp/legaltempdocumentsourcedoc"+str(len(output_temp_documents_created))+".pdf"
+                                        temp_filename = "legaldiscoverytemp/legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
                                         output.write(temp_filename)
                                         output_temp_documents_created.append(temp_filename)
                                         
