@@ -137,6 +137,28 @@
           }
         });
         
+        //Panel for the Affidavit of Records
+        
+        if($( "#affidavit_panel" ))
+        
+        {
+        
+            $( "#affidavit_panel" ).dialog({
+              autoOpen: true,
+              height: $("#affidavit_panel_container").height(),
+              width: $("#affidavit_panel_container").width(),
+              modal: true,
+              closeOnEscape: false,
+              resizable: false,
+              draggable:false,
+              position: {
+                        my: "left top", at: "left top", of: $('#affidavit_panel_container')
+              }
+            });
+        }
+        
+        
+        
         //Choose Template Button
         
         $("#choose_template_button").button().click(function(){
@@ -201,6 +223,32 @@
         
         });
         
+        //Affidavit of Records Mode Button
+        
+        $("#affidavit_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            
+            //Toggle
+            
+            if($('#report_type').attr("value") != "affidavit")
+            {
+
+                $('#report_type').attr("value","affidavit");
+            }
+            else
+            {
+
+                $('#report_type').attr("value","legal_discovery");
+            }
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
+        
         
         
 
@@ -261,6 +309,25 @@
             })
         .find( ".available_element" )
         .addClass( "selected_list_element")
+        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
+        
+        
+        //Makes Corpus_list sortable and selectable
+        
+        
+        $( ".corpus_list" ).sortable({
+          placeholder: "ui-state-highlight-line",
+          items: ".downloadable_element",
+          handle: ".handle",
+          draggable: false,
+          distance: 10
+        })
+        .selectable({ 
+            filter:".downloadable_element", cancel:".handle",
+            
+            })
+        .find( ".downloadable_element" )
+        .addClass( "selected_doctype_element")
         .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
         
         
@@ -793,17 +860,56 @@
                             <button id="choose_template_button">Choose</button>
                             <button id="save_template_button">Save</button>
                             <button id="export_template_button">Produce Legal Discovery Report</button>
+                            <button id="affidavit_button">Affidavit of Records Mode</button>
                             
                             
                         </div>
                     
                     </div>
                     
+                    {% if report_type == "affidavit" %}
+                    <div id="affidavit_panel_container">
+                    
+                        <div id="affidavit_panel" title="Affidavit Generator Control Panel">
+                    
+                            <div id="document_lists_container">
+                            {% for document_corpus in document_corpus_list %}
+                            
+                                <div class="document_list" corpus_type = "{{document_corpus.name}}">
+                                    
+                                    {% for file in document_corpus.corpus_contents %}
+                                    <ul class="corpus_list">
+                                    <li class="ui-state-default doctype_element downloadable_element" {% if file.downloaded == "Downloaded" %} is_checked="checked" {% else %} is_checked="unchecked" {% endif %} file_name = "{{file.file_name}}"">
+                                  
+                                    <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count">Downloaded : {{file.downloaded}}</span>
+                                    
+                                    <div class='edit_doctype_element' file_name="{{file.file_name}}" cute_name="{{file.file_name}}">
+                                        <span class='ui-icon ui-icon-download'></span>
+                                    </div>
+                                    
+                                    </li>
+                                    </ul>
+                                    {% endfor %}
+                                    
+                                </div>
+                                
+                                
+                            {% endfor %}
+                    
+                            </div>
+                            
+                        </div>
+                    
+                    </div>
+                    {% endif %}
+                    
                     <input type="input" class="invisible" id="legal_template" name="legal_template" value=""/>
                     <input type="input" class="invisible" id="action_mark" name="action_mark" value=""/>
                     <input type="input" class="invisible" id="final_legal_discovery" name="final_legal_discovery" value=""/>
-            
+                    <input type="input" class="invisible" id="report_type" name="report_type" value="{{report_type}}"/>
+
                 </fieldset>
+
             </form>
         
         

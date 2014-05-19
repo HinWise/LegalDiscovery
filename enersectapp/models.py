@@ -475,6 +475,10 @@ class TransactionsReportTemplate(models.Model):
     
     def __unicode__(self):
         return self.name
+
+
+
+
         
 class UserProfile(models.Model):  
     user = models.OneToOneField(User)

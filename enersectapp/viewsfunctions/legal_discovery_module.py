@@ -38,6 +38,7 @@ from datetime import timedelta
 import datetime
 
 import os
+import shutil
 
 
 import random
@@ -184,7 +185,7 @@ def legal_discovery(request):
         
         elif (action_mark == "save_template" or action_mark == "export_template") and len(stringified_legal_discovery_template) > 0:
         
-            
+            new_created_template = False
         
             template_exists = selected_template in legaldiscovery_templates_names_list
             
@@ -241,6 +242,10 @@ def legal_discovery(request):
                         new_Legal_Discovery_Template.name = "Saved Template "+str(len(legaldiscovery_templates_names_list)+1)
                         new_Legal_Discovery_Template.creation_user = the_user
                         new_Legal_Discovery_Template.modification_date = datetime.datetime.now().replace(tzinfo=timezone.utc)
+                        
+                        if action_mark == "export_template":
+                        
+                            new_created_template = True
 
                     new_Legal_Discovery_Template.save()
                     
@@ -392,11 +397,22 @@ def legal_discovery(request):
                         
                         Legal_Discovery_object = new_Legal_Discovery_Template
                         
+                        
                         corpus_pdfs_to_export = final_entries
                         
                         max_limit_to_print_of_each = 2
                         
                         if max_limit_to_print_of_each > 0 and len(corpus_pdfs_to_export) > 0:
+        
+        
+                            ## Loop to have a list of all files in the folder, and delete all the .pdfs
+                                
+                            file_list = os.listdir('legaldiscoverytemp/output_files/')#os.chdir('legaldiscoverytemp/output_files')
+                            
+                            for item in file_list:
+                            
+                                if ".pdf" in str(item):
+                                    os.remove('legaldiscoverytemp/output_files/'+str(item))
         
                             
                             
@@ -411,9 +427,6 @@ def legal_discovery(request):
 
                             title_string = "Legal Discovery Report\n"
                             title_date = str(Legal_Discovery_object.modification_date)
-                        
-                            response = HttpResponse(mimetype="application/pdf")
-                            response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/legal_discovery_report_%s.pdf' %(title_date)
                         
                             
                             tmpfile = tempfile.SpooledTemporaryFile(1048576)
@@ -430,7 +443,15 @@ def legal_discovery(request):
                             output.append(input1)
                             #output.append(input1)
                             
-                            temp_filename = "legaldiscoverytemp/initial_cover"+str(len(output_temp_documents_created))+".pdf"
+                            
+                            
+                            
+                            exhibit_count = 1
+                            corpus_doccount = 1
+                            
+                            
+                            
+                            temp_filename = "legaldiscoverytemp/output_files/initial_cover__"+str(corpus_doccount).zfill(7)+".pdf"
                             
                             output.write(temp_filename)
                             
@@ -849,13 +870,15 @@ def legal_discovery(request):
                                 #   -Force the end_range to start_range + max_limit_to_print_of_each
                                 #   -Make a variable for all the extraction fields
                                 
+                                
+
                                 try:
                                     max_documents = request.POST['max_documents']
                                     
                                 except:
                                     max_documents = 10
                                 
-                                max_documents = 10
+                                max_documents = 111
                                 
                                 try:
                                     report_type = request.POST['report_type']
@@ -863,9 +886,13 @@ def legal_discovery(request):
                                 except:
                                     report_type = ""
                                 
+                                
+                                
                                 corpus_common_final = PdfRecord.objects.none()
                                 
                                 exhibit_count = 1
+                                corpus_doccount = 1
+                                doc_iterator = exhibit_count - 1
                                 pdf_string = ""
                                 
                                 all_sourcedoctypestemplate = Legal_Discovery_object.sourcedoctypes_list.filter(checked = "checked")
@@ -901,23 +928,51 @@ def legal_discovery(request):
                                 corpus_common_final = corpus_common_final[:max_documents]   
                                 print "----z  "+str(len(corpus_common_final))
                                 
+                                did_page_jump = False
+                                
+                                
                                 with transaction.commit_on_success():
                                     for selected_entry_item in corpus_common_final:
                                     
-                                        if exhibit_count % 5000 == 0:
+                                        created_page = False
+                                    
+                                        if doc_iterator % 25 == 0 and doc_iterator != 0:
                                             
-                                           
-                                            print "<-------------------------- ---------------------->"
+                                            if did_page_jump == False:
                                             
-                                            temp_filename = "legaldiscoverytemp/legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                                tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                    
+                                                # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                                tmpfile.rollover()
+                                              
+                                                the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                                                string_to_pdf(the_canvas,pdf_string)
+                                                       
+                                                the_canvas.save()
+                                                
+                                                input1 = PdfFileReader(tmpfile)
+                                                
+                                                output.append(input1)
+                                                
+                                                pdf_string = ""
+                                            
+                                            
+
+                                            print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
+                                            
+                                            temp_filename = "legaldiscoverytemp/output_files/icr_partial_document__"+str(corpus_doccount).zfill(7)+".pdf"
+                                            corpus_doccount += 1
                                             output.write(temp_filename)
                                             output_temp_documents_created.append(temp_filename)
                                             
                                             output = PdfFileMerger()
                                             
+                                            created_page = True
+                                            
                                             db.reset_queries()
+                                            
+                                            
 
-                                        
                                         print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
                                     
                                         equivalent_doctype_template = Legal_Discovery_object.sourcedoctypes_list.get(clean_name = selected_entry_item.modified_document_type.clean_name)
@@ -1086,15 +1141,18 @@ def legal_discovery(request):
                                                 
                                                 pdf_string = ""
 
+                                                did_page_jump = True
+                                                
                                             exhibit_count += 1
-                                        
-                                  
+                                            doc_iterator = exhibit_count - 1
+                                    
+                                    
+                                    
                                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
                                     
                                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
                                     tmpfile.rollover()
                                   
-                                    
                                     the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
                                     string_to_pdf(the_canvas,pdf_string)
                                            
@@ -1107,9 +1165,12 @@ def legal_discovery(request):
                                     
                                     '''Write command to finish and save new page'''
                                 
-                                try:
+                           
                                 
-                                    temp_filename = "legaldiscoverytemp/legaltempdocument"+str(len(output_temp_documents_created))+".pdf"
+                                try:
+
+                                    temp_filename = "legaldiscoverytemp/output_files/icr_partial_document__"+str(corpus_doccount).zfill(7)+".pdf"
+                                    corpus_doccount += 1
                                     output.write(temp_filename)
                                     output_temp_documents_created.append(temp_filename)
                                     
@@ -1121,8 +1182,12 @@ def legal_discovery(request):
                                 
                                     print "empty"
                                 
-                            
+                                
+                                output = PdfFileMerger()
+                                
                                 exhibit_count = 1
+                                corpus_doccount = 1
+                                doc_iterator = exhibit_count - 1
                                 
                                 documents_to_include_in_output = ["icr","sourcedoc_pdfs"]
                                 
@@ -1131,16 +1196,21 @@ def legal_discovery(request):
                                     with transaction.commit_on_success():
                                         for selected_entry_item in corpus_common_final:
                                         
-                                            if exhibit_count % 5000 == 0 or exhibit_count == 1:
+                                            created_page = False
+                                        
+                                            if doc_iterator % 25 == 0 and doc_iterator != 0:
                                             
                                                 
-                                                print "<-------------------------- ---------------------->"
+                                                print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
                                                 
-                                                temp_filename = "legaldiscoverytemp/legaltempdocumentsourcedoc"+str(len(output_temp_documents_created))+".pdf"
+                                                temp_filename = "legaldiscoverytemp/output_files/sourcepdfs_partial_document__"+str(corpus_doccount).zfill(7)+".pdf"
+                                                corpus_doccount += 1
                                                 output.write(temp_filename)
                                                 output_temp_documents_created.append(temp_filename)
                                                 
                                                 output = PdfFileMerger()
+                                                
+                                                created_page == True
                                                 
                                                 db.reset_queries()
 
@@ -1201,13 +1271,18 @@ def legal_discovery(request):
                                             
 
                                             '''Write command to finish and save new page'''
+                                            
+                                            db.reset_queries()
+                                            
                                             exhibit_count += 1
-
+                                            doc_iterator = exhibit_count - 1
                                 
                                 
+                                   
                                     try:
                                     
-                                        temp_filename = "legaldiscoverytemp/legaltempdocumentsourcedoc"+str(len(output_temp_documents_created))+".pdf"
+                                        temp_filename = "legaldiscoverytemp/output_files/sourcepdfs_partial_document__"+str(corpus_doccount).zfill(7)+".pdf"
+                                        corpus_doccount += 1
                                         output.write(temp_filename)
                                         output_temp_documents_created.append(temp_filename)
                                         
@@ -1220,6 +1295,8 @@ def legal_discovery(request):
                                         print "empty"
                                 
                                 
+                                
+                                
                                 '''try:
                                     temp_output.write(temp_outputStream)
                                     output_streams_files_list.append(temp_outputStream)
@@ -1228,8 +1305,13 @@ def legal_discovery(request):
                                     temp_output = PdfFileMerger()
                                 except:
                                     tried = ""'''
+                                    
+                                output = PdfFileMerger()    
+
+                                ##This block is functional, and merging all the things into one .PDF to be exported in the response
+                                #Changed to a .zip
                                 
-                                final_output = PdfFileMerger()
+                                '''final_output = PdfFileMerger()
                                 
                                 partial_output = PdfFileMerger()
                                 
@@ -1245,7 +1327,7 @@ def legal_discovery(request):
                                
                                 #To isolate the generated report for the ICR corpus
                                
-                                partial_filename = "legaldiscoverytemp/icr-affidavitofrecords-final.pdf"
+                                partial_filename = "legaldiscoverytemp/output_files/icr-affidavitofrecords-final.pdf"
                                 
                                 partial_output.write(partial_filename)
                                 
@@ -1253,10 +1335,49 @@ def legal_discovery(request):
                                 
                                 final_output.append(PdfFileReader(file(partial_filename, 'rb')))
                                 
-                                final_output.write(outputStream)
+                                final_output.write(outputStream)'''
                                 
-                                response.write(outputStream.getvalue())
-                                response.write(final_output)
+                                ##
+                                
+                                myZipFile = shutil.make_archive("legaldiscoverytemp/output_files_final/testing_zip", "zip", "legaldiscoverytemp/output_files")
+                                #myZipFile.write(outputStream)
+                                
+                                test_file = open('legaldiscoverytemp/output_files_final/testing_zip.zip', 'rb')
+                                
+                                
+                                ## Loop to have a list of all files in the folder, and delete all the .pdfs
+                                
+                                file_list = os.listdir('legaldiscoverytemp/output_files/')#os.chdir('legaldiscoverytemp/output_files')
+                                
+                                '''for item in file_list:
+                                
+                                    if ".pdf" in str(item):
+                                        os.remove('legaldiscoverytemp/output_files/'+str(item))'''
+                                
+                                
+                                document_corpus_maker(file_list)
+                                ###
+                                
+                                
+                                ##If .pdf instead
+                                #response = HttpResponse(mimetype="application/pdf")
+                                #response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files/legal_discovery_report_%s.pdf' %(title_date)
+                                
+                                response = HttpResponse(test_file, mimetype="application/zip")
+                                response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files/legal_discovery_report_%s.zip' %(title_date)
+
+                                ##If .pdf instead, this line is necessary:
+                                #response.write(outputStream.getvalue())
+
+                                
+                                report_type = "affidavit"
+    
+                                
+                                if report_type == "affidavit" and new_created_template == True:
+                                
+                                    remove_template(new_Legal_Discovery_Template)
+                                
+                                
                                 return response
                                 
                     
@@ -1325,11 +1446,61 @@ def legal_discovery(request):
     
     legaldiscovery_templates_names_list = user_profile.created_legaldiscovery_templates.all().values_list('name',flat="True").distinct()
     
+    try:
+        report_type = request.POST['report_type']
+        
+    except:
+        report_type = "legal_discovery"
     
+    
+    document_corpus_list = []
+    
+    if report_type == "affidavit":
+    
+        try:
+        
+            file_list = os.listdir('legaldiscoverytemp/output_files/')#os.chdir('legaldiscoverytemp/output_files')
+
+            print file_list
+            
+            document_corpus_list = document_corpus_maker(file_list)
+         
+        except:
+        
+            print "EXCEPTIOOOOOOOOON IN DOCUMENT LISTS DICT MAKING!--/n"
+            document_corpus_list = []
+
+            
     context = {'user_type':user_type,'the_user':the_user,'document_types_list_dictionaries':document_types_list_dictionaries,
-                'legaldiscovery_templates_names_list':legaldiscovery_templates_names_list}
+                'legaldiscovery_templates_names_list':legaldiscovery_templates_names_list,'report_type':report_type,
+                'document_corpus_list':document_corpus_list}
     
     return render(request,'enersectapp/legal_discovery.html',context)
+
+
+def document_corpus_maker(all_documents):
+    
+    document_corpus_list = []
+    
+    icr_corpus_dict = {}
+    icr_corpus_contents_list = []
+    
+    for file in all_documents:
+        
+        file_dict = {}
+        
+        if "icr" in file:
+            file_dict["file_name"] = file
+            file_dict["downloaded"] = "Not Downloaded"
+            
+            icr_corpus_contents_list.append(file_dict)
+            
+    icr_corpus_dict["corpus_name"] = "icr_corpus"
+    icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
+    
+    document_corpus_list.append(icr_corpus_dict)
+    
+    return document_corpus_list 
     
 def string_to_pdf(canvas,string):
 
@@ -1344,16 +1515,25 @@ def string_to_pdf(canvas,string):
         
         times +=1
                             
+def remove_template(template_object):
 
-    '''textobject = canvas.beginText()
-    textobject.setTextOrigin(2, 800)
-    textobject.setFont("Helvetica-Oblique", 14)
+    print template_object
     
-    # for line in lyrics:
-    # textobject.textOut(line)
-    # textobject.moveCursor(14,14) # POSITIVE Y moves down!!!
-    # textobject.setFillColorRGB(0.4,0,1)
-    textobject.textLines(string)
+    try:
     
-    canvas.drawText(textobject)'''
+        with transaction.commit_on_success():
+            for sourcedoc_template in template_object.sourcedoctypes_list.all():
+
+                for extractionfield_template in sourcedoc_template.extraction_fields.all():
+         
+                    extractionfield_template.delete()
+            
+                sourcedoc_template.delete()
+
+        template_object.delete()
+        
+        return True
+        
+    except:
     
+        return False

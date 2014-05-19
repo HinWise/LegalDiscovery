@@ -205,9 +205,34 @@ html,body {
 
 }
 
+
+
+#affidavit_panel_container {
+
+
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    width: 91%;
+    height: 85%;
+    pointer-events: all;
+    
+    z-index: 100 !important;
+    
+    overflow:auto;
+
+
+}
+
+
+#affidavit_panel {
+
+
+
+}
+
+
 /*Selectable && Sortable css*/
-
-
 
 li { position:relative !important; padding: 1% !important; padding-left: 8% !important;  }
 
