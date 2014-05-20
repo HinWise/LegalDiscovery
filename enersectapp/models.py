@@ -6,6 +6,14 @@ from django.contrib.auth.models import User,Group
 from django.db.models.signals import post_save
 
 
+class AffidavitInstance(models.Model):
+
+    watermark_name = models.CharField(max_length=7,default="00000000")
+    modification_date = models.DateTimeField('modification time of template', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
+
+    def __unicode__(self):
+        return str(self.watermark_name)
+    
 class BankRecord(models.Model):
 
     BankRecordIndex = models.IntegerField('BankRecordIndex_Reference')
@@ -29,6 +37,9 @@ class BankRecord(models.Model):
     Reftran = models.CharField('Reference Transaction',max_length=31)
     Provenance = models.CharField('Provenance',max_length=31)
 
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    
     def __unicode__(self):
         return str(self.BankRecordIndex)
 
@@ -70,6 +81,9 @@ class InternalRecord(models.Model):
     BankName = models.CharField('Existing Bank Name',max_length=31)
     BankCurrency = models.CharField('Existing Bank Currency',max_length=31)
 
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    
     def __unicode__(self):
         return self.Memo  
 
@@ -109,6 +123,9 @@ class TransactionTable(models.Model):
     BankName = models.CharField('Bank Name',max_length=63)
     BankCurrency = models.CharField('Bank Currency',max_length=31)
     
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    
     def __unicode__(self):
         return str(self.TransactionIndex)
     
@@ -124,6 +141,7 @@ class Record(models.Model):
     linked_style_class = models.CharField(max_length=255, default="nolink")
     error_style_class = models.CharField(max_length=255, default="noerror")
     internalrecord_link = models.ForeignKey(InternalRecord)
+    
     def __unicode__(self):
         return self.status
 
@@ -312,7 +330,8 @@ class SourcePdf(models.Model):
     FullDate = models.CharField('Year',max_length=31,default="")
     Currency = models.CharField('Currency',max_length=63,default="")
     
-    
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
     
     assigndata = models.ManyToManyField(SourcePdfToHandle,null=True, blank=True, default=None)
     def __unicode__(self):
@@ -346,7 +365,6 @@ class SourcePdf(models.Model):
 
     
 
-        
 class OcrRecord(models.Model):
     Document_Type = models.CharField('Document Type',max_length=255)
     Amount = models.CharField('Amount',max_length=255)
@@ -411,7 +429,10 @@ class EntryLinks(models.Model):
     
     def __unicode__(self):
         return self.entry_pk
-    
+
+
+
+        
 class PdfRecord(models.Model):
     name = models.CharField(max_length=255, default="Pdf Record")
     modification_date = models.DateTimeField('last date modified', default=datetime.datetime.now().replace(tzinfo=timezone.utc))
@@ -442,6 +463,10 @@ class PdfRecord(models.Model):
     EntryByCompany = models.ForeignKey(Group,null=True,blank=True)
     EntryAuthor = models.ForeignKey(User,null=True,blank=True)
     AssignedLotNumber = models.ForeignKey(LotNumber,null=True,blank=True)
+    
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    
     def __unicode__(self):
         return self.name
     
@@ -476,10 +501,8 @@ class TransactionsReportTemplate(models.Model):
     def __unicode__(self):
         return self.name
 
-
-
-
         
+
 class UserProfile(models.Model):  
     user = models.OneToOneField(User)
     user_company = models.ForeignKey(Group,null=True,blank=True)

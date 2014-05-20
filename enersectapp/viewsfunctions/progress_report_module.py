@@ -41,6 +41,8 @@ def progress_report(request):
     
     total_pdf_entered_list = PdfRecord.objects.exclude(audit_mark="duplicatemarked_reentered").exclude(audit_mark="auditmarked_confirmed_reassignment").exclude(ocrrecord_link__OcrByCompany=test_group).exclude(ocrrecord_link__OcrByCompany=invensis_group).exclude(ocrrecord_link__OcrAuthor__username="nemot").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').distinct()
     
+    
+            
     #total_pdf_entered_list = total_pdf_entered_list[:5000]
     
     total_pdf_entered = len(total_pdf_entered_list)

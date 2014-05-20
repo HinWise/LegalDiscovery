@@ -158,6 +158,23 @@
         }
         
         
+        //Create New Affidavit Instance Panel
+        
+        if($( "#affidavit_create_watermark_panel" ))
+        {
+            $( "#affidavit_create_watermark_panel" ).dialog({
+              autoOpen: true,
+              height: $("#affidavit_create_watermark_panel_container").height(),
+              width: $("#affidavit_create_watermark_panel_container").width(),
+              modal: true,
+              closeOnEscape: false,
+              resizable: false,
+              position: {
+                        my: "left top", at: "left top", of: $('#affidavit_create_watermark_panel_container')
+              }
+            });
+        }
+        
         
         //Choose Template Button
         
@@ -249,7 +266,45 @@
         
         });
         
+        //Create Affidavit Watermark Instance
         
+        $("#create_new_instance_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#action_mark').attr("value","create_instance_watermark");
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Legal Discovery Mode Button
+        
+        $("#legaldiscovery_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            
+            //Toggle
+            
+            if($('#report_type').attr("value") != "legal_discovery")
+            {
+
+                $('#report_type').attr("value","legal_discovery");
+            }
+            else
+            {
+
+                $('#report_type').attr("value","legal_discovery");
+            }
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
         
 
         //Make DocType_List sortable && dragable! 
@@ -876,12 +931,16 @@
                             {% for document_corpus in document_corpus_list %}
                             
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
+                                    <div>Corpus : {{document_corpus.corpus_name}}</div>
+                                    
+                                    <button id="generate_corpus_files_button">Generate Corpus Files</button>
+                                    {% if document_corpus.corpus_contents %}<button id="merge_files_button">Try to Merge into one Pdf</button>{%endif%}
                                     
                                     {% for file in document_corpus.corpus_contents %}
                                     <ul class="corpus_list">
                                     <li class="ui-state-default doctype_element downloadable_element" {% if file.downloaded == "Downloaded" %} is_checked="checked" {% else %} is_checked="unchecked" {% endif %} file_name = "{{file.file_name}}"">
                                   
-                                    <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count">Downloaded : {{file.downloaded}}</span>
+                                    <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count"></span>
                                     
                                     <div class='edit_doctype_element' file_name="{{file.file_name}}" cute_name="{{file.file_name}}">
                                         <span class='ui-icon ui-icon-download'></span>
@@ -898,6 +957,18 @@
                     
                             </div>
                             
+                        </div>
+                    
+                    </div>
+                    
+                    <div id="affidavit_create_watermark_panel_container">
+                    
+                        <div id="affidavit_create_watermark_panel" title="Affidavit Instance Maker">
+                            
+                            <div>{% if watermark_name%}{{watermark_name}}{% else %}No Instance{% endif %}</div>
+                            
+                            <button id="create_new_instance_button">Create New Instance</button>
+                            <button id="legaldiscovery_button">Legal Discovery Mode</button>
                         </div>
                     
                     </div>
