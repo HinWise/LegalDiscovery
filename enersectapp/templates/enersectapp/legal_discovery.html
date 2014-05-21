@@ -272,13 +272,72 @@
         
             toggleLoadingScreen();
             $('button').attr("disabled", true).addClass("ui-state-disabled");
-            $('#action_mark').attr("value","create_instance_watermark");
+            $('#affidavit_action_mark').attr("value","create_instance_watermark");
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+
+        });
+        
+        //Generate Corpus of Files from Corpus
+        
+        $(".generate_corpus_files_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","generate_corpus_files_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            $('#selected_corpus_mark').attr("value",corpus_name);
 
             $('#legal_template').attr("value",$('#select_template_menu').val());
           
             $('#discovery_form').submit();
         
         });
+        
+        //Merge Files from Corpus Button
+        
+        $(".merge_files_button").button().click(function(){
+        
+            //toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","merge_corpus_files_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            $('#selected_corpus_mark').attr("value",corpus_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Download  File from Corpus Button
+        
+        $(".download_file_button").button().click(function(){
+        
+            //toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","download_file_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            file_name = $(this).attr("file_name");
+            
+            $('#selected_corpus_mark').attr("value",corpus_name);
+            $('#selected_file_mark').attr("value",file_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
+        
         
         //Legal Discovery Mode Button
         
@@ -931,10 +990,10 @@
                             {% for document_corpus in document_corpus_list %}
                             
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
-                                    <div>Corpus : {{document_corpus.corpus_name}}</div>
+                                    <div>Corpus : {{document_corpus.corpus_name}} corpus</div>
                                     
-                                    <button id="generate_corpus_files_button">Generate Corpus Files</button>
-                                    {% if document_corpus.corpus_contents %}<button id="merge_files_button">Try to Merge into one Pdf</button>{%endif%}
+                                    <button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="{{document_corpus.corpus_name}}">Generate Corpus Files</button>
+                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name != "sourcepdfs" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
                                     
                                     {% for file in document_corpus.corpus_contents %}
                                     <ul class="corpus_list">
@@ -943,7 +1002,7 @@
                                     <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count"></span>
                                     
                                     <div class='edit_doctype_element' file_name="{{file.file_name}}" cute_name="{{file.file_name}}">
-                                        <span class='ui-icon ui-icon-download'></span>
+                                        <span class='ui-icon ui-icon-download download_file_button' corpus_name ="{{document_corpus.corpus_name}}" file_name ="{{file.file_name}}" ></span>
                                     </div>
                                     
                                     </li>
@@ -976,9 +1035,14 @@
                     
                     <input type="input" class="invisible" id="legal_template" name="legal_template" value=""/>
                     <input type="input" class="invisible" id="action_mark" name="action_mark" value=""/>
+                    <input type="input" class="invisible" id="affidavit_action_mark" name="affidavit_action_mark" value=""/>
+                    <input type="input" class="invisible" id="selected_corpus_mark" name="selected_corpus_mark" value=""/>
+                    <input type="input" class="invisible" id="selected_file_mark" name="selected_file_mark" value=""/>
                     <input type="input" class="invisible" id="final_legal_discovery" name="final_legal_discovery" value=""/>
                     <input type="input" class="invisible" id="report_type" name="report_type" value="{{report_type}}"/>
-
+                    
+                    
+                    
                 </fieldset>
 
             </form>
