@@ -1205,7 +1205,7 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 100
+    max_documents = 500
 
     #Initialize the Pdf to be written
     
@@ -1293,7 +1293,7 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 5 == 0 and doc_iterator != 0:
+            if doc_iterator % 100 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1536,7 +1536,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             created_page = False
         
-            if doc_iterator % 50 == 0 and doc_iterator != 0:
+            if doc_iterator % 100 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
