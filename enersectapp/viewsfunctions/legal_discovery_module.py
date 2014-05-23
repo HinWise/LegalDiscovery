@@ -984,6 +984,8 @@ def document_corpus_maker():
     icr_corpus_contents_list = []
     sourcepdfs_corpus_dict = {}
     sourcepdfs_corpus_contents_list = []
+    grandelivre_corpus_dict = {}
+    grandelivre_corpus_contents_list = []
     
     for file in all_documents:
         
@@ -1002,6 +1004,13 @@ def document_corpus_maker():
             
             sourcepdfs_corpus_contents_list.append(file_dict)
             
+        if "grandelivre" in file:
+
+            file_dict["file_name"] = file
+            file_dict["downloaded"] = "Not Downloaded"
+            
+            grandelivre_corpus_contents_list.append(file_dict)
+            
             
             
     icr_corpus_dict["corpus_name"] = "icr"
@@ -1010,8 +1019,13 @@ def document_corpus_maker():
     sourcepdfs_corpus_dict["corpus_name"] = "sourcepdfs"
     sourcepdfs_corpus_dict["corpus_contents"] = sourcepdfs_corpus_contents_list
     
+    grandelivre_corpus_dict["corpus_name"] = "grandelivre"
+    grandelivre_corpus_dict["corpus_contents"] = grandelivre_corpus_contents_list
+    
     document_corpus_list.append(icr_corpus_dict)
     document_corpus_list.append(sourcepdfs_corpus_dict)
+    document_corpus_list.append(grandelivre_corpus_dict)
+    
     
     return document_corpus_list 
     
@@ -1194,6 +1208,14 @@ def generate_corpus_output(request,watermark_name):
         delete_temp_affidavit_files("sourcepdfs","merge")
         
         generate_sourcepdfs_output(request,watermark_name)
+        
+    if "grandelivre" in documents_corpus_to_include_in_output:
+        
+        delete_temp_affidavit_files("grandelivre","cover")
+        delete_temp_affidavit_files("grandelivre","partial")
+        delete_temp_affidavit_files("grandelivre","merge")
+        
+        generate_grandelivre_output(request,watermark_name)
 
 
 def generate_icr_output(request,watermark_name):
@@ -1205,7 +1227,7 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 500
+    max_documents = 100000
 
     #Initialize the Pdf to be written
     
@@ -1293,7 +1315,7 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 100 == 0 and doc_iterator != 0:
+            if doc_iterator % 10000 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1371,7 +1393,7 @@ def generate_icr_output(request,watermark_name):
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" :
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no":
                                 pdf_string += " "+test_string+test_string2+cute_name+" "+field_content
                               
                         except:
@@ -1454,7 +1476,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     except:
         max_documents = 10
     
-    max_documents = 100
+    max_documents = 2500
     
     #Initialize the Pdf to be written
     
@@ -1536,7 +1558,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             created_page = False
         
-            if doc_iterator % 100 == 0 and doc_iterator != 0:
+            if doc_iterator % 500 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1632,6 +1654,235 @@ def generate_sourcepdfs_output(request,watermark_name):
     
         print "empty"
     
+
+def generate_grandelivre_output(request,watermark_name):
+    
+    
+    try:
+        max_documents = request.POST['max_documents']
+        
+    except:
+        max_documents = 10
+
+    max_documents = 2500
+
+    #Initialize the Pdf to be written
+    
+    output = PdfFileMerger()
+
+    #Creating a list to divide the output in various files before merging them in one, for memory purposes
+    
+    output_temp_documents_created = []
+
+
+    title_string = "GrandeLivre Corpus Report\n"
+
+    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+
+    
+    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+
+    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+    tmpfile.rollover()
+
+            
+    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+
+    string_to_pdf(the_canvas,title_string+title_date)
+
+           
+    the_canvas.save()
+    input1 = PdfFileReader(tmpfile)
+
+     
+    output.append(input1)
+
+    #output.append(input1)
+    
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    
+
+    temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+
+    output.write(temp_filename)
+
+    output_temp_documents_created.append(temp_filename)
+
+    output = PdfFileMerger()
+
+    
+    corpus_common_final = PdfRecord.objects.none()
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    doc_iterator = exhibit_count - 1
+    pdf_string = ""
+
+               
+
+    corpus_common_final = InternalRecord.objects.all().order_by('Year','Month','Day')
+
+    corpus_common_final = corpus_common_final[:max_documents]
+
+    
+    
+    did_page_jump = False
+    
+    with transaction.commit_on_success():
+        for selected_entry_item in corpus_common_final:
+    
+            created_page = False
+        
+            if doc_iterator % 100 == 0 and doc_iterator != 0:
+                
+                if did_page_jump == False:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+                
+                
+
+                print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
+                
+                temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                corpus_doccount += 1
+                output.write(temp_filename)
+                output_temp_documents_created.append(temp_filename)
+                
+                output = PdfFileMerger()
+                
+                created_page = True
+                
+                db.reset_queries()
+                
+
+            print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
+        
+
+            #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+            
+            corpus_include_fields = ["InternalRecordIndex","BestTransactionMatch","IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["InternalRecordIndex","BestTransactionMatch","IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
+
+
+            #Not making cut, because the entry is already decided upon
+            
+            corpus_final = PdfRecord.objects.filter(pk = selected_entry_item.pk)
+            
+
+            for record in corpus_final:
+                
+                 
+                
+                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                
+                for field_name in corpus_include_fields:
+                    
+                    try:
+                        field_content = str(getattr(record, field_name))
+                    except:
+                        field_content = ""
+                    
+                    
+                    try:
+                        
+                        try:
+                            
+                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                                test_string = "\n"
+                                test_string2 = ".              -"
+                            else:
+                                test_string = ""
+                                test_string2 = ""
+                            
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" :
+                                pdf_string += " "+test_string+test_string2+field_name+" "+field_content
+                              
+                        except:
+                            test_string = ""
+                        
+                    except:
+                        pdf_string += " "
+                        
+                
+                '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                if pdf_string.count('\n') > 53:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+
+                    did_page_jump = True
+                    
+                exhibit_count += 1
+                doc_iterator = exhibit_count - 1
+        
+        
+        
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+      
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+        string_to_pdf(the_canvas,pdf_string)
+               
+        the_canvas.save()
+        
+        input1 = PdfFileReader(tmpfile)
+        
+        output.append(input1)
+       
+        
+        '''Write command to finish and save new page'''
+    
+
+    try:
+
+        temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        corpus_doccount += 1
+        output.write(temp_filename)
+        output_temp_documents_created.append(temp_filename)
+        
+        output = PdfFileMerger()
+        
+        db.reset_queries()
+        
+    except:
+    
+        print "empty"
+
     
 
 def merge_corpus_output(request,watermark_name):
@@ -1709,7 +1960,7 @@ def merge_corpus_output(request,watermark_name):
     return response
     
 def download_file_output(request,watermark_name):
-    print "GOTCHA1"
+
     try:
         corpus_to_include = request.POST["selected_corpus_mark"]
     except:
@@ -1724,33 +1975,33 @@ def download_file_output(request,watermark_name):
 
     file_to_include = str(file_to_include)
         
-    print "GOTCHA2"
+
     final_output = PdfFileMerger()
-    print file_to_include
+
     
     outputStream = StringIO()
     
-    print "GOTCHA3"
+
     partial_filename = "legaldiscoverytemp/output_files/"+str(file_to_include)
     
-    print "GOTCHA4"
+
     final_output.append(PdfFileReader(file(partial_filename, 'rb')))
     
-    print "GOTCHA5"
+
     final_output.write(outputStream)
 
 
     ###
-    print "GOTCHA6"
+
     ##If .pdf instead
     response = HttpResponse(mimetype="application/pdf")
-    print "GOTCHA7"
+
     response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files/'+str(file_to_include)
-    print "GOTCHA8"
+
 
     ##If .pdf instead, this line is necessary:
     response.write(outputStream.getvalue())
-    print "GOTCHA9"
+
     return response
     
     
