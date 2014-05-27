@@ -165,7 +165,8 @@ def randomqa_spider(request):
         pdf_test_item4 = pdf_records_list.count()
         if selected_company != "all":
    
-            company_selected = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
+            #company_selected = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
+            company_selected = Group.objects.get(name = selected_company)
         
             pdf_records_list = pdf_records_list.filter(EntryByCompany = company_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
 
