@@ -161,8 +161,8 @@ def randomqa_spider(request):
             
             pdf_records_list = pdf_records_list.filter(EntryAuthor = user_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
  
-        pdf_test_item3 = selected_company    
-        pdf_test_item4 = pdf_records_list.count()
+           
+        
         if selected_company != "all":
    
             #company_selected = Group.objects.exclude(name="NathanTeam").exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="INVENSIS")
@@ -170,7 +170,7 @@ def randomqa_spider(request):
         
             pdf_records_list = pdf_records_list.filter(EntryByCompany = company_selected).values('ocrrecord_link','sourcedoc_link','sourcedoc_link__job_directory','sourcedoc_link__filename','id','audit_mark_saved','audit_mark_revision','EntryByCompany','AssignedLotNumber','EntryAuthor').order_by()
 
-        pdf_test_item5 = pdf_records_list.count()
+        
         pdf_doctype_distinct = PdfRecord.objects.none()
         
         #Delete this line to deactivate selection by Entered Document Types
@@ -193,7 +193,7 @@ def randomqa_spider(request):
         pdf_records_list = pdf_records_list.filter(audit_mark_saved="save_audited_entry").distinct()
         
         pdf_records_list = pdf_records_list.exclude(audit_mark = "auditmarked_confirmed_reassignment").exclude(audit_mark = "duplicatemarked_reentered")
-        pdf_test_item6 = pdf_records_list.count()
+      
         #Compare the Time to the selected TimeFrame in Filter
         
         enddate = datetime.datetime.now()
@@ -356,7 +356,7 @@ def randomqa_spider(request):
         
 
         pdf_records_list = pdf_authors_list
-        pdf_test_item7 = pdf_records_list.count()
+        
         if selected_auditmark == "all":
             
             #pdf_records_list = pdf_records_list.exclude(audit_mark="auditmarked_as_correct").exclude(audit_mark="auditmarked_as_incorrect").exclude(audit_mark="auditmarked_as_incorrect_reentry").exclude(audit_mark="auditmarked_as_selection_reentry").exclude(audit_mark="auditmarked_confirmed_reassignment")
@@ -372,14 +372,12 @@ def randomqa_spider(request):
             
         
         pdf_id_list_to_randomize = []
-        pdf_test_item8 = "untouched"
-        pdf_test_item9 = "untouched"
+        
         if len(pdf_records_list) > 0:
         
             
             pdf_random_item = random.choice(pdf_records_list)
-            pdf_test_item8 = pdf_records_list.count()
-            pdf_test_item9 = "With content"
+            
             pdf_item_list = PdfRecord.objects.filter(id=pdf_random_item['id'])
             '''pdf_random_source = pdf_random_item.sourcedoc_link
             pdf_random_company = pdf_random_item.ocrrecord_link.OcrByCompany
@@ -396,20 +394,16 @@ def randomqa_spider(request):
         
             pdf_item_list = PdfRecord.objects.none()
             pdf_random_item = pdf_item_list
-            pdf_test_item8 = pdf_records_list.count()
-            pdf_test_item9 = "No content"
+       
       
         if len(pdf_item_list)>1:
             pdf_item_list = pdf_item_list.order_by('-modification_date')
        
        
-        pdf_test_item = pdf_random_item
-        pdf_test_item2 = pdf_item_list
+  
  
        
-        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,'pdf_test_item':pdf_test_item,'pdf_test_item2':pdf_test_item2,'pdf_test_item3':pdf_test_item3,
-        'pdf_test_item4':pdf_test_item4,'pdf_test_item5':pdf_test_item5,'pdf_test_item6':pdf_test_item6,'pdf_test_item7':pdf_test_item7,'pdf_test_item8':pdf_test_item8,
-        'pdf_test_item9':pdf_test_item9,
+        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
         'error_rate':error_rate,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
