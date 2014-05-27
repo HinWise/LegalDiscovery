@@ -397,7 +397,9 @@ def randomqa_spider(request):
             pdf_item_list = pdf_item_list.order_by('-modification_date')
        
        
-        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,
+        pdf_test_item = pdf_random_item
+       
+        context = {'user_type':user_type,'pdf_random_item':pdf_random_item,'pdf_test_item':pdf_test_item,
         'pdf_item_list':pdf_item_list,"lot_number":lot_number_check,
         'error_rate':error_rate,'show_progress_mark':show_progress_mark,
         'pdf_doctype_distinct':pdf_doctype_distinct,'modification_authors_list':modification_authors_list,
