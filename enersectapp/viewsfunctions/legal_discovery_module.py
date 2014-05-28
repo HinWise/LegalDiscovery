@@ -978,6 +978,8 @@ def document_corpus_maker():
     
     all_documents = os.listdir('legaldiscoverytemp/output_files/')
     
+    all_documents = sorted(all_documents)
+    
     document_corpus_list = []
     
     icr_corpus_dict = {}
