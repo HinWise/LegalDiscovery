@@ -1896,6 +1896,8 @@ def merge_corpus_output(request,watermark_name):
         
     file_list = os.listdir('legaldiscoverytemp/output_files/')
 
+    file_list = sorted(file_list)
+    
     final_output = PdfFileMerger()
     
 
