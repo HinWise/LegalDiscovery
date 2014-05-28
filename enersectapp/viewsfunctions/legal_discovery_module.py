@@ -406,7 +406,9 @@ def legal_discovery(request):
         
         
                             ## Loop to have a list of all files in the folder, and delete all the .pdfs
-                                
+                            
+                            
+                            
                             file_list = os.listdir('legaldiscoverytemp/output_files/')#os.chdir('legaldiscoverytemp/output_files')
                             
                             for item in file_list:
@@ -976,9 +978,18 @@ def legal_discovery(request):
 
 def document_corpus_maker():
     
-    all_documents = os.listdir('legaldiscoverytemp/output_files/')
+    corpus_list = ["icr","sourcepdfs","grandelivre"]
+    
+    all_documents = []
+    
+    for corpus_type in corpus_list:
+    
+        temp_documents = os.listdir('legaldiscoverytemp/output_files/'+corpus_type+"/")
+        all_documents.extend(temp_documents)
     
     all_documents = sorted(all_documents)
+    
+    print all_documents
     
     document_corpus_list = []
     
@@ -1269,7 +1280,7 @@ def generate_icr_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/icr__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -1341,7 +1352,7 @@ def generate_icr_output(request,watermark_name):
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1455,7 +1466,7 @@ def generate_icr_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1512,7 +1523,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/sourcepdfs__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
     
     output.write(temp_filename)
     
@@ -1565,7 +1576,7 @@ def generate_sourcepdfs_output(request,watermark_name):
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1643,7 +1654,7 @@ def generate_sourcepdfs_output(request,watermark_name):
    
     try:
     
-        temp_filename = "legaldiscoverytemp/output_files/sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1706,7 +1717,7 @@ def generate_grandelivre_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -1737,7 +1748,7 @@ def generate_grandelivre_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 100 == 0 and doc_iterator != 0:
+            if doc_iterator % 500 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1761,7 +1772,7 @@ def generate_grandelivre_output(request,watermark_name):
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1784,7 +1795,7 @@ def generate_grandelivre_output(request,watermark_name):
 
             #Not making cut, because the entry is already decided upon
             
-            corpus_final = PdfRecord.objects.filter(pk = selected_entry_item.pk)
+            corpus_final = InternalRecord.objects.filter(pk = selected_entry_item.pk)
             
 
             for record in corpus_final:
@@ -1812,7 +1823,7 @@ def generate_grandelivre_output(request,watermark_name):
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" :
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
                                 pdf_string += " "+test_string+test_string2+field_name+" "+field_content
                               
                         except:
@@ -1872,7 +1883,7 @@ def generate_grandelivre_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1895,42 +1906,44 @@ def merge_corpus_output(request,watermark_name):
         corpus_to_include = ""
 
     corpus_to_include = str(corpus_to_include)
-        
-    file_list = os.listdir('legaldiscoverytemp/output_files/')
 
+    print "Debug1"
+    file_list = os.listdir('legaldiscoverytemp/output_files/'+corpus_to_include+'/')
+    print "Debug2"
     file_list = sorted(file_list)
-    
+    print "Debug3"
     final_output = PdfFileMerger()
-    
+    print "Debug4"
 
-    partial_filename = "legaldiscoverytemp/output_files/"+str(corpus_to_include)+"__"+str(watermark_name)+"__cover__0000001.pdf"
+    partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+str(corpus_to_include)+"__"+str(watermark_name)+"__cover__0000001.pdf"
     
-
+    print "Debug45"
     final_output.append(PdfFileReader(file(partial_filename, 'rb')))
     
-
+    print "Debug5"
     partial_output = PdfFileMerger()
-
+    print "Debug6"
     outputStream = StringIO()
 
 
     #final_output.append(PdfFileReader(temp_outputStream))
     
     count = 0
-    
+    print "Debug7"
     for filename in file_list:
-        print "---->"+str(filename)   
+        print "---->"+str(filename)
+                  
         #final_output.append(PdfFileReader(temp_output_item))
         if corpus_to_include in filename and "partial" in filename:
-
-            partial_filename = "legaldiscoverytemp/output_files/"+filename
+            print "---->"+str(corpus_to_include) 
+            partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+filename
             partial_output.append(PdfFileReader(file(partial_filename, 'rb')))
 
             count += 1
    
-    #To isolate the generated report for the ICR corpus
-
-    partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count)+"_files.pdf"
+    #To isolate the generated report for the selected corpus
+    print "Debug8"
+    partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count)+"_files.pdf"
 
     partial_output.write(partial_filename)
 
@@ -1942,10 +1955,10 @@ def merge_corpus_output(request,watermark_name):
 
     ##
     
-    myZipFile = shutil.make_archive("legaldiscoverytemp/output_files_final/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count+1)+"_files", "zip", "legaldiscoverytemp/output_files")
+    myZipFile = shutil.make_archive("legaldiscoverytemp/output_files_final/"+corpus_to_include+"/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count+1)+"_files", "zip", "legaldiscoverytemp/output_files"+"/"+corpus_to_include)
     #myZipFile.write(outputStream)
 
-    test_file = open("legaldiscoverytemp/output_files_final/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count+1)+"_files.zip", "rb")
+    test_file = open("legaldiscoverytemp/output_files_final/"+corpus_to_include+"/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count+1)+"_files.zip", "rb")
 
     ###
     
@@ -1957,7 +1970,7 @@ def merge_corpus_output(request,watermark_name):
 
     title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
     
-    response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files_final/'+corpus_to_include+'__'+str(watermark_name)+'__'+str(count+1)+'_files_report__%s.zip' %(title_date)
+    response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files_final/'+corpus_to_include+'/'+corpus_to_include+'__'+str(watermark_name)+'__'+str(count+1)+'_files_report__%s.zip' %(title_date)
 
     ##If .pdf instead, this line is necessary:
     #response.write(outputStream.getvalue())
@@ -1986,7 +1999,7 @@ def download_file_output(request,watermark_name):
     outputStream = StringIO()
     
 
-    partial_filename = "legaldiscoverytemp/output_files/"+str(file_to_include)
+    partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+str(file_to_include)
     
 
     final_output.append(PdfFileReader(file(partial_filename, 'rb')))
@@ -2000,7 +2013,7 @@ def download_file_output(request,watermark_name):
     ##If .pdf instead
     response = HttpResponse(mimetype="application/pdf")
 
-    response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files/'+str(file_to_include)
+    response['Content-Disposition'] = 'attachment; filename=legaldiscoverytemp/output_files/'+corpus_to_include+'/'+str(file_to_include)
 
 
     ##If .pdf instead, this line is necessary:
@@ -2015,6 +2028,13 @@ def create_instance_watermark(request,watermark_name):
     
     delete_temp_affidavit_files("all","all")
     
+    AffidavitInstance.objects.all().delete()
+    
+    new_AffidavitInstance = AffidavitInstance()
+    new_AffidavitInstance.watermark_name = new_watermark
+    
+    new_AffidavitInstance.save()
+    
     return new_watermark
     
 def affidavit_watermark_everything(corpus_common_final):
@@ -2026,20 +2046,33 @@ def affidavit_watermark_everything(corpus_common_final):
     
 def delete_temp_affidavit_files(corpus,partial_or_merge):
 
-    file_list = os.listdir('legaldiscoverytemp/output_files/')#os.chdir('legaldiscoverytemp/output_files')
+    corpus_list = ["icr","sourcepdfs","grandelivre"]
+
+    file_list = []
     
+    if corpus == "all":
+    
+        for corpus_type in corpus_list:
+            print corpus_type
+            temp_list = os.listdir('legaldiscoverytemp/output_files/'+corpus_type+"/")#os.chdir('legaldiscoverytemp/output_files')
+            file_list.extend(temp_list)
+    
+    else:
+    
+        file_list = os.listdir('legaldiscoverytemp/output_files/'+corpus+"/")#os.chdir('legaldiscoverytemp/output_files')
+        
     for item in file_list:
     
         to_remove = False
-    
+
         if partial_or_merge == "all":
             
                 to_remove = True
-    
+
         if ".pdf" in str(item):
-        
+
             if corpus in str(item):
-            
+
                 if partial_or_merge == "partial":
                 
                     if "partial" in str(item):
@@ -2061,17 +2094,32 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
 
             if to_remove == True:    
         
-                try:
-                    os.remove('legaldiscoverytemp/output_files/'+str(item))    
-                except:
-                    print "Not in that folder"
-                    
-                    try:
-                        os.remove('legaldiscoverytemp/output_files_final/'+str(item))    
-                    except:
-                        "Not in that folder"
+                if corpus == "all":
+                    for corpus_type in corpus_list:
+            
+                        try:
+                            os.remove('legaldiscoverytemp/output_files/'+corpus_type+'/'+str(item))    
+                        except:
+                            print "Not in that folder"
+                            
+                            try:
+                                os.remove('legaldiscoverytemp/output_files_final/'+corpus_type+'/'+str(item))    
+                            except:
+                                "Not in that folder"
                             
 
+                else:
+
+                    try:
+                        os.remove('legaldiscoverytemp/output_files/'+corpus+'/'+str(item))    
+                    except:
+                        print "Not in that folder"
+                            
+                        try:
+                            os.remove('legaldiscoverytemp/output_files_final/'+corpus+'/'+str(item))    
+                        except:
+                            "Not in that folder"
+                            
     
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
