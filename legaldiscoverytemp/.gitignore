@@ -1,4 +1,6 @@
 *.pdf
 *.zip
 *.tar
+*.odt
+*.doc
 /source_docs

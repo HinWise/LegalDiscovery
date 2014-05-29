@@ -4,4 +4,6 @@
 *.rar
 *.json
 *.pyc
+*.odt
+*.doc
 nathansqlite3db
