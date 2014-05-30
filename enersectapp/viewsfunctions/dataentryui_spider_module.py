@@ -74,7 +74,8 @@ def dataentryui_spider(request):
 
         count_assigned = sourcepdfs_list.count()
 
-        count_done = sourcepdfs_list.filter(assigndata__checked="checked",assigndata__assigneduser=the_user).count()
+        #count_done = sourcepdfs_list.filter(assigndata__checked="checked",assigndata__assigneduser=the_user).count()
+        count_done = PdfRecord.objects.filter(EntryAuthor=the_user).count()
         
         sourcepdfs_handles_list = SourcePdfToHandle.objects.filter(assigneduser=the_user).exclude(checked="checked")[:1]
         
