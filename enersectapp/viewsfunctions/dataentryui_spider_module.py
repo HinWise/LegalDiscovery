@@ -27,7 +27,7 @@ def dataentryui_spider(request):
         
         
     the_user = request.user
-    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic").exclude(name="Arabic")[0]
+    user_group = the_user.groups.all().exclude(name="TeamLeaders").exclude(name="Auditors").exclude(name="TeamAuditors").exclude(name="Arabic")[0]
     
     types_list = {}
     
