@@ -1390,6 +1390,20 @@
                                     <td><input type="text" class="extract_item" name="selected_fieldtype_piecenum" id="selected_fieldtype_piecenum" value="" /></td>
                                 </tr>
                                 <tr>
+                                    <th>Receiver</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td fieldtype="receiver" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Receiver}}</td>
+                                    {% endfor %}
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_receiver" id="selected_fieldtype_receiver" value="" /></td>
+                                </tr>
+                                <tr>
+                                    <th>Sender</th>
+                                    {% for pdf_item in pdf_item_list %}
+                                    <td fieldtype="sender" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.Sender}}</td>
+                                    {% endfor %}
+                                    <td><input type="text" class="extract_item" name="selected_fieldtype_sender" id="selected_fieldtype_sender" value="" /></td>
+                                </tr>
+                                <tr>
                                     <th>Contains Arabic</th>
                                     {% for pdf_item in pdf_item_list %}
                                     <td fieldtype="arabic" class="doubleclick" table_id="{{pdf_item.id}}">{{pdf_item.ocrrecord_link.ContainsArabic}}</td>

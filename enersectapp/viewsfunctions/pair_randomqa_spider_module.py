@@ -264,12 +264,12 @@ def pair_randomqa_spider(request):
             chequenum = "NoChequeNumberField"
             
         try:
-            receiver = request.POST['receiver']
+            receiver = request.POST['selected_fieldtype_receiver']
         except:
             receiver = "NoReceiverField"
             
         try:
-            sender = request.POST['sender']
+            sender = request.POST['selected_fieldtype_sender']
         except:
             sender = "NoSenderField"
         ###
@@ -939,12 +939,12 @@ def pair_randomqa_spider(request):
                     chequenum = "NoChequeNumberField"
             
                 try:
-                    receiver = request.POST['receiver']
+                    receiver = request.POST['selected_fieldtype_receiver']
                 except:
                     receiver = "NoReceiverField"
                     
                 try:
-                    sender = request.POST['sender']
+                    sender = request.POST['selected_fieldtype_sender']
                 except:
                     sender = "NoSenderField"
             
