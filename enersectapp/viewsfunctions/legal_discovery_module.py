@@ -2366,7 +2366,52 @@ def generate_transactions_output(request,watermark_name):
                                 test_string4 = ""
                             
                             if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                                
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
+                                
+                                if pdf_string.count('\n') > 50:
+                
+                                    pdf_string += '\n'
+                    
+                                    pdf_string_templist = pdf_string.split('\n')
+                                    pdf_string = ""
+                                    pdf_string_temp = ""
+                
+                                    iterator_index = 0
+                                    iterator_set = 0
+                                    
+                                    
+                                    for list_element in pdf_string_templist:
+                
+                                        iterator_index += 1
+                                        iterator_set += 1
+                                        pdf_string_temp += list_element
+                                        pdf_string_temp += '\n'
+                                        
+                                        if iterator_set > 50 or iterator_index == len(pdf_string_templist)+1:
+                                            
+                                            iterator_set = 0
+                                        
+                                            tmpfile = tempfile.SpooledTemporaryFile(1048576)
+                                
+                                            # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                                            tmpfile.rollover()
+                                          
+                                            the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                                            string_to_pdf(the_canvas,pdf_string_temp)
+                                                   
+                                            the_canvas.save()
+                                            
+                                            input1 = PdfFileReader(tmpfile)
+                                            
+                                            output.append(input1)
+                                            
+                                            pdf_string_temp = ""
+                                            
+                                            
+
+                                            did_page_jump = True
+                                
                               
                         except:
                             test_string = ""
@@ -2380,7 +2425,7 @@ def generate_transactions_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 45:
+                '''if pdf_string.count('\n') > 45:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -2398,7 +2443,7 @@ def generate_transactions_output(request,watermark_name):
                     
                     pdf_string = ""
 
-                    did_page_jump = True
+                    did_page_jump = True'''
                     
                 exhibit_count += 1
                 doc_iterator = exhibit_count - 1

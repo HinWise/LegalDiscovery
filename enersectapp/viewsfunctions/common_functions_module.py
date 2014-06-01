@@ -15,7 +15,7 @@ import datetime
 
 def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
-    memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
+    memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,receiver,sender,page_number,accountnum,chequenum,
     the_user):
  
 
@@ -90,11 +90,11 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
     
     if(doctype == "blank"):
         
-        new_ocr = OcrRecord(Amount="Blank",Currency="Blank",Company="Blank",Address="Blank",City="Blank",Country="Blank",Telephone="Blank",Source_Bank_Account="Blank",Document_Type="Blank",IssueDate="Blank",Day="Blank",Month="Blank",Year="Blank",ContainsArabic="Blank",Blank="Blank",Notes="Blank",Unreadable="Blank",Document_Number="Blank",PurchaseOrder_Number="Blank",Piece_Number="Blank",Page_Number="Blank",Translation_Notes = "Blank",Cheque_Number = "Blank")
+        new_ocr = OcrRecord(Amount="Blank",Currency="Blank",Company="Blank",Address="Blank",City="Blank",Country="Blank",Telephone="Blank",Source_Bank_Account="Blank",Document_Type="Blank",IssueDate="Blank",Day="Blank",Month="Blank",Year="Blank",ContainsArabic="Blank",Blank="Blank",Notes="Blank",Unreadable="Blank",Document_Number="Blank",PurchaseOrder_Number="Blank",Piece_Number="Blank",Receiver="Blank",Sender="Blank",Page_Number="Blank",Translation_Notes = "Blank",Cheque_Number = "Blank")
         company_link = CompanyTemplate.objects.get(companyname_base="ControlCompanyTemplate")
     
     else:
-        new_ocr = OcrRecord(Amount=amount,Currency=currency,Company=company_name,Address=company_address,City=company_city,Country=company_country,Telephone=company_telephone,Source_Bank_Account=accountnum,Document_Type=doctype,IssueDate=issuedate,Day=issuedate_day,Month=issuedate_month,Year=issuedate_year,ContainsArabic=arabic,Blank="none",Document_Number=docnumber,Notes=memo,Unreadable="no",PurchaseOrder_Number=purch_order_num,Piece_Number=piece_number,Page_Number=page_number,Translation_Notes = translation_memo,Cheque_Number = chequenum)
+        new_ocr = OcrRecord(Amount=amount,Currency=currency,Company=company_name,Address=company_address,City=company_city,Country=company_country,Telephone=company_telephone,Source_Bank_Account=accountnum,Document_Type=doctype,IssueDate=issuedate,Day=issuedate_day,Month=issuedate_month,Year=issuedate_year,ContainsArabic=arabic,Blank="none",Document_Number=docnumber,Notes=memo,Unreadable="no",PurchaseOrder_Number=purch_order_num,Piece_Number=piece_number,Receiver=receiver,Sender=sender,Page_Number=page_number,Translation_Notes = translation_memo,Cheque_Number = chequenum)
         
     
     try:

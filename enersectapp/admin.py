@@ -96,9 +96,9 @@ class PdfRecordAdmin(admin.ModelAdmin):
 class OcrRecordAdmin(admin.ModelAdmin):
     fieldsets = [
     ("Main Details",               {'fields': ['Amount', 'Company','IssueDate','Day','Month','Year','Document_Type']}),
-    ("Extra Details",               {'fields': ['Currency', 'Address','City','Telephone','Country','Source_Bank_Account','PurchaseOrder_Number','Document_Number','Piece_Number','Page_Number']}),
+    ("Extra Details",               {'fields': ['Currency', 'Address','City','Telephone','Country','Source_Bank_Account','PurchaseOrder_Number','Document_Number','Piece_Number','Receiver','Sender','Page_Number']}),
     ("Tech Details",               {'fields': ['ContainsArabic','Blank','Notes','Unreadable','OcrByCompany','OcrAuthor','OcrCreationDate']}),]
-    list_display = ('Document_Number','Amount','Company','Document_Type','OcrByCompany','OcrAuthor','OcrCreationDate', 'IssueDate','id','Source_Bank_Account','Page_Number','Piece_Number','Translation_Notes')
+    list_display = ('Document_Number','Amount','Company','Document_Type','OcrByCompany','OcrAuthor','OcrCreationDate', 'IssueDate','id','Source_Bank_Account','Page_Number','Piece_Number','Receiver','Sender','Translation_Notes')
     
    
     search_fields = ['Document_Number','Amount','Company','IssueDate','=Document_Type','OcrByCompany__name','OcrAuthor__username']

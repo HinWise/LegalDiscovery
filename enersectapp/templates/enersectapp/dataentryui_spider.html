@@ -1315,6 +1315,172 @@
                 });
             }
             
+            //RECEIVER Menu Config
+
+            var receiver = $( "#receiver" );
+            
+            if(receiver.length)
+            {
+            
+                allFields.add(receiver);
+                
+                
+                
+                
+                $( "#receivermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#receivermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            
+                            $(".receiveroption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.receiveroption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#receiver').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#receiverlink').text("Receiver: " + new_text);
+                      $('#receiver').attr("value",new_text);
+                      $('#receiver').val(new_text);
+                      
+                        $("#receivermenu").addClass("ui-state-custom-error");
+
+                        
+                    $('#receiver').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                
+                
+                $('#receivermenu').removeClass('ui-menu-divider');
+                
+                $('#receiver').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#receivermenu").unbind('keydown');
+                
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                    
+                    var new_value = event.currentTarget.value;
+                    $('#receiverlink').text("Receiver: " + new_value);
+                    $(this).attr("value",new_value);
+                                                    
+                    
+                    
+                    if ($("#receivermenu").hasClass("ui-state-custom-filled"))
+                    {
+                        $("#receivermenu").removeClass("ui-state-custom-filled");
+                    }
+                    
+                    if(new_value.length > 0)
+                    {
+                        $("#receivermenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#receivermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                        {
+                            $("#receivermenu").removeClass("ui-state-custom-error");
+                        }
+                    }
+                    }); 
+                });
+            }
+            
+            //SENDER Menu Config
+
+            var sender = $( "#sender" );
+            
+            if(sender.length)
+            {
+            
+                allFields.add(sender);
+                
+                
+                
+                
+                $( "#sendermenu" ).menu({ position: { my: "left top", at: "left top+30" },
+                    select: function( event, ui ) {
+                                            
+                        var first_elem = ui.item.parent().is($( "#sendermenu" ));
+                        
+                        if(!first_elem)
+                        {
+                            
+                            var new_text = ui.item.text();
+                            
+                            $(".senderoption[value='"+new_text+"']").click();
+                        } 
+                    } 
+                });
+                
+                $('.senderoption').click(function(){
+                
+                    var new_text = $(this).text();
+                
+                    $('#sender').unbind('copy paste', function (e) {
+                                    
+                    });
+                            
+                      $('#senderlink').text("Sender: " + new_text);
+                      $('#sender').attr("value",new_text);
+                      $('#sender').val(new_text);
+                      
+                        $("#sendermenu").addClass("ui-state-custom-error");
+
+                        
+                    $('#sender').bind('copy paste', function (e) {
+                            e.preventDefault();
+                    });
+                });
+                
+                
+                
+                $('#sendermenu').removeClass('ui-menu-divider');
+                
+                $('#sender').unbind('click').click(function(event) {
+                event.stopPropagation();
+                $(this).unbind('focus').focus();
+                $("#sendermenu").unbind('keydown');
+                
+                $(this).unbind('focusout').focusout(function(event) {
+                                              
+                    
+                    var new_value = event.currentTarget.value;
+                    $('#senderlink').text("Sender: " + new_value);
+                    $(this).attr("value",new_value);
+                                                    
+                    
+                    
+                    if ($("#sendermenu").hasClass("ui-state-custom-filled"))
+                    {
+                        $("#sendermenu").removeClass("ui-state-custom-filled");
+                    }
+                    
+                    if(new_value.length > 0)
+                    {
+                        $("#sendermenu").addClass("ui-state-custom-filled");
+                        
+                        if ($("#sendermenu").hasClass("ui-state-custom-error") && new_value != "MISSING" && new_value != "UNREADABLE" )
+                        {
+                            $("#sendermenu").removeClass("ui-state-custom-error");
+                        }
+                    }
+                    }); 
+                });
+            }
+            
             //PAGE NUMBER Menu Config
 
             var pagenumber = $( "#pagenumber" );
@@ -2008,6 +2174,16 @@
                                 bValid = bValid && checkRegexp( piecenumber,  /^([jc]{2}[3-50]{1,2})$|^([0-9]{1,4})$/i, "Piece Number may consist of 1 to 4 numbers or, in exceptional cases, the letters 'jc' plus 1 to 4 digits." );
                                 bValid = bValid && checkRange( piecenumber,[1,4341],"Incorrect Range: Piece Number must be in the range from 1 to 4341.");
                             }
+                            if(receiver.length)
+                            {
+                                bValid = bValid && checkLength( receiver, "Receiver", 1, 255  );
+                                
+                            }
+                            if(sender.length)
+                            {
+                                bValid = bValid && checkLength( sender, "Sender", 1, 255  );
+                               
+                            }
                             if(pagenumber.length)
                             {
                                 bValid = bValid && checkLength( pagenumber, "Page Number", 1, 255  );
@@ -2538,6 +2714,9 @@
                           <li><a href="#">Journal de Paie</a></li>
                           {% endif %}
                           {% if user_group = "NathanTeam" or user_group = "FlatWorld" or user_group = "Enersect_Berlin" %}
+                          <li><a href="#">Letter</a></li>
+                          {% endif %}
+                          {% if user_group = "NathanTeam" or user_group = "FlatWorld" or user_group = "Enersect_Berlin" %}
                           <li><a href="#">Movement en Cours</a></li>
                           {% endif %}
                           {% if user_group = "INVENSIS" or user_group = "FlatWorld" or user_group = "Enersect" or user_group = "NathanTeam" %}
@@ -2728,7 +2907,7 @@
                 
                 <!-- ISSUE DATE -->
                 
-                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Journal de Paie" or document_type = "Teletec" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" or document_type = "Funds Transfer" or document_type = "Cheque Receipt" or document_type = "Virement" or document_type = "Bon a Payer" or document_type = "Remise de Cheques" or document_type = "Movement en Cours" or document_type = "Air Waybill" or document_type = "Bank Statement" or document_type = "Bon de Livraison" or document_type = "Catering" or document_type = "Email" or document_type = "Eni Tunisia" or document_type = "Fax" %}
+                {% if document_type = "Custom Generic Template" or document_type = "Cheque" or document_type = "Cheque Stub" or document_type = "Partial" or document_type = "Invoice/Facture" or document_type = "Receipt/Recu" or document_type = "Purchase Order/Bon de Commande" or document_type = "Contract Page 1" or document_type = "Purchase Order/Bon de Commande" or document_type = "Bulletin de Paie" or document_type = "Expense Claim" or document_type = "Avis de Credit" or document_type = "Avis de Debit" or document_type = "Journal de Paie" or document_type = "Teletec" or document_type = "Credit Note" or document_type = "Payment Order" or document_type = "Quittance" or document_type = "Quote" or document_type = "Phone Records" or document_type = "Funds Transfer" or document_type = "Cheque Receipt" or document_type = "Virement" or document_type = "Bon a Payer" or document_type = "Remise de Cheques" or document_type = "Movement en Cours" or document_type = "Air Waybill" or document_type = "Bank Statement" or document_type = "Bon de Livraison" or document_type = "Catering" or document_type = "Email" or document_type = "Eni Tunisia" or document_type = "Fax" or document_type = "Letter" %}
                 <label for="issuedate-day">Issue Date:</label>
                 <input type="text" name="issuedate" id="issuedate" class="invisible"/>
                 {% if document_type = "Custom Generic Template" %}
@@ -2861,6 +3040,56 @@
                           <li><a class="piecenumberoption" value="MISSING" href="#">MISSING</a></li>
                           <li>--</li>
                           <li><a class="piecenumberoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                              
+                {% endif %}
+                
+                <!-- RECEIVER -->
+                
+                {% if document_type = "Custom Generic Template" or document_type = "Letter" or document_type = "Fax" or document_type = "Email" %}
+                
+                <ul class="menuclass" id="receivermenu">
+                    <li>
+                        <a id="receiverlink" href="#">Receiver:</a>
+                        <ul>
+                        {% if document_type = "Custom Generic Template" %}
+                        <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Receiver here" name="receiver" id="receiver" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% else %}
+                        <li><a href="#"><input type="text" value="" placeholder="Write the Receiver here" name="receiver" id="receiver" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% endif %}
+                          
+                          <li>--</li>
+                          <li><a class="receiveroption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="receiveroption" value="UNREADABLE" href="#">UNREADABLE</a></li>
+                        </ul>
+                    </li>
+                    
+                </ul>
+                                              
+                {% endif %}
+                
+                <!-- SENDER -->
+                
+                {% if document_type = "Custom Generic Template" or document_type = "Letter" or document_type = "Fax" or document_type = "Email" %}
+                
+                <ul class="menuclass" id="sendermenu">
+                    <li>
+                        <a id="senderlink" href="#">Sender:</a>
+                        <ul>
+                        {% if document_type = "Custom Generic Template" %}
+                        <li><a href="#"><input type="text" value="MISSING" placeholder="Write the Sender here" name="sender" id="sender" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% else %}
+                        <li><a href="#"><input type="text" value="" placeholder="Write the Sender here" name="sender" id="sender" class="disablecopypaste menu_text text ui-widget-content ui-corner-all" /></a></li>
+                        {% endif %}
+                          
+                          <li>--</li>
+                          <li><a class="senderoption" value="MISSING" href="#">MISSING</a></li>
+                          <li>--</li>
+                          <li><a class="senderoption" value="UNREADABLE" href="#">UNREADABLE</a></li>
                         </ul>
                     </li>
                     

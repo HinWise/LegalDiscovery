@@ -263,11 +263,20 @@ def dataentryui_savedata(request):
         chequenum = request.POST['chequenum']
     except:
         chequenum = "NoChequeNumberField"
+     
+    try:
+        receiver = request.POST['receiver']
+    except:
+        receiver = "NoReceiverField"
         
+    try:
+        sender = request.POST['sender']
+    except:
+        sender = "NoSenderField"
     
     new_pdf = common_functions_module.save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_address,company_telephone,
     company_city,company_country,company_template,issuedate,issuedate_day,issuedate_month,issuedate_year,docnumber,
-    memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,page_number,accountnum,chequenum,
+    memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,receiver,sender,page_number,accountnum,chequenum,
     the_user)
     
     handle = new_pdf.sourcedoc_link.assigndata.get(assigneduser=the_user)
