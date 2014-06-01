@@ -978,7 +978,7 @@ def legal_discovery(request):
 
 def document_corpus_maker():
     
-    corpus_list = ["icr","sourcepdfs","grandelivre"]
+    corpus_list = ["icr","sourcepdfs","grandelivre","albaraka","transactions"]
     
     all_documents = []
     
@@ -999,6 +999,10 @@ def document_corpus_maker():
     sourcepdfs_corpus_contents_list = []
     grandelivre_corpus_dict = {}
     grandelivre_corpus_contents_list = []
+    albaraka_corpus_dict = {}
+    albaraka_corpus_contents_list = []
+    transactions_corpus_dict = {}
+    transactions_corpus_contents_list = []
     
     for file in all_documents:
         
@@ -1024,6 +1028,20 @@ def document_corpus_maker():
             
             grandelivre_corpus_contents_list.append(file_dict)
             
+        if "albaraka" in file:
+
+            file_dict["file_name"] = file
+            file_dict["downloaded"] = "Not Downloaded"
+            
+            albaraka_corpus_contents_list.append(file_dict)
+            
+        if "transactions" in file:
+
+            file_dict["file_name"] = file
+            file_dict["downloaded"] = "Not Downloaded"
+            
+            transactions_corpus_contents_list.append(file_dict)
+            
             
             
     icr_corpus_dict["corpus_name"] = "icr"
@@ -1035,9 +1053,17 @@ def document_corpus_maker():
     grandelivre_corpus_dict["corpus_name"] = "grandelivre"
     grandelivre_corpus_dict["corpus_contents"] = grandelivre_corpus_contents_list
     
+    albaraka_corpus_dict["corpus_name"] = "albaraka"
+    albaraka_corpus_dict["corpus_contents"] = albaraka_corpus_contents_list
+    
+    transactions_corpus_dict["corpus_name"] = "transactions"
+    transactions_corpus_dict["corpus_contents"] = transactions_corpus_contents_list
+    
     document_corpus_list.append(icr_corpus_dict)
     document_corpus_list.append(sourcepdfs_corpus_dict)
     document_corpus_list.append(grandelivre_corpus_dict)
+    document_corpus_list.append(albaraka_corpus_dict)
+    document_corpus_list.append(transactions_corpus_dict)
     
     
     return document_corpus_list 
@@ -1229,6 +1255,22 @@ def generate_corpus_output(request,watermark_name):
         delete_temp_affidavit_files("grandelivre","merge")
         
         generate_grandelivre_output(request,watermark_name)
+        
+    if "albaraka" in documents_corpus_to_include_in_output:
+        
+        delete_temp_affidavit_files("albaraka","cover")
+        delete_temp_affidavit_files("albaraka","partial")
+        delete_temp_affidavit_files("albaraka","merge")
+        
+        generate_albaraka_output(request,watermark_name)
+        
+    if "transactions" in documents_corpus_to_include_in_output:
+        
+        delete_temp_affidavit_files("transactions","cover")
+        delete_temp_affidavit_files("transactions","partial")
+        delete_temp_affidavit_files("transactions","merge")
+        
+        generate_transactions_output(request,watermark_name)
 
 
 def generate_icr_output(request,watermark_name):
@@ -1240,7 +1282,7 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 100000
+    max_documents = 2500
 
     #Initialize the Pdf to be written
     
@@ -1328,7 +1370,7 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 10000 == 0 and doc_iterator != 0:
+            if doc_iterator % 1000 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1489,7 +1531,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     except:
         max_documents = 10
     
-    max_documents = 2500
+    max_documents = 200
     
     #Initialize the Pdf to be written
     
@@ -1571,7 +1613,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             created_page = False
         
-            if doc_iterator % 500 == 0 and doc_iterator != 0:
+            if doc_iterator % 100 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1896,7 +1938,505 @@ def generate_grandelivre_output(request,watermark_name):
     
         print "empty"
 
+
+def generate_albaraka_output(request,watermark_name):
     
+    
+    try:
+        max_documents = request.POST['max_documents']
+        
+    except:
+        max_documents = 10
+
+    max_documents = 200
+
+    #Initialize the Pdf to be written
+    
+    output = PdfFileMerger()
+
+    #Creating a list to divide the output in various files before merging them in one, for memory purposes
+    
+    output_temp_documents_created = []
+
+
+    title_string = "AlBaraka Corpus Report\n"
+
+    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+
+    
+    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+
+    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+    tmpfile.rollover()
+
+            
+    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+
+    string_to_pdf(the_canvas,title_string+title_date)
+
+           
+    the_canvas.save()
+    input1 = PdfFileReader(tmpfile)
+
+     
+    output.append(input1)
+
+    #output.append(input1)
+    
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    
+
+    temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+
+    output.write(temp_filename)
+
+    output_temp_documents_created.append(temp_filename)
+
+    output = PdfFileMerger()
+
+    
+    corpus_common_final = BankRecord.objects.none()
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    doc_iterator = exhibit_count - 1
+    pdf_string = ""
+
+               
+
+    corpus_common_final = BankRecord.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
+
+    corpus_common_final = corpus_common_final[:max_documents]
+
+    
+    
+    did_page_jump = False
+    
+    with transaction.commit_on_success():
+        for selected_entry_item in corpus_common_final:
+    
+            created_page = False
+        
+            if doc_iterator % 50 == 0 and doc_iterator != 0:
+                
+                if did_page_jump == False:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+                
+                
+
+                print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
+                print "---------"+str("albaraka")+"--------"
+                
+                temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                corpus_doccount += 1
+                output.write(temp_filename)
+                output_temp_documents_created.append(temp_filename)
+                
+                output = PdfFileMerger()
+                
+                created_page = True
+                
+                db.reset_queries()
+                
+
+            print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
+        
+
+            #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+            
+            corpus_include_fields = ["BankRecordIndex","TransactionIndex","Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["BankRecordIndex","TransactionIndex","Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+
+
+            #Not making cut, because the entry is already decided upon
+            
+            corpus_final = BankRecord.objects.filter(pk = selected_entry_item.pk)
+            
+
+            for record in corpus_final:
+                
+                 
+                
+                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                
+                for field_name in corpus_include_fields:
+                    
+                    try:
+                        field_content = str(getattr(record, field_name))
+                    except:
+                        field_content = ""
+                    
+                    
+                    try:
+                        
+                        try:
+                            
+                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                                test_string = "\n"
+                                test_string2 = ".              -"
+                            else:
+                                test_string = ""
+                                test_string2 = ""
+                            
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                                pdf_string += " "+test_string+test_string2+field_name+" "+field_content
+                              
+                        except:
+                            test_string = ""
+                        
+                    except:
+                        pdf_string += " "
+                        
+                
+                '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                if pdf_string.count('\n') > 53:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+
+                    did_page_jump = True
+                    
+                exhibit_count += 1
+                doc_iterator = exhibit_count - 1
+        
+        
+        
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+      
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+        string_to_pdf(the_canvas,pdf_string)
+               
+        the_canvas.save()
+        
+        input1 = PdfFileReader(tmpfile)
+        
+        output.append(input1)
+       
+        
+        '''Write command to finish and save new page'''
+    
+
+    try:
+
+        temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        corpus_doccount += 1
+        output.write(temp_filename)
+        output_temp_documents_created.append(temp_filename)
+        
+        output = PdfFileMerger()
+        
+        db.reset_queries()
+        
+    except:
+    
+        print "empty"
+
+
+def generate_transactions_output(request,watermark_name):
+    
+    
+    print "Arrived Transactions Corpus"
+    
+    try:
+        max_documents = request.POST['max_documents']
+        
+    except:
+        max_documents = 10
+
+    max_documents = 200
+
+    #Initialize the Pdf to be written
+    
+    output = PdfFileMerger()
+
+    #Creating a list to divide the output in various files before merging them in one, for memory purposes
+    
+    output_temp_documents_created = []
+
+
+    title_string = "Transactions Corpus Report\n"
+
+    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+
+    
+    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+
+    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+    tmpfile.rollover()
+
+            
+    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+
+    string_to_pdf(the_canvas,title_string+title_date)
+
+           
+    the_canvas.save()
+    input1 = PdfFileReader(tmpfile)
+
+     
+    output.append(input1)
+
+    #output.append(input1)
+    
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    
+
+    temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+
+    output.write(temp_filename)
+
+    output_temp_documents_created.append(temp_filename)
+
+    output = PdfFileMerger()
+
+    
+    corpus_common_final = BankRecord.objects.none()
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    doc_iterator = exhibit_count - 1
+    pdf_string = ""
+
+               
+
+    corpus_common_final = TransactionTable.objects.all().order_by('CompleteValueDate','CompletePostDate','ValueYear')
+
+    corpus_common_final = corpus_common_final[:max_documents]
+
+    
+    
+    did_page_jump = False
+    
+    with transaction.commit_on_success():
+        for selected_entry_item in corpus_common_final:
+    
+            created_page = False
+        
+            if doc_iterator % 50 == 0 and doc_iterator != 0:
+                
+                if did_page_jump == False:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+                
+                
+
+                print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
+                print "---------"+str("transactions")+"--------"
+                
+                temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                corpus_doccount += 1
+                output.write(temp_filename)
+                output_temp_documents_created.append(temp_filename)
+                
+                output = PdfFileMerger()
+                
+                created_page = True
+                
+                db.reset_queries()
+                
+
+            print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
+        
+
+            #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
+            
+            corpus_include_fields = ["TransactionIndex","NumberBankRecordIndexes","BankRecordsListOriginalArray","NumberInternalRecordIndexes","InternalRecordListOriginalArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["TransactionIndex","NumberBankRecordIndexes","BankRecordsListOriginalArray","NumberInternalRecordIndexes","InternalRecordListOriginalArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+
+
+            #Not making cut, because the entry is already decided upon
+            
+            corpus_final = TransactionTable.objects.filter(pk = selected_entry_item.pk)
+            
+
+            for record in corpus_final:
+                
+                 
+                
+                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                
+                for field_name in corpus_include_fields:
+                    
+                    try:
+                        field_content = str(getattr(record, field_name))
+                    except:
+                        field_content = ""
+                    
+                    
+                    try:
+                        
+                        try:
+                            
+                            if field_name == "BankRecordsListOriginalArray" or field_name == "InternalRecordListOriginalArray":
+                            
+                                test_string = "\n"
+                                test_string2 = ".              -"
+                                test_string3 = ".                   -"
+                                test_string4 = test_string + test_string3
+                                
+                                records_list = field_content.split(",")
+                                
+                                field_content = ""
+                                
+                                records_count = 0
+                                
+                                line_break_count = 1
+                                
+                                temp_sum_line = 0
+                                
+                                for actual_record in records_list:
+                                
+                                    temp_sum_line = len(field_content) + len(actual_record)
+                                
+                                    #If length of string plus new content is greater than the line width with margin, introduce
+                                    #a new indented line
+                                
+                                    if temp_sum_line >= 80 * line_break_count:
+                                    
+                                        field_content += test_string4
+                                        line_break_count += 1
+                                    
+                                    field_content += str(actual_record)+","
+                                    
+                                    records_count += 1
+                                    
+                                
+                                field_content += test_string + test_string2
+                            
+                            elif (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                                test_string = "\n"
+                                test_string2 = ".              -"
+                                test_string4 = ""
+                            else:
+                                test_string = ""
+                                test_string2 = ""
+                                test_string4 = ""
+                            
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                                pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
+                              
+                        except:
+                            test_string = ""
+                        
+                    except:
+                        pdf_string += " "
+                        
+                
+                '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                if pdf_string.count('\n') > 45:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+
+                    did_page_jump = True
+                    
+                exhibit_count += 1
+                doc_iterator = exhibit_count - 1
+        
+        
+        
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+      
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+        string_to_pdf(the_canvas,pdf_string)
+               
+        the_canvas.save()
+        
+        input1 = PdfFileReader(tmpfile)
+        
+        output.append(input1)
+       
+        
+        '''Write command to finish and save new page'''
+    
+
+    try:
+
+        temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        corpus_doccount += 1
+        output.write(temp_filename)
+        output_temp_documents_created.append(temp_filename)
+        
+        output = PdfFileMerger()
+        
+        db.reset_queries()
+        
+    except:
+    
+        print "empty"        
 
 def merge_corpus_output(request,watermark_name):
 
@@ -1907,29 +2447,31 @@ def merge_corpus_output(request,watermark_name):
 
     corpus_to_include = str(corpus_to_include)
 
-    print "Debug1"
+
     file_list = os.listdir('legaldiscoverytemp/output_files/'+corpus_to_include+'/')
-    print "Debug2"
+
     file_list = sorted(file_list)
-    print "Debug3"
+
     final_output = PdfFileMerger()
-    print "Debug4"
+
 
     partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+str(corpus_to_include)+"__"+str(watermark_name)+"__cover__0000001.pdf"
     
-    print "Debug45"
+
     final_output.append(PdfFileReader(file(partial_filename, 'rb')))
     
-    print "Debug5"
+
     partial_output = PdfFileMerger()
-    print "Debug6"
+
     outputStream = StringIO()
 
-
+    #Line added to include the cover in the .zip file
+    partial_output.append(PdfFileReader(file(partial_filename, 'rb')))
+    
     #final_output.append(PdfFileReader(temp_outputStream))
     
     count = 0
-    print "Debug7"
+
     for filename in file_list:
         print "---->"+str(filename)
                   
@@ -1942,7 +2484,7 @@ def merge_corpus_output(request,watermark_name):
             count += 1
    
     #To isolate the generated report for the selected corpus
-    print "Debug8"
+
     partial_filename = "legaldiscoverytemp/output_files/"+corpus_to_include+"/"+corpus_to_include+"__"+str(watermark_name)+"__merge__"+str(count)+"_files.pdf"
 
     partial_output.write(partial_filename)
@@ -2046,7 +2588,7 @@ def affidavit_watermark_everything(corpus_common_final):
     
 def delete_temp_affidavit_files(corpus,partial_or_merge):
 
-    corpus_list = ["icr","sourcepdfs","grandelivre"]
+    corpus_list = ["icr","sourcepdfs","grandelivre","albaraka","transactions"]
 
     file_list = []
     
