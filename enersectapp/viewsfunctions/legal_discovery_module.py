@@ -1282,7 +1282,7 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 2500
+    max_documents = 100000
 
     #Initialize the Pdf to be written
     
@@ -1370,7 +1370,7 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 1000 == 0 and doc_iterator != 0:
+            if doc_iterator % 10000 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -2269,7 +2269,7 @@ def generate_transactions_output(request,watermark_name):
                     
                     output.append(input1)
                     
-                    pdf_string = ""
+                    #pdf_string = ""
                 
                 
 
@@ -2305,7 +2305,6 @@ def generate_transactions_output(request,watermark_name):
             for record in corpus_final:
                 
                  
-                
                 pdf_string += "Exhibit "+str(exhibit_count)+": "
                 
                 for field_name in corpus_include_fields:
@@ -2369,26 +2368,28 @@ def generate_transactions_output(request,watermark_name):
                                 
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
                                 
-                                if pdf_string.count('\n') > 50:
+                                if pdf_string.count('\n') >= 45:
                 
                                     pdf_string += '\n'
                     
                                     pdf_string_templist = pdf_string.split('\n')
-                                    pdf_string = ""
                                     pdf_string_temp = ""
                 
                                     iterator_index = 0
                                     iterator_set = 0
                                     
-                                    
+
                                     for list_element in pdf_string_templist:
-                
+
                                         iterator_index += 1
                                         iterator_set += 1
                                         pdf_string_temp += list_element
                                         pdf_string_temp += '\n'
                                         
-                                        if iterator_set > 50 or iterator_index == len(pdf_string_templist)+1:
+                                        
+                                        if iterator_set >= 45:
+                                            
+                                            pdf_string = ""
                                             
                                             iterator_set = 0
                                         
@@ -2407,8 +2408,6 @@ def generate_transactions_output(request,watermark_name):
                                             output.append(input1)
                                             
                                             pdf_string_temp = ""
-                                            
-                                            
 
                                             did_page_jump = True
                                 
