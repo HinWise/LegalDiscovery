@@ -2180,7 +2180,7 @@ def generate_transactions_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 200
+    max_documents = 1000000
 
     #Initialize the Pdf to be written
     
@@ -2238,7 +2238,7 @@ def generate_transactions_output(request,watermark_name):
 
                
 
-    corpus_common_final = TransactionTable.objects.all().order_by('CompleteValueDate','CompletePostDate','ValueYear')
+    corpus_common_final = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
 
     corpus_common_final = corpus_common_final[:max_documents]
 
@@ -2251,7 +2251,7 @@ def generate_transactions_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 50 == 0 and doc_iterator != 0:
+            if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -2364,32 +2364,53 @@ def generate_transactions_output(request,watermark_name):
                                 test_string2 = ""
                                 test_string4 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content !="XX/XX/XXXX":
                                 
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
                                 
-                                if pdf_string.count('\n') >= 45:
+                                if pdf_string.count('\n') >= 53:
                 
-                                    pdf_string += '\n'
+                                    pdf_string_count = pdf_string.count('\n')
+                
+                                    #pdf_string += '\n'
                     
                                     pdf_string_templist = pdf_string.split('\n')
                                     pdf_string_temp = ""
-                
+                                    
                                     iterator_index = 0
                                     iterator_set = 0
                                     
-
+                                    pdf_string = ""
+                                    
                                     for list_element in pdf_string_templist:
 
                                         iterator_index += 1
                                         iterator_set += 1
-                                        pdf_string_temp += list_element
-                                        pdf_string_temp += '\n'
                                         
+                                        #Control so it will never start the output of an Exhibit at the end of a page.
+                                        #Instead, it will skip it for the next page.
                                         
-                                        if iterator_set >= 45:
+                                        if iterator_set == len(pdf_string_templist):
+                                        
+                                            if "Exhibit" in list_element:
+
+                                                pdf_string = list_element
+                                                
+                                            else:    
+
+                                                pdf_string = ".              -"
                                             
-                                            pdf_string = ""
+                                            
+                                        else:
+  
+                                            pdf_string_temp += list_element
+                                            pdf_string_temp += '\n'
+                                                                          
+                                        #Include all the strings contained in the page
+                                        
+                                        if iterator_set == len(pdf_string_templist):
+                                            
+                                            #pdf_string = ".              -"
                                             
                                             iterator_set = 0
                                         
