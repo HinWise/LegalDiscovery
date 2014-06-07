@@ -1282,8 +1282,8 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 100000
-
+    max_documents = 100
+    
     #Initialize the Pdf to be written
     
     output = PdfFileMerger()
@@ -1370,7 +1370,7 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 10000 == 0 and doc_iterator != 0:
+            if doc_iterator % 50 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1426,7 +1426,25 @@ def generate_icr_output(request,watermark_name):
                 
                 ocr_record_final = record.ocrrecord_link
                 
-                pdf_string += "Exhibit "+str(exhibit_count)+": "+str(pretty_name)
+                
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+", "+str(pretty_name)+":"
+                pdf_string += "\n"
+                pdf_string += "\n"
+                
+                show_date = ocr_record_final.IssueDate
+                if show_date == "MISSING" or show_date == "UNREADABLE" or show_date == "" or show_date == "NoIssueDateField":
+                    show_date = "(No Date Available)"
+                show_amount = ocr_record_final.Amount    
+                if show_amount == "MISSING" or show_amount == "UNREADABLE" or show_amount == "" or show_amount == "NoAmountField":
+                    show_amount = "(No Amount Available)"
+                show_currency = ocr_record_final.Currency    
+                if show_currency == "MISSING" or show_currency == "UNREADABLE" or show_currency == "" or show_currency == "NoCurrencyField":
+                    show_currency = "(No Currency Available)"
+                
+                pdf_string += ".  -This "+str(pretty_name)+" Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
+                pdf_string += "\n"
+                pdf_string += "\n"
+                pdf_string += ".              -"
                 
                 for field_name in corpus_include_fields:
                     
@@ -1463,7 +1481,7 @@ def generate_icr_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 53:
+                if pdf_string.count('\n') > 47:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1531,7 +1549,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     except:
         max_documents = 10
     
-    max_documents = 200
+    max_documents = 10
     
     #Initialize the Pdf to be written
     
@@ -1613,7 +1631,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             created_page = False
         
-            if doc_iterator % 100 == 0 and doc_iterator != 0:
+            if doc_iterator % 5 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1637,7 +1655,20 @@ def generate_sourcepdfs_output(request,watermark_name):
             
             '''Write command to begin outputing to a new page'''
         
-            pdf_string = "Exhibit "+str(exhibit_count)
+            doctype_name = selected_entry_item.sourcedoc_link.modified_document_type.pretty_name
+            job_directory = selected_entry_item.sourcedoc_link.job_directory
+            filename = selected_entry_item.sourcedoc_link.filename
+            
+            #pdf_string = "Exhibit "+str(exhibit_count)
+            pdf_string = ""
+            
+            pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+", "+str(doctype_name)+":"
+            pdf_string += "\n"
+            pdf_string += "\n"
+            
+                        
+            pdf_string += ".  - File Name is: "+str(filename)+", on Directory: "+str(job_directory)
+            
             
             '''Write command to finish and save new page'''
             
@@ -1657,8 +1688,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             
             '''Write command to begin outputing to a new page'''
             
-            job_directory = selected_entry_item.sourcedoc_link.job_directory
-            filename = selected_entry_item.sourcedoc_link.filename
+            
             
             #source_url = "http://54.200.180.182/sourcepdfs/%s/%s" %(job_directory, filename)
                 
@@ -1719,7 +1749,7 @@ def generate_grandelivre_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 2500
+    max_documents = 100
 
     #Initialize the Pdf to be written
     
@@ -1790,7 +1820,7 @@ def generate_grandelivre_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 500 == 0 and doc_iterator != 0:
+            if doc_iterator % 50 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1842,9 +1872,24 @@ def generate_grandelivre_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                 
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                pdf_string += "\n"
+                pdf_string += "\n"
                 
-                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                show_date = str(record.Day)+"/"+str(record.Month)+"/"+str(record.Year)
+                if show_date == "XX/XX/XXXX" or show_date == "":
+                    show_date = "(No Date Available)"
+                show_amount = record.Credit    
+                if show_amount == "":
+                    show_amount = "(No Amount Available)"
+                show_currency = record.BankCurrency    
+                if show_currency == "":
+                    show_currency = "(No Currency Available)"
+                
+                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
+                pdf_string += "\n"
+                pdf_string += "\n"
+                pdf_string += ".              -"
                 
                 for field_name in corpus_include_fields:
                     
@@ -1880,7 +1925,7 @@ def generate_grandelivre_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 53:
+                if pdf_string.count('\n') > 47:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1948,7 +1993,7 @@ def generate_albaraka_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 200
+    max_documents = 1000000
 
     #Initialize the Pdf to be written
     
@@ -2019,7 +2064,7 @@ def generate_albaraka_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 50 == 0 and doc_iterator != 0:
+            if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -2072,9 +2117,24 @@ def generate_albaraka_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                 
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                pdf_string += "\n"
+                pdf_string += "\n"
                 
-                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
+                if show_date == "XX/XX/XXXX" or show_date == "":
+                    show_date = "(No Date Available)"
+                show_amount = record.Amount    
+                if show_amount == "":
+                    show_amount = "(No Amount Available)"
+                show_currency = record.BankCurrency    
+                if show_currency == "":
+                    show_currency = "(No Currency Available)"
+                
+                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
+                pdf_string += "\n"
+                pdf_string += "\n"
+                pdf_string += ".              -"
                 
                 for field_name in corpus_include_fields:
                     
@@ -2110,7 +2170,7 @@ def generate_albaraka_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 53:
+                if pdf_string.count('\n') > 47:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -2305,7 +2365,25 @@ def generate_transactions_output(request,watermark_name):
             for record in corpus_final:
                 
                  
-                pdf_string += "Exhibit "+str(exhibit_count)+": "
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                pdf_string += "\n"
+                pdf_string += "\n"
+                
+                show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
+                if show_date == "XX/XX/XXXX" or show_date == "":
+                    show_date = "(No Date Available)"
+                show_amount = record.Amount    
+                if show_amount == "":
+                    show_amount = "(No Amount Available)"
+                show_currency = record.BankCurrency    
+                if show_currency == "":
+                    show_currency = "(No Currency Available)"
+                
+                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
+                pdf_string += "\n"
+                pdf_string += "\n"
+                pdf_string += ".              -"
+                
                 
                 for field_name in corpus_include_fields:
                     
@@ -2368,7 +2446,7 @@ def generate_transactions_output(request,watermark_name):
                                 
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
                                 
-                                if pdf_string.count('\n') >= 53:
+                                if pdf_string.count('\n') >= 47:
                 
                                     pdf_string_count = pdf_string.count('\n')
                 
