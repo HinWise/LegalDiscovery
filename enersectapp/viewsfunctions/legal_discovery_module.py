@@ -2478,12 +2478,11 @@ def generate_transactions_output(request,watermark_name):
 
                                                 pdf_string = ".              -"
                                             
-                                            
-                                        else:
-  
-                                            pdf_string_temp += list_element
-                                            pdf_string_temp += '\n'
-                                                                          
+                                                 
+
+                                        pdf_string_temp += list_element
+                                        pdf_string_temp += '\n'
+                                        
                                         #Include all the strings contained in the page
                                         
                                         if iterator_set == len(pdf_string_templist):
