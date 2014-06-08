@@ -1426,8 +1426,9 @@ def generate_icr_output(request,watermark_name):
                 
                 ocr_record_final = record.ocrrecord_link
                 
+                record_uid = record.affidavit_uid_string
                 
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+", "+str(pretty_name)+":"
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(pretty_name)+":"
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
@@ -1662,7 +1663,9 @@ def generate_sourcepdfs_output(request,watermark_name):
             #pdf_string = "Exhibit "+str(exhibit_count)
             pdf_string = ""
             
-            pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+", "+str(doctype_name)+":"
+            record_uid = selected_entry_item.affidavit_uid_string
+                
+            pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(doctype_name)+":"
             pdf_string += "\n"
             pdf_string += "\n"
             
@@ -1872,7 +1875,9 @@ def generate_grandelivre_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                record_uid = record.affidavit_uid_string
+                
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
@@ -2117,7 +2122,9 @@ def generate_albaraka_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                record_uid = record.affidavit_uid_string
+                
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
@@ -2364,8 +2371,9 @@ def generate_transactions_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                 
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(watermark_name)+"_"+str(corpus_doccount).zfill(7)+":"
+                record_uid = record.affidavit_uid_string
+                
+                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
@@ -2708,24 +2716,144 @@ def download_file_output(request,watermark_name):
     
 def create_instance_watermark(request,watermark_name):
 
-    new_watermark = id_generator()
-    
-    delete_temp_affidavit_files("all","all")
-    
-    AffidavitInstance.objects.all().delete()
-    
-    new_AffidavitInstance = AffidavitInstance()
-    new_AffidavitInstance.watermark_name = new_watermark
-    
-    new_AffidavitInstance.save()
-    
-    return new_watermark
-    
-def affidavit_watermark_everything(corpus_common_final):
+    #Brings up a new watermark of 8 random digits in all caps
 
-    #Brings up a new watermark of 8 digits
+    try:
+        new_watermark = id_generator()
+        delete_temp_affidavit_files("all","all")
+
+        AffidavitInstance.objects.all().delete()
+
+        new_AffidavitInstance = AffidavitInstance()
+        new_AffidavitInstance.watermark_name = new_watermark
+        
+        new_AffidavitInstance.save()
+        
+        affidavit_watermark_everything(new_watermark,new_AffidavitInstance)
+
+        return new_watermark
+    except:
+        print "Debug05"
+        return False
     
-    new_watermark = id_generator()
+def affidavit_watermark_everything(watermark_name,watermark_instance):
+
+    corpus_icr = PdfRecord.objects.none()
+    
+    all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
+     
+    '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
+
+    with transaction.commit_on_success():
+        for doctype in all_sourcedoctypes:
+       
+            #Takes the ones that fit with the doctype we are searching for
+
+            corpus_icr_to_export = PdfRecord.objects.filter(audit_mark = "None").distinct()
+
+            corpus_base = corpus_icr_to_export.filter(modified_document_type = doctype)
+
+            corpus_final = corpus_base.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
+
+            corpus_icr = corpus_icr | corpus_final
+            
+
+    #corpus_sourcepdfs will be represented in the corpus_icr loop, by the field sourcedoc_link
+    #corpus_sourcepdfs = SourcePdf.objects.all().distinct()
+
+    corpus_grandelivre = InternalRecord.objects.all().order_by('Year','Month','Day').distinct()
+
+    corpus_albaraka = BankRecord.objects.all().order_by('ValueYear','ValueMonth','ValueDay').distinct()
+
+    corpus_transactions = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay').distinct()
+
+    
+    with transaction.commit_on_success():
+        
+        db.reset_queries()
+        
+        corpus_tag = "icr"
+        corpus_tag2 = "sourcepdfs"
+        corpus_doccount = 1
+   
+        for element in corpus_icr:
+     
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+
+            element.sourcedoc_link.affidavit_watermark_string = watermark_name
+            #element.sourcedoc_link.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag2 + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+            
+            element.save()
+            element.sourcedoc_link.save()
+    
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
+
+            
+        
+    with transaction.commit_on_success():
+        
+        db.reset_queries()
+        
+        corpus_tag = "grandelivre"
+        corpus_doccount = 1
+    
+    
+        for element in corpus_grandelivre:
+        
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+
+            element.save()
+            
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)+"----> PK : "+str(element.pk)
+            
+              
+    
+    with transaction.commit_on_success():
+    
+        db.reset_queries()
+        
+        corpus_tag = "albaraka"   
+        corpus_doccount = 1  
+    
+        for element in corpus_albaraka:
+        
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+
+            element.save()
+            
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
+        
+        
+    
+    with transaction.commit_on_success():
+    
+        db.reset_queries()
+        
+        corpus_tag = "transactions"
+        corpus_doccount = 1
+    
+        for element in corpus_transactions:
+        
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+
+            element.save()
+            
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
+    
+
 
     
 def delete_temp_affidavit_files(corpus,partial_or_merge):
@@ -2744,13 +2872,14 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
     else:
     
         file_list = os.listdir('legaldiscoverytemp/output_files/'+corpus+"/")#os.chdir('legaldiscoverytemp/output_files')
+
         
     for item in file_list:
     
         to_remove = False
-
+        
         if partial_or_merge == "all":
-            
+ 
                 to_remove = True
 
         if ".pdf" in str(item):
@@ -2784,7 +2913,7 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
                         try:
                             os.remove('legaldiscoverytemp/output_files/'+corpus_type+'/'+str(item))    
                         except:
-                            print "Not in that folder"
+                            #print "Not in that folder"
                             
                             try:
                                 os.remove('legaldiscoverytemp/output_files_final/'+corpus_type+'/'+str(item))    
@@ -2797,7 +2926,7 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
                     try:
                         os.remove('legaldiscoverytemp/output_files/'+corpus+'/'+str(item))    
                     except:
-                        print "Not in that folder"
+                        #print "Not in that folder"
                             
                         try:
                             os.remove('legaldiscoverytemp/output_files_final/'+corpus+'/'+str(item))    

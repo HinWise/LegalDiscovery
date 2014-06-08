@@ -39,6 +39,7 @@ class BankRecord(models.Model):
 
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     def __unicode__(self):
         return str(self.BankRecordIndex)
@@ -83,6 +84,7 @@ class InternalRecord(models.Model):
 
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     def __unicode__(self):
         return self.Memo  
@@ -125,6 +127,7 @@ class TransactionTable(models.Model):
     
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     def __unicode__(self):
         return str(self.TransactionIndex)
@@ -332,6 +335,7 @@ class SourcePdf(models.Model):
     
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     assigndata = models.ManyToManyField(SourcePdfToHandle,null=True, blank=True, default=None)
     def __unicode__(self):
@@ -468,6 +472,7 @@ class PdfRecord(models.Model):
     
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     def __unicode__(self):
         return self.name
