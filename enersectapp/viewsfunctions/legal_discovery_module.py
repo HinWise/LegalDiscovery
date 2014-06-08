@@ -25,17 +25,20 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 import time
 import tempfile
+import pytz
+from tzlocal import get_localzone
 
 from django.db.models import Count
 
 import json 
 
-import time
+
 import gc
 from django.views import generic
 from django.utils import timezone
 from datetime import timedelta
 import datetime
+
 
 import os
 import shutil
@@ -1282,7 +1285,7 @@ def generate_icr_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 100
+    max_documents = 1000000
     
     #Initialize the Pdf to be written
     
@@ -1293,10 +1296,25 @@ def generate_icr_output(request,watermark_name):
     output_temp_documents_created = []
 
 
-    title_string = "Icr Corpus Report\n"
+    title_string = "Icr Corpus Report\n\n"
 
-    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+    local_tz = get_localzone()
+    
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
 
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
     
     tmpfile = tempfile.SpooledTemporaryFile(1048576)
 
@@ -1306,7 +1324,7 @@ def generate_icr_output(request,watermark_name):
             
     the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
 
-    string_to_pdf(the_canvas,title_string+title_date)
+    string_to_pdf(the_canvas,cover_content)
 
            
     the_canvas.save()
@@ -1336,6 +1354,7 @@ def generate_icr_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     doc_iterator = exhibit_count - 1
+    page_count = 1
     pdf_string = ""
 
     all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
@@ -1343,7 +1362,7 @@ def generate_icr_output(request,watermark_name):
                                 
     '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
 
-    with transaction.commit_on_success():
+    '''with transaction.commit_on_success():
         for doctype in all_sourcedoctypes:
        
             #Takes the ones that fit with the doctype we are searching for
@@ -1359,10 +1378,10 @@ def generate_icr_output(request,watermark_name):
 
     corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
 
-    corpus_common_final = corpus_common_final[:max_documents]
+    corpus_common_final = corpus_common_final[:max_documents]'''
 
-    
-    
+    corpus_common_final = PdfRecord.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
+
     did_page_jump = False
     
     with transaction.commit_on_success():
@@ -1370,7 +1389,13 @@ def generate_icr_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 50 == 0 and doc_iterator != 0:
+            if doc_iterator == 0 or doc_iterator % 2500 == 0:
+            
+                    pdf_string += "                                                                                                                                   "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1
+            
+            if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1388,9 +1413,7 @@ def generate_icr_output(request,watermark_name):
                     
                     output.append(input1)
                     
-                    pdf_string = ""
-                
-                
+
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
@@ -1418,7 +1441,6 @@ def generate_icr_output(request,watermark_name):
             #Not making cut, because the entry is already decided upon
             
             corpus_final = PdfRecord.objects.filter(pk = selected_entry_item.pk)
-            
 
             for record in corpus_final:
                 
@@ -1479,10 +1501,7 @@ def generate_icr_output(request,watermark_name):
                 
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
-                pdf_string += '\n'
-                pdf_string += '\n'
-                
-                if pdf_string.count('\n') > 47:
+                if pdf_string.count('\n') > 44:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1499,9 +1518,15 @@ def generate_icr_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
-
-                    did_page_jump = True
+                    pdf_string += "                                                                                                                                   "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += '\n'
+                    page_count +=1
                     
+                    did_page_jump = True
+                
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
                 exhibit_count += 1
                 doc_iterator = exhibit_count - 1
         
@@ -1550,7 +1575,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     except:
         max_documents = 10
     
-    max_documents = 10
+    max_documents = 1000000
     
     #Initialize the Pdf to be written
     
@@ -1561,17 +1586,34 @@ def generate_sourcepdfs_output(request,watermark_name):
     output_temp_documents_created = []
     
 
-    title_string = "Source Pdfs Corpus Report\n"
-    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+    title_string = "Source Pdfs Corpus Report\n\n"
+
+    local_tz = get_localzone()
     
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
     
     tmpfile = tempfile.SpooledTemporaryFile(1048576)
+
     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
     tmpfile.rollover()
+
             
     the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
-    string_to_pdf(the_canvas,title_string+title_date)
-           
+
+    string_to_pdf(the_canvas,cover_content)
+   
     the_canvas.save()
                     
     input1 = PdfFileReader(tmpfile)
@@ -1598,6 +1640,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     doc_iterator = exhibit_count - 1
+    page_count = 1
     pdf_string = ""
     
     all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
@@ -1605,7 +1648,7 @@ def generate_sourcepdfs_output(request,watermark_name):
                                 
     '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
     
-    with transaction.commit_on_success():
+    '''with transaction.commit_on_success():
         for doctype in all_sourcedoctypes:
        
             #Takes the ones that fit with the doctype we are searching for
@@ -1621,7 +1664,9 @@ def generate_sourcepdfs_output(request,watermark_name):
 
     corpus_common_final = corpus_common_final.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
     
-    corpus_common_final = corpus_common_final[:max_documents]
+    corpus_common_final = corpus_common_final[:max_documents]'''
+    
+    corpus_common_final = PdfRecord.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
     
     did_page_jump = False  
 
@@ -1632,7 +1677,8 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             created_page = False
         
-            if doc_iterator % 5 == 0 and doc_iterator != 0:
+            
+            if doc_iterator % 2500 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1663,8 +1709,13 @@ def generate_sourcepdfs_output(request,watermark_name):
             #pdf_string = "Exhibit "+str(exhibit_count)
             pdf_string = ""
             
-            record_uid = selected_entry_item.affidavit_uid_string
-                
+            record_uid = selected_entry_item.sourcedoc_link.affidavit_uid_string
+             
+            pdf_string = ""
+            pdf_string += "                                                                                                                      "+"sourcepdfs__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+            pdf_string +="\n\n\n"
+            page_count +=1
+             
             pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(doctype_name)+":"
             pdf_string += "\n"
             pdf_string += "\n"
@@ -1689,6 +1740,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
             output.append(input1)
             
+
             '''Write command to begin outputing to a new page'''
             
             
@@ -1714,6 +1766,8 @@ def generate_sourcepdfs_output(request,watermark_name):
                 
                 source_url = os.path.join(os.path.abspath(enersectapp.__path__[0]), os.pardir ,"legaldiscoverytemp/source_pdfs",file_url)
                 
+            
+            #tempfile_output = PdfFileMerger()
             
             output.append(PdfFileReader(file(source_url, 'rb')))
             
@@ -1752,7 +1806,7 @@ def generate_grandelivre_output(request,watermark_name):
     except:
         max_documents = 10
 
-    max_documents = 100
+    max_documents = 1000000
 
     #Initialize the Pdf to be written
     
@@ -1763,10 +1817,23 @@ def generate_grandelivre_output(request,watermark_name):
     output_temp_documents_created = []
 
 
-    title_string = "GrandeLivre Corpus Report\n"
+    title_string = "GrandeLivre Corpus Report\n\n"
 
-    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
+    local_tz = get_localzone()
+    
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
 
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
     
     tmpfile = tempfile.SpooledTemporaryFile(1048576)
 
@@ -1776,7 +1843,7 @@ def generate_grandelivre_output(request,watermark_name):
             
     the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
 
-    string_to_pdf(the_canvas,title_string+title_date)
+    string_to_pdf(the_canvas,cover_content)
 
            
     the_canvas.save()
@@ -1806,13 +1873,14 @@ def generate_grandelivre_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     doc_iterator = exhibit_count - 1
+    page_count = 1
     pdf_string = ""
 
                
+    corpus_common_final = InternalRecord.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
+    #corpus_common_final = InternalRecord.objects.all().order_by('Year','Month','Day')
 
-    corpus_common_final = InternalRecord.objects.all().order_by('Year','Month','Day')
-
-    corpus_common_final = corpus_common_final[:max_documents]
+    #corpus_common_final = corpus_common_final[:max_documents]
 
     
     
@@ -1823,7 +1891,13 @@ def generate_grandelivre_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 50 == 0 and doc_iterator != 0:
+            if doc_iterator % 2500 == 0 and doc_iterator == 0:
+                pdf_string = ""
+                pdf_string += "                                                                                                                      "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
+        
+            if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1930,7 +2004,7 @@ def generate_grandelivre_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 47:
+                if pdf_string.count('\n') > 44:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1947,6 +2021,9 @@ def generate_grandelivre_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
+                    pdf_string += "                                                                                                                      "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1
 
                     did_page_jump = True
                     
@@ -2008,11 +2085,23 @@ def generate_albaraka_output(request,watermark_name):
     
     output_temp_documents_created = []
 
+    title_string = "AlBaraka Corpus Report\n\n"
 
-    title_string = "AlBaraka Corpus Report\n"
+    local_tz = get_localzone()
+    
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
 
-    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
-
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
     
     tmpfile = tempfile.SpooledTemporaryFile(1048576)
 
@@ -2022,7 +2111,7 @@ def generate_albaraka_output(request,watermark_name):
             
     the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
 
-    string_to_pdf(the_canvas,title_string+title_date)
+    string_to_pdf(the_canvas,cover_content)
 
            
     the_canvas.save()
@@ -2052,13 +2141,14 @@ def generate_albaraka_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     doc_iterator = exhibit_count - 1
+    page_count = 1
     pdf_string = ""
 
                
+    corpus_common_final = BankRecord.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
+    #corpus_common_final = BankRecord.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
 
-    corpus_common_final = BankRecord.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
-
-    corpus_common_final = corpus_common_final[:max_documents]
+    #corpus_common_final = corpus_common_final[:max_documents]
 
     
     
@@ -2068,6 +2158,13 @@ def generate_albaraka_output(request,watermark_name):
         for selected_entry_item in corpus_common_final:
     
             created_page = False
+        
+            if doc_iterator % 2500 == 0 and doc_iterator == 0:
+        
+                pdf_string = ""
+                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
         
             if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
@@ -2177,7 +2274,7 @@ def generate_albaraka_output(request,watermark_name):
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
-                if pdf_string.count('\n') > 47:
+                if pdf_string.count('\n') > 44:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -2194,6 +2291,10 @@ def generate_albaraka_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
+
+                    pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1
 
                     did_page_jump = True
                     
@@ -2257,11 +2358,23 @@ def generate_transactions_output(request,watermark_name):
     
     output_temp_documents_created = []
 
+    title_string = "Transactions Corpus Report\n\n"
 
-    title_string = "Transactions Corpus Report\n"
+    local_tz = get_localzone()
+    
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
 
-    title_date = str(datetime.datetime.now().replace(tzinfo=timezone.utc))
-
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
     
     tmpfile = tempfile.SpooledTemporaryFile(1048576)
 
@@ -2271,8 +2384,7 @@ def generate_transactions_output(request,watermark_name):
             
     the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
 
-    string_to_pdf(the_canvas,title_string+title_date)
-
+    string_to_pdf(the_canvas,cover_content)
            
     the_canvas.save()
     input1 = PdfFileReader(tmpfile)
@@ -2301,13 +2413,14 @@ def generate_transactions_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     doc_iterator = exhibit_count - 1
+    page_count = 1
     pdf_string = ""
 
                
+    corpus_common_final = TransactionTable.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
+    #corpus_common_final = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
 
-    corpus_common_final = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
-
-    corpus_common_final = corpus_common_final[:max_documents]
+    #corpus_common_final = corpus_common_final[:max_documents]
 
     
     
@@ -2317,6 +2430,12 @@ def generate_transactions_output(request,watermark_name):
         for selected_entry_item in corpus_common_final:
     
             created_page = False
+        
+            if doc_iterator % 2500 == 0 and doc_iterator == 0:
+            
+                pdf_string += "                                                                                                                    "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
         
             if doc_iterator % 2500 == 0 and doc_iterator != 0:
                 
@@ -2454,7 +2573,7 @@ def generate_transactions_output(request,watermark_name):
                                 
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
                                 
-                                if pdf_string.count('\n') >= 47:
+                                if pdf_string.count('\n') >= 44:
                 
                                     pdf_string_count = pdf_string.count('\n')
                 
@@ -2514,6 +2633,12 @@ def generate_transactions_output(request,watermark_name):
                                             output.append(input1)
                                             
                                             pdf_string_temp = ""
+                                            temp_str = pdf_string
+                                            pdf_string =""
+                                            pdf_string += "                                                                                                                    "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                                            pdf_string +="\n\n\n"
+                                            pdf_string += temp_str
+                                            page_count +=1
 
                                             did_page_jump = True
                                 
@@ -2784,7 +2909,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
             element.sourcedoc_link.affidavit_watermark_string = watermark_name
             #element.sourcedoc_link.actual_affidavit_watermark = watermark_instance
-            element.affidavit_uid_string = corpus_tag2 + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+            element.sourcedoc_link.affidavit_uid_string = corpus_tag2 + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
             
             element.save()
             element.sourcedoc_link.save()
