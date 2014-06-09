@@ -1391,7 +1391,7 @@ def generate_icr_output(request,watermark_name):
         
             if doc_iterator == 0 or doc_iterator % 2500 == 0:
             
-                    pdf_string += "                                                                                                                                   "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1
             
@@ -1455,19 +1455,26 @@ def generate_icr_output(request,watermark_name):
                 pdf_string += "\n"
                 
                 show_date = ocr_record_final.IssueDate
-                if show_date == "MISSING" or show_date == "UNREADABLE" or show_date == "" or show_date == "NoIssueDateField":
-                    show_date = "(No Date Available)"
+                if show_date == "MISSING" or show_date == "UNREADABLE" or show_date == "" or show_date == "NoIssueDateField" or show_date == "Blank":
+                    show_date = "(No Date)"
                 show_amount = ocr_record_final.Amount    
-                if show_amount == "MISSING" or show_amount == "UNREADABLE" or show_amount == "" or show_amount == "NoAmountField":
-                    show_amount = "(No Amount Available)"
+                if show_amount == "MISSING" or show_amount == "UNREADABLE" or show_amount == "" or show_amount == "NoAmountField" or show_amount == "Blank":
+                    show_amount = "(No Amount)"
                 show_currency = ocr_record_final.Currency    
-                if show_currency == "MISSING" or show_currency == "UNREADABLE" or show_currency == "" or show_currency == "NoCurrencyField":
-                    show_currency = "(No Currency Available)"
+                if show_currency == "MISSING" or show_currency == "UNREADABLE" or show_currency == "" or show_currency == "NoCurrencyField" or show_currency == "Blank":
+                    show_currency = "(No Currency)"
                 
-                pdf_string += ".  -This "+str(pretty_name)+" Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
-                pdf_string += "\n"
-                pdf_string += "\n"
-                pdf_string += ".              -"
+                if show_date != "(No Date)" or show_amount != "(No Amount)" or show_currency != "(No Currency)":
+                
+                    pdf_string += ".  -This "+str(pretty_name)+" Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
+                    pdf_string += "\n"
+                    pdf_string += "\n"
+                    pdf_string += ".              -"
+                
+                else:
+                
+                    pdf_string += ".  -This "+str(pretty_name)+" Document has no extracted information."
+                    
                 
                 for field_name in corpus_include_fields:
                     
@@ -1489,7 +1496,7 @@ def generate_icr_output(request,watermark_name):
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank":
                                 pdf_string += " "+test_string+test_string2+cute_name+" "+field_content
                               
                         except:
@@ -1518,7 +1525,7 @@ def generate_icr_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
-                    pdf_string += "                                                                                                                                   "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string += '\n'
                     page_count +=1
                     
@@ -1575,7 +1582,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     except:
         max_documents = 10
     
-    max_documents = 1000000
+    max_documents = 1000
     
     #Initialize the Pdf to be written
     
@@ -1678,7 +1685,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             created_page = False
         
             
-            if doc_iterator % 2500 == 0 and doc_iterator != 0:
+            if doc_iterator % 500 == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1957,13 +1964,13 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 show_date = str(record.Day)+"/"+str(record.Month)+"/"+str(record.Year)
                 if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date Available)"
+                    show_date = "(No Date)"
                 show_amount = record.Credit    
                 if show_amount == "":
-                    show_amount = "(No Amount Available)"
+                    show_amount = "(No Amount)"
                 show_currency = record.BankCurrency    
                 if show_currency == "":
-                    show_currency = "(No Currency Available)"
+                    show_currency = "(No Currency)"
                 
                 pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
                 pdf_string += "\n"
@@ -2227,13 +2234,13 @@ def generate_albaraka_output(request,watermark_name):
                 
                 show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
                 if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date Available)"
+                    show_date = "(No Date)"
                 show_amount = record.Amount    
                 if show_amount == "":
-                    show_amount = "(No Amount Available)"
+                    show_amount = "(No Amount)"
                 show_currency = record.BankCurrency    
                 if show_currency == "":
-                    show_currency = "(No Currency Available)"
+                    show_currency = "(No Currency)"
                 
                 pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
                 pdf_string += "\n"
@@ -2498,13 +2505,13 @@ def generate_transactions_output(request,watermark_name):
                 
                 show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
                 if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date Available)"
+                    show_date = "(No Date)"
                 show_amount = record.Amount    
                 if show_amount == "":
-                    show_amount = "(No Amount Available)"
+                    show_amount = "(No Amount)"
                 show_currency = record.BankCurrency    
                 if show_currency == "":
-                    show_currency = "(No Currency Available)"
+                    show_currency = "(No Currency)"
                 
                 pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
                 pdf_string += "\n"
@@ -2865,9 +2872,9 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
     corpus_icr = PdfRecord.objects.none()
     
-    all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
+    '''all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
      
-    '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
+    #Iteration of all the DocTypes to select the appropriate documents (OcrEntries)
 
     with transaction.commit_on_success():
         for doctype in all_sourcedoctypes:
@@ -2880,8 +2887,10 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
             corpus_final = corpus_base.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
 
-            corpus_icr = corpus_icr | corpus_final
-            
+            corpus_icr = corpus_icr | corpus_final'''
+     
+    corpus_icr = PdfRecord.objects.filter(audit_mark = "None").exclude(EntryByCompany__name = "TestGroup").exclude(EntryAuthor__username = "nemot").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').distinct()
+    
 
     #corpus_sourcepdfs will be represented in the corpus_icr loop, by the field sourcedoc_link
     #corpus_sourcepdfs = SourcePdf.objects.all().distinct()
