@@ -102,10 +102,14 @@ class TransactionTable(models.Model):
     
     bank_records_list = models.ManyToManyField(BankRecord,related_name='bank records (albaraka) list', null=True, blank=True, default=None)
     
+    BankRecordsUIDArray = models.CharField('Original Bank Record (Al Baraka) UID References',max_length=2047,default="")
+    
     InternalRecordListOriginalArray = models.CharField('Original Internal Record (Grande Livre) References',max_length=127,default="")
     NumberInternalRecordIndexes = models.IntegerField('Number Bank Record Indexes in Transaction',default=0)
     
     internal_records_list = models.ManyToManyField(InternalRecord,related_name='internal records (grande livre) list', null=True, blank=True, default=None)
+    
+    InternalRecordUIDArray = models.CharField('Original Internal Record (Grande Livre) UID References',max_length=2047,default="")
     
     Amount = models.CharField('Amount',max_length=31)
     AmountDiscrepancy = models.IntegerField('Amount between Credit and Debit',default=0)

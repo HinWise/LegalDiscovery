@@ -1278,14 +1278,23 @@ def generate_corpus_output(request,watermark_name):
 
 def generate_icr_output(request,watermark_name):
     
-    
     try:
-        max_documents = request.POST['max_documents']
-        
+        output_option = request.POST['select_output_option']
     except:
-        max_documents = 10
+        output_option = "Preview"
 
-    max_documents = 1000000
+
+    if output_option == "Complete":
+    
+        max_documents = 100000000000
+        docs_per_pdf = 2500
+
+    else:
+    
+        max_documents = 93
+        docs_per_pdf = 7
+    
+    max_characters_line = 95
     
     #Initialize the Pdf to be written
     
@@ -1356,8 +1365,8 @@ def generate_icr_output(request,watermark_name):
     doc_iterator = exhibit_count - 1
     page_count = 1
     pdf_string = ""
-
-    all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
+    
+    #all_sourcedoctypes = SourceDocType.objects.filter(extraction_fields__isnull = False).distinct()
 
                                 
     '''Iteration of all the DocTypes to select the appropriate documents (OcrEntries)'''
@@ -1385,20 +1394,18 @@ def generate_icr_output(request,watermark_name):
     did_page_jump = False
     
     with transaction.commit_on_success():
+    
         for selected_entry_item in corpus_common_final:
     
             created_page = False
-        
-            if doc_iterator == 0 or doc_iterator % 2500 == 0:
             
-                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                    pdf_string +="\n\n\n"
-                    page_count +=1
-            
-            if doc_iterator % 2500 == 0 and doc_iterator != 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
+
                 if did_page_jump == False:
                 
+                    print "---------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                    
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
@@ -1413,7 +1420,7 @@ def generate_icr_output(request,watermark_name):
                     
                     output.append(input1)
                     
-
+                    pdf_string = ""
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
@@ -1428,7 +1435,15 @@ def generate_icr_output(request,watermark_name):
                 
                 db.reset_queries()
                 
+                pdf_string = ""
 
+            if doc_iterator % docs_per_pdf == 0 or doc_iterator == 0:
+                      
+                    pdf_string = ""
+                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1    
+                
             print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
         
 
@@ -1471,6 +1486,7 @@ def generate_icr_output(request,watermark_name):
                     pdf_string += "\n"
                     pdf_string += ".              -"
                 
+                
                 else:
                 
                     pdf_string += ".  -This "+str(pretty_name)+" Document has no extracted information."
@@ -1489,14 +1505,14 @@ def generate_icr_output(request,watermark_name):
                         
                         try:
                             
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > 104:
+                            if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > max_characters_line:
                                 test_string = "\n"
                                 test_string2 = ".              -"
                             else:
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank" and field_content != "*":
                                 pdf_string += " "+test_string+test_string2+cute_name+" "+field_content
                               
                         except:
@@ -1508,7 +1524,14 @@ def generate_icr_output(request,watermark_name):
                 
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                did_page_jump = False
+                
                 if pdf_string.count('\n') > 44:
+                
+                    print "<<<<<----------PRINT"
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1531,8 +1554,6 @@ def generate_icr_output(request,watermark_name):
                     
                     did_page_jump = True
                 
-                pdf_string += '\n'
-                pdf_string += '\n'
                 
                 exhibit_count += 1
                 doc_iterator = exhibit_count - 1
@@ -1577,12 +1598,22 @@ def generate_icr_output(request,watermark_name):
 def generate_sourcepdfs_output(request,watermark_name):
 
     try:
-        max_documents = request.POST['max_documents']
-        
+        output_option = request.POST['select_output_option']
     except:
-        max_documents = 10
+        output_option = "Preview"
+
+
+    if output_option == "Complete":
     
-    max_documents = 1000
+        max_documents = 100000000000
+        docs_per_pdf = 500
+
+    else:
+    
+        max_documents = 20
+        docs_per_pdf = 10
+    
+    max_characters_line = 95
     
     #Initialize the Pdf to be written
     
@@ -1685,7 +1716,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             created_page = False
         
             
-            if doc_iterator % 500 == 0 and doc_iterator != 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
             
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
@@ -1808,13 +1839,23 @@ def generate_grandelivre_output(request,watermark_name):
     
     
     try:
-        max_documents = request.POST['max_documents']
-        
+        output_option = request.POST['select_output_option']
     except:
-        max_documents = 10
+        output_option = "Preview"
 
-    max_documents = 1000000
 
+    if output_option == "Complete":
+    
+        max_documents = 100000000000
+        docs_per_pdf = 2500
+
+    else:
+    
+        max_documents = 93
+        docs_per_pdf = 7
+
+    max_characters_line = 95
+        
     #Initialize the Pdf to be written
     
     output = PdfFileMerger()
@@ -1890,7 +1931,6 @@ def generate_grandelivre_output(request,watermark_name):
     #corpus_common_final = corpus_common_final[:max_documents]
 
     
-    
     did_page_jump = False
     
     with transaction.commit_on_success():
@@ -1898,13 +1938,7 @@ def generate_grandelivre_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 2500 == 0 and doc_iterator == 0:
-                pdf_string = ""
-                pdf_string += "                                                                                                                      "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                pdf_string +="\n\n\n"
-                page_count +=1
-        
-            if doc_iterator % 2500 == 0 and doc_iterator != 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -1925,7 +1959,6 @@ def generate_grandelivre_output(request,watermark_name):
                     pdf_string = ""
                 
                 
-
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
                 temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
@@ -1940,13 +1973,19 @@ def generate_grandelivre_output(request,watermark_name):
                 db.reset_queries()
                 
 
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
+                pdf_string = ""
+                pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1    
+                
             print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
         
 
             #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
             
-            corpus_include_fields = ["InternalRecordIndex","BestTransactionMatch","IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
-            corpus_sorting_fields = ["InternalRecordIndex","BestTransactionMatch","IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
+            corpus_include_fields = ["IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["IssueDate","Credit","Piece_Number","Day","Month","Year","NoPiece","ExchangeRate","Company","AccountNum","NoMvt","Memo","Lett","BankAccount","BankName","BankCurrency"]
 
 
             #Not making cut, because the entry is already decided upon
@@ -1989,14 +2028,14 @@ def generate_grandelivre_output(request,watermark_name):
                         
                         try:
                             
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
                                 test_string = "\n"
                                 test_string2 = ".              -"
                             else:
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content != "*":
                                 pdf_string += " "+test_string+test_string2+field_name+" "+field_content
                               
                         except:
@@ -2010,6 +2049,8 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 pdf_string += '\n'
                 pdf_string += '\n'
+                
+                did_page_jump = False
                 
                 if pdf_string.count('\n') > 44:
                 
@@ -2026,9 +2067,10 @@ def generate_grandelivre_output(request,watermark_name):
                     input1 = PdfFileReader(tmpfile)
                     
                     output.append(input1)
+                    print "---------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
                     
                     pdf_string = ""
-                    pdf_string += "                                                                                                                      "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1
 
@@ -2077,13 +2119,24 @@ def generate_albaraka_output(request,watermark_name):
     
     
     try:
-        max_documents = request.POST['max_documents']
-        
+        output_option = request.POST['select_output_option']
     except:
-        max_documents = 10
+        output_option = "Preview"
 
-    max_documents = 1000000
 
+    if output_option == "Complete":
+    
+        max_documents = 100000000000
+        docs_per_pdf = 2500
+
+    else:
+    
+        max_documents = 100
+        docs_per_pdf = 25
+   
+
+    max_characters_line = 95
+   
     #Initialize the Pdf to be written
     
     output = PdfFileMerger()
@@ -2166,14 +2219,14 @@ def generate_albaraka_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 2500 == 0 and doc_iterator == 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
         
                 pdf_string = ""
                 pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1
         
-            if doc_iterator % 2500 == 0 and doc_iterator != 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -2215,8 +2268,8 @@ def generate_albaraka_output(request,watermark_name):
 
             #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
             
-            corpus_include_fields = ["BankRecordIndex","TransactionIndex","Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
-            corpus_sorting_fields = ["BankRecordIndex","TransactionIndex","Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_include_fields = ["Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["Amount","PostDay","PostMonth","PostYear","ValueDay","ValueMonth","ValueYear","Libelle","Reference","Description","TransactionId","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
 
 
             #Not making cut, because the entry is already decided upon
@@ -2259,14 +2312,14 @@ def generate_albaraka_output(request,watermark_name):
                         
                         try:
                             
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
                                 test_string = "\n"
                                 test_string2 = ".              -"
                             else:
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content != "*":
                                 pdf_string += " "+test_string+test_string2+field_name+" "+field_content
                               
                         except:
@@ -2350,12 +2403,24 @@ def generate_transactions_output(request,watermark_name):
     print "Arrived Transactions Corpus"
     
     try:
-        max_documents = request.POST['max_documents']
-        
+        output_option = request.POST['select_output_option']
     except:
-        max_documents = 10
+        output_option = "Preview"
 
-    max_documents = 1000000
+
+    if output_option == "Complete":
+    
+        max_documents = 100000000000
+        docs_per_pdf = 2500
+
+    else:
+    
+        max_documents = 100
+        docs_per_pdf = 25
+    
+    max_characters_line = 95
+    
+    #max_documents = 1000000
 
     #Initialize the Pdf to be written
     
@@ -2438,13 +2503,13 @@ def generate_transactions_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % 2500 == 0 and doc_iterator == 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
             
-                pdf_string += "                                                                                                                    "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1
         
-            if doc_iterator % 2500 == 0 and doc_iterator != 0:
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
                 
@@ -2486,8 +2551,8 @@ def generate_transactions_output(request,watermark_name):
 
             #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
             
-            corpus_include_fields = ["TransactionIndex","NumberBankRecordIndexes","BankRecordsListOriginalArray","NumberInternalRecordIndexes","InternalRecordListOriginalArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
-            corpus_sorting_fields = ["TransactionIndex","NumberBankRecordIndexes","BankRecordsListOriginalArray","NumberInternalRecordIndexes","InternalRecordListOriginalArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_include_fields = ["NumberBankRecordIndexes","BankRecordsUIDArray","NumberInternalRecordIndexes","InternalRecordUIDArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
+            corpus_sorting_fields = ["NumberBankRecordIndexes","BankRecordsUIDArray","NumberInternalRecordIndexes","InternalRecordUIDArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
 
 
             #Not making cut, because the entry is already decided upon
@@ -2531,7 +2596,12 @@ def generate_transactions_output(request,watermark_name):
                         
                         try:
                             
-                            if field_name == "BankRecordsListOriginalArray" or field_name == "InternalRecordListOriginalArray":
+                            if field_name == "BankRecordsUIDArray" or field_name == "InternalRecordUIDArray":
+                            
+                                if field_name == "BankRecordsUIDArray":
+                                    corpus_tempname = "albaraka"
+                                else:
+                                    corpus_tempname = "grandelivre"
                             
                                 test_string = "\n"
                                 test_string2 = ".              -"
@@ -2539,7 +2609,7 @@ def generate_transactions_output(request,watermark_name):
                                 test_string4 = test_string + test_string3
                                 
                                 records_list = field_content.split(",")
-                                
+
                                 field_content = ""
                                 
                                 records_count = 0
@@ -2550,12 +2620,21 @@ def generate_transactions_output(request,watermark_name):
                                 
                                 for actual_record in records_list:
                                 
+                                    if actual_record != "":
+                                        item_content = actual_record
+                                        actual_record = actual_record.replace(item_content,corpus_tempname+"__"+str(watermark_name)+"__element__"+item_content)
+                                        
+                                    if records_count == 0:
+                                        actual_record = "["+actual_record
+                                    if records_count == len(records_list)-1:
+                                        actual_record = actual_record + "]"
+                                
                                     temp_sum_line = len(field_content) + len(actual_record)
                                 
                                     #If length of string plus new content is greater than the line width with margin, introduce
                                     #a new indented line
                                 
-                                    if temp_sum_line >= 80 * line_break_count:
+                                    if temp_sum_line >= 60 * line_break_count:
                                     
                                         field_content += test_string4
                                         line_break_count += 1
@@ -2566,8 +2645,9 @@ def generate_transactions_output(request,watermark_name):
                                     
                                 
                                 field_content += test_string + test_string2
+                                
                             
-                            elif (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > 104:
+                            elif (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
                                 test_string = "\n"
                                 test_string2 = ".              -"
                                 test_string4 = ""
@@ -2576,7 +2656,7 @@ def generate_transactions_output(request,watermark_name):
                                 test_string2 = ""
                                 test_string4 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content !="XX/XX/XXXX":
+                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content !="XX/XX/XXXX" and field_content != "*":
                                 
                                 pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
                                 
@@ -2642,7 +2722,7 @@ def generate_transactions_output(request,watermark_name):
                                             pdf_string_temp = ""
                                             temp_str = pdf_string
                                             pdf_string =""
-                                            pdf_string += "                                                                                                                    "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                                            pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                                             pdf_string +="\n\n\n"
                                             pdf_string += temp_str
                                             page_count +=1
@@ -2981,7 +3061,11 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.affidavit_watermark_string = watermark_name
             #element.actual_affidavit_watermark = watermark_instance
             element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
-
+    
+            element.BankRecordsUIDArray = str(element.bank_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("albaraka" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")
+            
+            element.InternalRecordUIDArray = str(element.internal_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("grandelivre" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")   
+            
             element.save()
             
             corpus_doccount += 1

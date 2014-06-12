@@ -281,6 +281,7 @@
 
         });
         
+
         //Generate Corpus of Files from Corpus
         
         $(".generate_corpus_files_button").button().click(function(){
@@ -291,9 +292,18 @@
             
             corpus_name = $(this).attr("corpus_name");
             
+            //Tells what corpus is selected
             $('#selected_corpus_mark').attr("value",corpus_name);
 
             $('#legal_template').attr("value",$('#select_template_menu').val());
+            
+            //Choose between Preview Output or Complete Output, which will translate into a
+            //maximum number of records to show and the way they are divided in different .pdfs
+            
+            var select_output_option = $('#select_output_option'+corpus_name).val();
+            $('#select_output_option').attr("value",select_output_option);
+            
+            
           
             $('#discovery_form').submit();
         
@@ -992,6 +1002,12 @@
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
                                     <div>Corpus : {{document_corpus.corpus_name}} corpus</div>
                                     
+                                    <select class="select_output_option" name="select_output_option{{document_corpus.corpus_name}}" id="select_output_option{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
+                                            <option value="" disabled selected>Select Output Option</option>
+                                            <option value="Preview">Preview Output</option>
+                                            <option value="Complete">Complete Output</option>
+                                    </select>
+                                    
                                     <button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="{{document_corpus.corpus_name}}">Generate Corpus Files</button>
                                     {% if document_corpus.corpus_contents and document_corpus.corpus_name != "sourcepdfs" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
                                     
@@ -1040,9 +1056,8 @@
                     <input type="input" class="invisible" id="selected_file_mark" name="selected_file_mark" value=""/>
                     <input type="input" class="invisible" id="final_legal_discovery" name="final_legal_discovery" value=""/>
                     <input type="input" class="invisible" id="report_type" name="report_type" value="{{report_type}}"/>
-                    
-                    
-                    
+                    <input type="input" class="invisible" id="select_output_option" name="select_output_option" value=""/>
+
                 </fieldset>
 
             </form>
