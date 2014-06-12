@@ -1277,22 +1277,29 @@ def generate_corpus_output(request,watermark_name):
 
 
 def generate_icr_output(request,watermark_name):
-    
+
+
     try:
-        output_option = request.POST['select_output_option']
+        max_documents = request.POST['select_max_documents']
     except:
-        output_option = "Preview"
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
 
-
-    if output_option == "Complete":
+        
+    if max_documents == "":
     
-        max_documents = 100000000000
-        docs_per_pdf = 2500
-
-    else:
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
     
-        max_documents = 93
-        docs_per_pdf = 7
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
     
     max_characters_line = 95
     
@@ -1391,20 +1398,18 @@ def generate_icr_output(request,watermark_name):
 
     corpus_common_final = PdfRecord.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
 
-    did_page_jump = False
+    did_page_jump = True
     
     with transaction.commit_on_success():
     
         for selected_entry_item in corpus_common_final:
     
-            created_page = False
             
             if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
 
                 if did_page_jump == False:
-                
-                    print "---------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
                     
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1431,14 +1436,15 @@ def generate_icr_output(request,watermark_name):
                 
                 output = PdfFileMerger()
                 
-                created_page = True
+                did_page_jump = True
                 
                 db.reset_queries()
                 
                 pdf_string = ""
 
-            if doc_iterator % docs_per_pdf == 0 or doc_iterator == 0:
+            if did_page_jump == True:
                       
+
                     pdf_string = ""
                     pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
@@ -1531,7 +1537,7 @@ def generate_icr_output(request,watermark_name):
                 
                 if pdf_string.count('\n') > 44:
                 
-                    print "<<<<<----------PRINT"
+
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1547,10 +1553,11 @@ def generate_icr_output(request,watermark_name):
                     
                     output.append(input1)
                     
-                    pdf_string = ""
+                    
+                    '''pdf_string = ""
                     pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string += '\n'
-                    page_count +=1
+                    page_count +=1'''
                     
                     did_page_jump = True
                 
@@ -1942,6 +1949,7 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 if did_page_jump == False:
                 
+                    print "<<<<<<<<<<------------>>>>>>>>>>>>>>"
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
@@ -1973,7 +1981,8 @@ def generate_grandelivre_output(request,watermark_name):
                 db.reset_queries()
                 
 
-            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
+            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
+                print "NEW PAGE INDICATOOOOOOOOOOOOOOOOOR 11111111111"
                 pdf_string = ""
                 pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"

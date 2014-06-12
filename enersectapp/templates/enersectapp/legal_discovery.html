@@ -299,15 +299,18 @@
             
             //Choose between Preview Output or Complete Output, which will translate into a
             //maximum number of records to show and the way they are divided in different .pdfs
+
             
-            var select_output_option = $('#select_output_option'+corpus_name).val();
-            $('#select_output_option').attr("value",select_output_option);
+            var select_max_documents = $('#select_max_documents'+corpus_name).val();
+            $('#select_max_documents').attr("value",select_max_documents);
             
-            
+            var select_docs_per_pdf = $('#select_docs_per_pdf'+corpus_name).val();
+            $('#select_docs_per_pdf').attr("value",select_docs_per_pdf);
           
             $('#discovery_form').submit();
         
         });
+        
         
         //Merge Files from Corpus Button
         
@@ -1002,11 +1005,44 @@
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
                                     <div>Corpus : {{document_corpus.corpus_name}} corpus</div>
                                     
-                                    <select class="select_output_option" name="select_output_option{{document_corpus.corpus_name}}" id="select_output_option{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
-                                            <option value="" disabled selected>Select Output Option</option>
-                                            <option value="Preview">Preview Output</option>
-                                            <option value="Complete">Complete Output</option>
+                                    
+                                    <select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
+                                            <option value="" disabled selected>Nº Max Documents</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="500">500</option>
+                                            <option value="1000">1000</option>
+                                            <option value="2500">2500</option>
+                                            <option value="5000">5000</option>
+                                            <option value="10000">10000</option>
+                                            <option value="10000000000000">All</option>
+                                            
                                     </select>
+                                    
+                                    <select class="select_docs_per_pdf" name="select_docs_per_pdf{{document_corpus.corpus_name}}" id="select_docs_per_pdf{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
+                                            <option value="" disabled selected>Nº Documents per Pdf</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="500">500</option>
+                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
+                                            <option value="1000">1000</option>
+                                            <option value="2500">2500</option>
+                                            <option value="5000">5000</option>
+                                            {% endif %}
+                                            
+                                    </select>
+                                    
+                                    
                                     
                                     <button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="{{document_corpus.corpus_name}}">Generate Corpus Files</button>
                                     {% if document_corpus.corpus_contents and document_corpus.corpus_name != "sourcepdfs" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
@@ -1056,8 +1092,9 @@
                     <input type="input" class="invisible" id="selected_file_mark" name="selected_file_mark" value=""/>
                     <input type="input" class="invisible" id="final_legal_discovery" name="final_legal_discovery" value=""/>
                     <input type="input" class="invisible" id="report_type" name="report_type" value="{{report_type}}"/>
-                    <input type="input" class="invisible" id="select_output_option" name="select_output_option" value=""/>
-
+                    <input type="input" class="invisible" id="select_max_documents" name="select_max_documents" value=""/>
+                    <input type="input" class="invisible" id="select_docs_per_pdf" name="select_docs_per_pdf" value=""/>
+                    
                 </fieldset>
 
             </form>
