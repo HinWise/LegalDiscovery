@@ -1278,7 +1278,6 @@ def generate_corpus_output(request,watermark_name):
 
 def generate_icr_output(request,watermark_name):
 
-
     try:
         max_documents = request.POST['select_max_documents']
     except:
@@ -1605,20 +1604,26 @@ def generate_icr_output(request,watermark_name):
 def generate_sourcepdfs_output(request,watermark_name):
 
     try:
-        output_option = request.POST['select_output_option']
+        max_documents = request.POST['select_max_documents']
     except:
-        output_option = "Preview"
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
 
-
-    if output_option == "Complete":
+        
+    if max_documents == "":
     
-        max_documents = 100000000000
-        docs_per_pdf = 500
-
-    else:
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
     
-        max_documents = 20
-        docs_per_pdf = 10
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
     
     max_characters_line = 95
     
@@ -1757,7 +1762,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             record_uid = selected_entry_item.sourcedoc_link.affidavit_uid_string
              
             pdf_string = ""
-            pdf_string += "                                                                                                                      "+"sourcepdfs__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+            pdf_string += "                                                                                                                    "+"sourcepdfs__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
             pdf_string +="\n\n\n"
             page_count +=1
              
@@ -1846,20 +1851,26 @@ def generate_grandelivre_output(request,watermark_name):
     
     
     try:
-        output_option = request.POST['select_output_option']
+        max_documents = request.POST['select_max_documents']
     except:
-        output_option = "Preview"
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
 
-
-    if output_option == "Complete":
+        
+    if max_documents == "":
     
-        max_documents = 100000000000
-        docs_per_pdf = 2500
-
-    else:
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
     
-        max_documents = 93
-        docs_per_pdf = 7
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
 
     max_characters_line = 95
         
@@ -2128,20 +2139,26 @@ def generate_albaraka_output(request,watermark_name):
     
     
     try:
-        output_option = request.POST['select_output_option']
+        max_documents = request.POST['select_max_documents']
     except:
-        output_option = "Preview"
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
 
-
-    if output_option == "Complete":
+        
+    if max_documents == "":
     
-        max_documents = 100000000000
-        docs_per_pdf = 2500
-
-    else:
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
     
-        max_documents = 100
-        docs_per_pdf = 25
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
    
 
     max_characters_line = 95
@@ -2409,23 +2426,27 @@ def generate_albaraka_output(request,watermark_name):
 def generate_transactions_output(request,watermark_name):
     
     
-    print "Arrived Transactions Corpus"
-    
     try:
-        output_option = request.POST['select_output_option']
+        max_documents = request.POST['select_max_documents']
     except:
-        output_option = "Preview"
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
 
-
-    if output_option == "Complete":
+        
+    if max_documents == "":
     
-        max_documents = 100000000000
-        docs_per_pdf = 2500
-
-    else:
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
     
-        max_documents = 100
-        docs_per_pdf = 25
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
     
     max_characters_line = 95
     
