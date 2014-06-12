@@ -1960,7 +1960,7 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 if did_page_jump == False:
                 
-                    print "<<<<<<<<<<------------>>>>>>>>>>>>>>"
+
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
@@ -1993,7 +1993,7 @@ def generate_grandelivre_output(request,watermark_name):
                 
 
             if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
-                print "NEW PAGE INDICATOOOOOOOOOOOOOOOOOR 11111111111"
+       
                 pdf_string = ""
                 pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
@@ -2087,7 +2087,6 @@ def generate_grandelivre_output(request,watermark_name):
                     input1 = PdfFileReader(tmpfile)
                     
                     output.append(input1)
-                    print "---------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
                     
                     pdf_string = ""
                     pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
@@ -2245,13 +2244,6 @@ def generate_albaraka_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
-        
-                pdf_string = ""
-                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                pdf_string +="\n\n\n"
-                page_count +=1
-        
             if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
@@ -2272,7 +2264,14 @@ def generate_albaraka_output(request,watermark_name):
                     
                     pdf_string = ""
                 
-                
+
+            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
+    
+    
+                pdf_string = ""
+                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 print "---------"+str("albaraka")+"--------"
@@ -2359,6 +2358,8 @@ def generate_albaraka_output(request,watermark_name):
                 
                 pdf_string += '\n'
                 pdf_string += '\n'
+                
+                did_page_jump = False
                 
                 if pdf_string.count('\n') > 44:
                 
@@ -2533,12 +2534,7 @@ def generate_transactions_output(request,watermark_name):
     
             created_page = False
         
-            if doc_iterator % docs_per_pdf == 0 and doc_iterator == 0:
-            
-                pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                pdf_string +="\n\n\n"
-                page_count +=1
-        
+
             if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
                 
                 if did_page_jump == False:
@@ -2578,7 +2574,12 @@ def generate_transactions_output(request,watermark_name):
 
             print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
         
-
+            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
+            
+                pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
+                
             #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
             
             corpus_include_fields = ["NumberBankRecordIndexes","BankRecordsUIDArray","NumberInternalRecordIndexes","InternalRecordUIDArray","CompletePostDate","CompleteValueDate","DateDiscrepancy","Amount","AmountDiscrepancy","ValueYear","Libdesc","Reftran","Provenance","BankAccount","BankName","BankCurrency"]
@@ -2728,6 +2729,8 @@ def generate_transactions_output(request,watermark_name):
                                         pdf_string_temp += '\n'
                                         
                                         #Include all the strings contained in the page
+                                        
+                                        did_page_jump = False
                                         
                                         if iterator_set == len(pdf_string_templist):
                                             
