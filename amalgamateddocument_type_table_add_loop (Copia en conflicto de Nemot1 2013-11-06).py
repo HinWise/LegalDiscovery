@@ -278,6 +278,81 @@ with transaction.commit_on_success():
 '''            
             
     
+### Method written for affidavit_of_records mode in Legal Disc Tool on 13/06/2014
     
+### To delete and clean the database so it doesn't have the entries made by TestGroup or nemot
+
+## Then , we mark the last entry of each sourcedoc_link as "None" (definitive), and the rest of them as duplicatemarked_reentered
 
 
+
+
+to_delete = PdfRecord.objects.filter(EntryAuthor__username = "nemot") | PdfRecord.objects.filter(EntryByCompany__name = "TestGroup") | PdfRecord.objects.filter(EntryByCompany__name = "INVENSIS") | PdfRecord.objects.filter(EntryAuthor__username = "mariosuser")
+
+to_delete.delete()
+
+all_pdf = PdfRecord.objects.all() #288024 --> 120847
+all_none_pdf = PdfRecord.objects.filter(audit_mark = "None") #120847 --> 120847
+all_duplicate_pdf = PdfRecord.objects.filter(audit_mark = "duplicatemarked_reentered") #167177 --> 0 (Untrue)
+
+all_sourcedocs = SourcePdf.objects.all() #194536
+
+
+#FlatWorld numbers: 113626 petitioned 105812 completed -> Same
+#NathanTeam numbers: 179 petitioned 42 completed -> Same
+#EnersectBerlin numbers: 24913 petitioned 15893 completed -> Same
+
+
+## First, Delete all duplicatemarked_reentered (Extra entries that are not useful for the final showing)
+
+duplicatemarked = PdfRecord.objects.filter(audit_mark = "duplicatemarked_reentered")
+
+count = 1
+
+with transaction.commit_on_success():
+    for duplicate in duplicatemarked:
+        
+        print "---> " +str(count)
+        
+        duplicate.delete()
+        
+        count +=1 
+        
+ 
+
+#Then, we find out what sourcedocs are repeated in more than one pdf_entry
+
+from django.db.models import Count
+ 
+duplicate_sources = all_pdf.values('sourcedoc_link').annotate(count=Count('id')).order_by().filter(count__gt=1).values_list('sourcedoc_link',flat=True).distinct()
+
+
+#Second loop deletes the non-definitive entries from the database (duplicatemarked_reentered)
+    
+count = 1
+    
+with transaction.commit_on_success():
+    for sourcedoc in duplicate_sources:
+        
+        print "---->" + str(count)
+        
+        sourcedoc_item = SourcePdf.objects.get(pk = sourcedoc)
+        
+        pdf_list = PdfRecord.objects.filter(sourcedoc_link = sourcedoc_item).order_by('modification_date')
+        
+        count += 1
+        
+        if len(pdf_list) > 1:
+        
+            old_records = pdf_list[:len(pdf_list)-1]
+            
+            for item in old_records:
+            
+                item.delete()
+
+      
+        
+
+
+
+          

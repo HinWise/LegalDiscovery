@@ -311,7 +311,6 @@
         
         });
         
-        
         //Merge Files from Corpus Button
         
         $(".merge_files_button").button().click(function(){
@@ -326,6 +325,37 @@
 
             $('#legal_template').attr("value",$('#select_template_menu').val());
           
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //COmplete Corpus Files Button (same as Generate Corpus, but with an extra mark)
+        
+        $(".complete_corpus_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","generate_corpus_files_action");
+            
+            $('#complete_corpus_mark').attr("value","complete");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            //Tells what corpus is selected
+            $('#selected_corpus_mark').attr("value",corpus_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+            
+            //Choose between Preview Output or Complete Output, which will translate into a
+            //maximum number of records to show and the way they are divided in different .pdfs
+
+            
+            var select_max_documents = $('#select_max_documents'+corpus_name).val();
+            $('#select_max_documents').attr("value",select_max_documents);
+            
+            var select_docs_per_pdf = $('#select_docs_per_pdf'+corpus_name).val();
+            $('#select_docs_per_pdf').attr("value",select_docs_per_pdf);
           
             $('#discovery_form').submit();
         
@@ -1008,25 +1038,30 @@
                                     
                                     <select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
                                             <option value="" disabled selected>Nº Max Documents</option>
+                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="5">5</option>
                                             <option value="10">10</option>
                                             <option value="25">25</option>
                                             <option value="50">50</option>
+                                            {% endif %}
                                             <option value="100">100</option>
+                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
                                             <option value="250">250</option>
                                             <option value="500">500</option>
                                             <option value="1000">1000</option>
                                             <option value="2500">2500</option>
                                             <option value="5000">5000</option>
                                             <option value="10000">10000</option>
+                                            {% endif %}
                                             <option value="10000000000000">All</option>
                                             
                                     </select>
                                     
                                     <select class="select_docs_per_pdf" name="select_docs_per_pdf{{document_corpus.corpus_name}}" id="select_docs_per_pdf{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
                                             <option value="" disabled selected>Nº Documents per Pdf</option>
+                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
                                             {% if document_corpus.corpus_name != "transactions" %}
                                             <option value="1">1</option>
                                             <option value="2">2</option>
@@ -1037,6 +1072,7 @@
                                             <option value="50">50</option>
                                             <option value="100">100</option>
                                             <option value="250">250</option>
+                                            {% endif %}
                                             <option value="500">500</option>
                                             {% if document_corpus.corpus_name != "sourcepdfs" %}
                                             <option value="1000">1000</option>
@@ -1050,6 +1086,8 @@
                                     
                                     <button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="{{document_corpus.corpus_name}}">Generate Corpus Files</button>
                                     {% if document_corpus.corpus_contents and document_corpus.corpus_name != "sourcepdfs" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
+                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name == "sourcepdfs" %}<button id="complete_corpus_button" class="complete_corpus_button" corpus_name ="{{document_corpus.corpus_name}}">Complete Corpus Files</button>{%endif%}
+                                    
                                     
                                     {% for file in document_corpus.corpus_contents %}
                                     <ul class="corpus_list">
@@ -1098,6 +1136,7 @@
                     <input type="input" class="invisible" id="report_type" name="report_type" value="{{report_type}}"/>
                     <input type="input" class="invisible" id="select_max_documents" name="select_max_documents" value=""/>
                     <input type="input" class="invisible" id="select_docs_per_pdf" name="select_docs_per_pdf" value=""/>
+                    <input type="input" class="invisible" id="complete_corpus_mark" name="complete_corpus_mark" value=""/>
                     
                 </fieldset>
 
