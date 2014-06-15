@@ -1771,7 +1771,7 @@ def generate_sourcepdfs_output(request,watermark_name):
     
     did_page_jump = False  
 
-
+    
     print "------------- STARTING SOURCE PDFS ----------------"
     with transaction.commit_on_success():
         for selected_entry_item in corpus_common_final:
@@ -1827,7 +1827,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             
             '''Write command to finish and save new page'''
             
-
+            
             tmpfile = tempfile.SpooledTemporaryFile(1048576)
             # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
             tmpfile.rollover()
@@ -1870,8 +1870,9 @@ def generate_sourcepdfs_output(request,watermark_name):
 
             #tempfile_output = PdfFileMerger()
             
+           
             output.append(PdfFileReader(file(source_url, 'rb')))
-
+            
             #Problem in record PDF 144099 , job4 , scan1~2013_06_12_11_36_12_36.pdf
             '''Write command to finish and save new page'''
             
@@ -3054,7 +3055,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
             corpus_icr = corpus_icr | corpus_final'''
      
-    corpus_icr = PdfRecord.objects.filter(audit_mark = "None").exclude(EntryByCompany__name = "TestGroup").exclude(EntryAuthor__username = "nemot").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').distinct()
+    corpus_icr = PdfRecord.objects.filter(audit_mark = "None").exclude(EntryByCompany__name = "TestGroup").exclude(EntryAuthor__username = "nemot").exclude(sourcedoc_link__corrupt = "yes").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').distinct()
     
     #corpus_sourcepdfs will be represented in the corpus_icr loop, by the field sourcedoc_link
     #corpus_sourcepdfs = SourcePdf.objects.all().distinct()
@@ -3094,7 +3095,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
             
         
-    '''with transaction.commit_on_success():
+    with transaction.commit_on_success():
         
         db.reset_queries()
         
@@ -3155,7 +3156,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.save()
             
             corpus_doccount += 1
-            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)'''
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
     
 
 
