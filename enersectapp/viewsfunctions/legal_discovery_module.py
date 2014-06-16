@@ -46,6 +46,8 @@ import shutil
 import string
 import random
 
+Month_Dictionary = {"01":"January","02":"February","03":"March","04":"April","05":"May","06":"June","07":"July","08":"August","09":"September","10":"October","11":"November","12":"December"}
+
 def legal_discovery(request):
     
     the_user = request.user
@@ -992,7 +994,7 @@ def document_corpus_maker():
     
     all_documents = sorted(all_documents)
     
-    print all_documents
+    #print all_documents
     
     document_corpus_list = []
     
@@ -1461,8 +1463,8 @@ def generate_icr_output(request,watermark_name):
 
             #For each of the checked extract_fields in this doctype, correct the sorting, to be used in the order of the pdfs to export
             
-            corpus_include_fields = ["Amount","Currency","IssueDate","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
-            corpus_sorting_fields = ["Amount","Currency","IssueDate","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
+            corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
+            corpus_sorting_fields = ["Month","Day","Year","Amount","Currency","IssueDate","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
 
 
             #Not making cut, because the entry is already decided upon
@@ -1474,6 +1476,7 @@ def generate_icr_output(request,watermark_name):
                 pretty_name = record.modified_document_type.pretty_name
                 
                 ocr_record_final = record.ocrrecord_link
+                sourcedoc_final = record.sourcedoc_link
                 
                 record_uid = record.affidavit_uid_string
                 
@@ -1481,7 +1484,7 @@ def generate_icr_output(request,watermark_name):
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
-                show_date = ocr_record_final.IssueDate
+                '''show_date = ocr_record_final.IssueDate
                 if show_date == "MISSING" or show_date == "UNREADABLE" or show_date == "" or show_date == "NoIssueDateField" or show_date == "Blank":
                     show_date = "(No Date)"
                 show_amount = ocr_record_final.Amount    
@@ -1501,7 +1504,7 @@ def generate_icr_output(request,watermark_name):
                 
                 else:
                 
-                    pdf_string += ".  -This "+str(pretty_name)+" Document has no extracted information."
+                    pdf_string += ".  -This "+str(pretty_name)+" Document has no extracted information."'''
                     
                 
                 for field_name in corpus_include_fields:
@@ -1509,13 +1512,16 @@ def generate_icr_output(request,watermark_name):
                     try:
                         field_content = str(getattr(ocr_record_final, field_name))
                     except:
-                        field_content = ""
+                        try:
+                            field_content = str(getattr(sourcedoc_final, field_name))
+                        except:
+                            field_content = ""
                     
                     cute_name = str(ExtractionField.objects.filter(real_field_name = field_name)[0].pretty_name)
                     
                     try:
                         
-                        try:
+                        '''try:
                             
                             if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > max_characters_line:
                                 test_string = "\n"
@@ -1524,11 +1530,12 @@ def generate_icr_output(request,watermark_name):
                                 test_string = ""
                                 test_string2 = ""
                             
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank" and field_content != "*":
-                                pdf_string += " "+test_string+test_string2+cute_name+" "+field_content
+                            
                               
                         except:
-                            test_string = ""
+                            test_string = ""'''
+                        
+                        pdf_string += evaluate_icr_field(cute_name,field_content)
                         
                     except:
                         pdf_string += " "
@@ -2896,6 +2903,7 @@ def merge_corpus_output(request,watermark_name):
     corpus_to_include = str(corpus_to_include)
 
 
+
     file_list = os.listdir('legaldiscoverytemp/output_files/'+corpus_to_include+'/')
 
     file_list = sorted(file_list)
@@ -2919,7 +2927,7 @@ def merge_corpus_output(request,watermark_name):
     #final_output.append(PdfFileReader(temp_outputStream))
     
     count = 0
-
+    
     for filename in file_list:
         print "---->"+str(filename)
                   
@@ -3241,3 +3249,67 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
     
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
+        
+        
+def evaluate_icr_field(cute_name,field_content):
+
+    worthOutputting = False
+              
+    return_string = ""
+
+    try:
+                            
+        if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > max_characters_line:
+            test_string = "\n"
+            test_string2 = ".              -"
+        else:
+            test_string = ""
+            test_string2 = ""
+        
+
+    except:
+        test_string = ""
+        
+        
+    if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank" and field_content != "*":
+       
+        worthOutputting = True
+        
+        actual_content = ""
+        
+        
+        
+    else:
+    
+        '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
+
+        7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
+
+        in the 2006 accounting of NA Solid Petroserve Ltd.'s Tunisian Branch with journal entry 474 as 
+
+        having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
+        
+        #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
+        worthOutputting = True
+        
+        actual_content = ""
+        
+        if cute_name == "Amount":
+        
+            actual_content = "transferring an unknown Amount"
+        
+        if cute_name == "Currency":
+        
+            actual_content = "of unknown Currency"
+            
+        if cute_name == "Month":
+        
+            actual_content = "On an unknown Date,"
+        
+        
+    
+    if worthOutputting == True:
+    
+        return_string = " "+test_string+test_string2+" "+actual_content
+       
+    return return_string
