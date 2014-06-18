@@ -1,0 +1,323 @@
+@charset "UTF-8";
+
+html,body {
+
+    background: none !important;
+    background-image: none !important;
+    
+}
+
+.ui-dialog-titlebar-close {
+
+    display:none;
+}
+
+.ui-widget {
+
+    font-family: Arial,sans-serif;
+    font-size: 80%;
+}
+
+#fieldset_fields { padding:0; border:0; margin-top:12%; overflow:hidden;}
+#fieldset_fields ul
+    { 
+    width: 85%;
+    overflow: hidden;
+    
+   }
+
+#doctype_list { list-style-type: none; margin-top: 8px;
+                padding: 0;
+                width: 100%; }
+                
+  #doctype_list li { height: 6%; }
+  .ui-state-highlight-line { height: 1% !important; line-height: 2px; background-color: #231d2b !important;}
+  .doctype_element { background:none !important; }
+  
+.doctype_list_name{ position:relative; }
+.doctype_list_count{ position:absolute; left:73%; top:23%; }
+ 
+#select_template_menu {
+
+    display: block;
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 2%;
+}
+
+#choose_template_button {
+
+    width:45%;
+    margin-left: 3%;
+
+}
+
+#save_template_button {
+
+   width:45%;
+
+}
+
+#export_template_button {
+
+    width: 98%;
+    height: 80%;
+    margin-top: 1.2%;
+
+}
+
+ 
+.sorting_buttonset {
+     position: relative;
+    display: inline-block;
+    width: 16%;
+    height: 5%;
+    left: 2%; 
+}
+ 
+.order_tab {
+
+    width: 20%;
+    height: 50%;
+    font-size: 80% !important;
+
+}
+
+.order_tab .ui-button-text {
+
+    padding: 0 !important;
+
+}
+
+.order_tab .ui-icon {
+
+    left: -10% !important;
+
+}
+ 
+#panels_container{
+    position: absolute;
+    top: 0%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    pointer-events: all;
+    
+}
+
+
+#doctypes_panel_container{
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    width: 45%;
+    height: 85%;
+    pointer-events: all;
+    
+    z-index: 50 !important;
+    
+    overflow:auto;
+}
+
+#doctypes_detail_panel_container{
+    position: absolute;
+    top: 22%;
+    left: 50.5%;
+    width: 45%;
+    height: 85%;
+    pointer-events: all;
+    
+    overflow:auto;
+}
+
+#doctypes_detail_extraction_list {
+
+    list-style-type: none;
+    margin-top: 10%;
+    margin-left: -10%;
+
+}
+
+#doctypes_choose_template_panel_container{
+    position: absolute;
+    top: 1%;
+    left: 37%;
+    width: 26%;
+    height: 20%;
+    pointer-events: all;
+    
+    overflow:auto;
+}
+
+
+
+#accordion_table {
+
+    position:absolute;
+    
+    top:0;
+    left: -50%;
+    width: 205%;
+    height:100%;
+    
+    overflow:auto;
+    
+}
+
+#accordion .ui-accordion-content {
+    
+    padding: 1%;
+    border-top: 0;
+    overflow: auto;
+
+}
+
+
+#right_container {
+
+    position:absolute;
+    
+    width:45%;
+    height:100%;
+    
+    left: 0.5%;
+    top: 0;
+}
+
+   
+    .divisor-line {
+    
+        width: 92%;
+        margin-left: 1%;
+
+        height: 0.5%;
+        border: 1px dashed silver;
+
+    }
+    
+
+.custom-tooltip {
+
+    width:260px;
+    height:35px;
+    
+    font-size:14px;
+
+}
+
+
+
+#affidavit_panel_container {
+
+
+    position: absolute;
+    top: 22%;
+    left: 5%;
+    width: 91%;
+    height: 85%;
+    pointer-events: all;
+    
+    z-index: 100 !important;
+    
+    overflow:auto;
+
+
+}
+
+
+#affidavit_panel {
+
+
+
+}
+
+#affidavit_create_watermark_panel_container {
+
+    position: absolute;
+    top: 1%;
+    left: 37%;
+    width: 26%;
+    height: 20%;
+    pointer-events: all;
+    
+    overflow:auto;
+
+}
+
+.document_list {
+
+    display: inline-block;
+    position: relative;
+    width: 43%;
+    height: 98%;
+    border: 1px solid grey;
+    overflow-y: auto;
+    
+}
+
+div#document_lists_container {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 100%;
+    /* height: 80px; */
+    white-space: nowrap;
+}
+
+
+/*Selectable && Sortable css*/
+
+li { position:relative !important; padding: 1% !important; padding-left: 8% !important;  }
+
+li .handle { background: #f8f8f8 !important; position: absolute !important; left: 0 !important; top: 0 !important; bottom: 0 !important; padding:2% !important; cursor:move;}
+
+li .edit_doctype_element { background: #f8f8f8 !important; position: absolute !important; right: 0 !important; top: 0 !important; bottom: 0 !important; padding:2% !important; cursor: pointer;}
+
+.extraction_field_element { background: -webkit-linear-gradient(top, rgba(232,234,255,0.5) 0%,rgba(230,234,255,1) 100%) !important; cursor: copy;}
+
+.unavailable_element { 
+    background: -webkit-linear-gradient(top, rgba(255,0,0,0.08) 0%,rgba(255,0,0,0.08) 100%) !important;
+    border: 1px solid rgba(10,0,0,0.05) !important;
+    color: rgba(112,112,112,0.4) !important; 
+}
+/*.unavailable_element {background-color: rgba(255,0,0,0.1) !important; color: rgba(112,112,112,0.6) !important; }*/
+
+
+.available_element { background: -webkit-linear-gradient(top, rgba(232,234,255,0.5) 0%,rgba(230,234,255,1) 100%) !important; cursor: copy; }
+/*.available_element {background-color: rgba(230,224,255,0.8) !important;}*/
+
+.ui-selecting { background: -webkit-linear-gradient(top, rgba(212,255,255,0.1) 0%,rgba(212,241,214,0.3) 100%) !important; border-width: 3px !important;
+border-style: double !important;}
+.ui-selecting .handle { background-color: rgba(221,221,221,0.3) !important; }
+
+.ui-selected { background: -webkit-linear-gradient(top, rgba(212,255,255,0.3) 0%,rgba(212,241,214,0.5) 100%) !important;
+color: black !important;
+border-width: 3px !important;
+border-style: double !important;}
+
+/*.ui-selected { background-color: rgba(221,238,255,0.8) !important; color:black !important;}*/
+.ui-selected .handle { background-color: rgba(204,221,238,0.3) !important; }
+
+
+
+.ui-selectable-helper{display:block; z-index:200; background-color: green !important; opacity:0.1 !important;}
+
+
+
+
+
+
+
+.ui-state-custom-linked {
+    
+	border: 1px solid #8cce3b;
+	background: #f6ecd5 url("images/ui-bg_gloss-wave_85_76e361_500x100.png") 50% 50% repeat-x;
+	color: #030303;
+}
+
+.ui-state-custom-error {
+        
+	border: 1px solid #f1ac88;
+	background: #f6ecd5 url("images/ui-bg_gloss-wave_85_d25d72_500x100.png") 50% 50% repeat-x;
+	
+}
+	

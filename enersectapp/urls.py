@@ -291,8 +291,8 @@ urlpatterns = patterns('',
     # It must freeze/save a selection of all documents at a certain point, so it won't happen that someone creates new entries while you
     # print one of the corpuses, then the next one won't relate to it.
     # Probable implementation: Freeze State button
-    # ex: enersectapp/linkui/transaction_linking/
-    url(r'^legalui/affidavit_create/$', views.affidavit_create, name='affidavit_create'),
+    # ex: enersectapp/legalui/affidavit_generator/
+    url(r'^legalui/affidavit_generator/$', views.affidavit_generator, name='affidavit_generator'),
     
     
     
