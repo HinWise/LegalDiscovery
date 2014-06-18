@@ -291,9 +291,9 @@ to_delete = PdfRecord.objects.filter(EntryAuthor__username = "nemot") | PdfRecor
 
 to_delete.delete()
 
-all_pdf = PdfRecord.objects.all() #288024 --> 120847
-all_none_pdf = PdfRecord.objects.filter(audit_mark = "None") #120847 --> 120847
-all_duplicate_pdf = PdfRecord.objects.filter(audit_mark = "duplicatemarked_reentered") #167177 --> 0 (Untrue)
+all_pdf = PdfRecord.objects.all() #288024 --> 120847 / 296478 --> 125484
+all_none_pdf = PdfRecord.objects.filter(audit_mark = "None") #120847 --> 120847 / 129016 --> 125484
+all_duplicate_pdf = PdfRecord.objects.filter(audit_mark = "duplicatemarked_reentered") #167177 --> 0 (Untrue) / 167462 --> 0 (Untrue)
 
 all_sourcedocs = SourcePdf.objects.all() #194536
 
@@ -301,6 +301,10 @@ all_sourcedocs = SourcePdf.objects.all() #194536
 #FlatWorld numbers: 113626 petitioned 105812 completed -> Same
 #NathanTeam numbers: 179 petitioned 42 completed -> Same
 #EnersectBerlin numbers: 24913 petitioned 15893 completed -> Same
+
+#FlatWorld numbers: 113626 petitioned 113626 completed -> Same
+#NathanTeam numbers: 179 petitioned 42 completed -> Same
+#EnersectBerlin numbers: 24913 petitioned 16195 completed -> Same
 
 
 ## First, Delete all duplicatemarked_reentered (Extra entries that are not useful for the final showing)

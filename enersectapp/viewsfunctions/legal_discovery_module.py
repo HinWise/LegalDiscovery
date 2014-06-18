@@ -47,6 +47,7 @@ import string
 import random
 
 Month_Dictionary = {"01":"January","02":"February","03":"March","04":"April","05":"May","06":"June","07":"July","08":"August","09":"September","10":"October","11":"November","12":"December"}
+max_characters_line = 95
 
 def legal_discovery(request):
     
@@ -1473,75 +1474,8 @@ def generate_icr_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                pretty_name = record.modified_document_type.pretty_name
                 
-                ocr_record_final = record.ocrrecord_link
-                sourcedoc_final = record.sourcedoc_link
-                
-                record_uid = record.affidavit_uid_string
-                
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(pretty_name)+":"
-                pdf_string += "\n"
-                pdf_string += "\n"
-                
-                '''show_date = ocr_record_final.IssueDate
-                if show_date == "MISSING" or show_date == "UNREADABLE" or show_date == "" or show_date == "NoIssueDateField" or show_date == "Blank":
-                    show_date = "(No Date)"
-                show_amount = ocr_record_final.Amount    
-                if show_amount == "MISSING" or show_amount == "UNREADABLE" or show_amount == "" or show_amount == "NoAmountField" or show_amount == "Blank":
-                    show_amount = "(No Amount)"
-                show_currency = ocr_record_final.Currency    
-                if show_currency == "MISSING" or show_currency == "UNREADABLE" or show_currency == "" or show_currency == "NoCurrencyField" or show_currency == "Blank":
-                    show_currency = "(No Currency)"
-                
-                if show_date != "(No Date)" or show_amount != "(No Amount)" or show_currency != "(No Currency)":
-                
-                    pdf_string += ".  -This "+str(pretty_name)+" Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
-                    pdf_string += "\n"
-                    pdf_string += "\n"
-                    pdf_string += ".              -"
-                
-                
-                else:
-                
-                    pdf_string += ".  -This "+str(pretty_name)+" Document has no extracted information."'''
-                    
-                
-                for field_name in corpus_include_fields:
-                    
-                    try:
-                        field_content = str(getattr(ocr_record_final, field_name))
-                    except:
-                        try:
-                            field_content = str(getattr(sourcedoc_final, field_name))
-                        except:
-                            field_content = ""
-                    
-                    cute_name = str(ExtractionField.objects.filter(real_field_name = field_name)[0].pretty_name)
-                    
-                    try:
-                        
-                        '''try:
-                            
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > max_characters_line:
-                                test_string = "\n"
-                                test_string2 = ".              -"
-                            else:
-                                test_string = ""
-                                test_string2 = ""
-                            
-                            
-                              
-                        except:
-                            test_string = ""'''
-                        
-                        pdf_string += evaluate_icr_field(cute_name,field_content)
-                        
-                    except:
-                        pdf_string += " "
-                        
-                
-                '''Write command to output the existing pdf_string variable as a new row, then line break'''
+                pdf_string += add_icr_entry_content(exhibit_count,record)
                 
                 pdf_string += '\n'
                 pdf_string += '\n'
@@ -3250,66 +3184,316 @@ def delete_temp_affidavit_files(corpus,partial_or_merge):
 def id_generator(size=8, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
         
-        
-def evaluate_icr_field(cute_name,field_content):
 
-    worthOutputting = False
-              
+        
+def test_length_add_line(previous_string, additional_string):
+
+
     return_string = ""
 
-    try:
-                            
-        if (len(pdf_string.split("\n")[-1]) + len(" "+cute_name+" "+field_content)) > max_characters_line:
-            test_string = "\n"
-            test_string2 = ".              -"
-        else:
-            test_string = ""
-            test_string2 = ""
-        
-
-    except:
-        test_string = ""
-        
-        
-    if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank" and field_content != "*":
-       
-        worthOutputting = True
-        
-        actual_content = ""
-        
-        
-        
-    else:
+    if (len(previous_string.split("\n")[-1])) + len(additional_string) > max_characters_line:
     
-        '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
+        return_string = "\n    "
+    
+    return_string = str(previous_string) + str(return_string) + str(additional_string) 
+    
+    return return_string    
+
+def test_icr_content(field_name,record):
+
+    actual_content = ""
+
+    if field_name == "IssueDate":
+        try:
+            
+            field_content = str(record.ocrrecord_link.IssueDate)
+
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "Blank" and field_content != "*" and field_content != "NaN":
+     
+                            
+                if record.ocrrecord_link.Day != "NaN" and record.ocrrecord_link.Day != "" and record.ocrrecord_link.Day != "*":
+                    day_string = str(record.ocrrecord_link.Day)
+                else:
+                    day_string = "an unknown Day"
+                    
+      
+                if record.ocrrecord_link.Month != "NaN" and record.ocrrecord_link.Month != "" and record.ocrrecord_link.Month != "*":
+                    
+                    try:
+                    
+                        month_string = Month_Dictionary[str(record.ocrrecord_link.Month)]
+                    
+                    except:
+                    
+                        month_string = str(record.ocrrecord_link.Month)
+                else:
+                    month_string = "an unknown Month"
+                    
+         
+                
+                if record.ocrrecord_link.Year != "NaN" and record.ocrrecord_link.Year != "" and record.ocrrecord_link.Year != "*":
+                    year_string = str(record.ocrrecord_link.Year)
+                else:
+                    year_string = "an unknown Year"
+
+                actual_content = month_string + " " + day_string + ", " + year_string
+            
+            else:
+                
+                actual_content = "an unknown Date"
+        except:
+        
+            actual_content = "an unknown Date"
+    
+    if field_name == "Document_Number":
+        try:
+            field_content = str(record.ocrrecord_link.Document_Number)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "Piece_Number":
+        try:
+            field_content = str(record.ocrrecord_link.Piece_Number)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+
+            actual_content = "unknown"
+            
+    if field_name == "Amount":
+        try:
+            field_content = str(record.ocrrecord_link.Amount)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Amount"
+        except:
+        
+            actual_content = "an unknown Amount"
+            
+    if field_name == "Currency":
+        try:
+            field_content = str(record.ocrrecord_link.Currency)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+         
+        except:
+        
+            actual_content = "unknown"
+         
+    if field_name == "Company":
+        try:
+            field_content = str(record.ocrrecord_link.Company)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Recipient"
+        except:
+        
+            actual_content = "an unknown Recipient"
+            
+    if field_name == "Address":
+        try:
+            field_content = str(record.ocrrecord_link.Address)
+
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+            
+    if field_name == "Telephone":
+        try:
+            field_content = str(record.ocrrecord_link.Telephone)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+            
+    if field_name == "Location":
+        try:
+            city_string = str(record.ocrrecord_link.City)
+            country_string = str(record.ocrrecord_link.Country)
+            
+            field_content = city_string
+            
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                city_string = field_content
+                city = True
+                
+            else:
+            
+                city = False
+                city_string = "an unknown City"
+                
+            field_content = country_string
+            
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                country_string = ", in "+field_content
+                country = True
+                
+            else:
+            
+                country = False
+                country_string = ", in an unknown Country"   
+        
+            
+            actual_content = city_string + country_string
+
+            
+            if city == False and country == False:
+            
+                actual_content = "an unknown Location"
+        except:
+
+            actual_content = "an unknown Location"
+    
+    #if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and "arabic translation" not in field_content and field_content != "no" and field_content != "Blank" and field_content != "*":
+    
+    if field_name == "sourcepdf_uid":
+        try:
+            field_content = str(record.sourcedoc_link.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_SourceDoc"
+        except:
+        
+            actual_content = "No_Linked_SourceDoc"
+    
+    return actual_content
+    
+def add_icr_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    doctype_pretty_name = record.modified_document_type.pretty_name
+           
+    ocr_record_final = record.ocrrecord_link
+    sourcedoc_final = record.sourcedoc_link
+
+    record_uid = record.affidavit_uid_string
+    sourcepdf_uid = sourcedoc_final.affidavit_uid_string
+
+    pdf_string = ""
+    
+    '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
 
         7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
 
         in the 2006 accounting of NA Solid Petroserve Ltd.'s Tunisian Branch with journal entry 474 as 
 
         having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
-        
-        #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
-        worthOutputting = True
-        
-        actual_content = ""
-        
-        if cute_name == "Amount":
-        
-            actual_content = "transferring an unknown Amount"
-        
-        if cute_name == "Currency":
-        
-            actual_content = "of unknown Currency"
-            
-        if cute_name == "Month":
-        
-            actual_content = "On an unknown Date,"
-        
-        
+    #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
+
+    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"], "+str(doctype_pretty_name)+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("IssueDate",record))
+
+    pdf_string += " "
     
-    if worthOutputting == True:
+    pdf_string = test_length_add_line(pdf_string, "a "+doctype_pretty_name+" document of number ")
     
-        return_string = " "+test_string+test_string2+" "+actual_content
-       
+
+    # X Document_Number / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Document_Number",record))
+    pdf_string = test_length_add_line(pdf_string, " and piece number ")
+    
+    
+    
+    # X Piece Number/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Piece_Number",record))
+    pdf_string = test_length_add_line(pdf_string, " was processed, transferring ")
+
+    
+
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, " of Currency ")
+    
+    
+    # X Currency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Currency",record))
+    pdf_string = test_length_add_line(pdf_string, " to ")
+    
+  
+    # X Company / an unknown Recipient
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Company",record))
+    pdf_string = test_length_add_line(pdf_string, ", with Address ")
+    
+    
+    # X Address / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Address",record))
+    pdf_string = test_length_add_line(pdf_string, " and Phone Number ")
+    
+    
+    # X Telephone / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Telephone",record))
+    pdf_string = test_length_add_line(pdf_string, " residing in ")
+    
+    
+    # X City, Country / an unknown Location
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Location",record))
+    pdf_string += ". "
+    
+    
+    # [sourcepdf_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
+
+    
+
+    return_string = pdf_string
+
     return return_string
