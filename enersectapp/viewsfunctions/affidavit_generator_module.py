@@ -2536,6 +2536,59 @@ def test_icr_content(field_name,record):
         
             actual_content = "No_Linked_SourceDoc"
     
+    
+    if field_name == "ExtraFields":
+        try:
+            sourcebankaccount_string = str(record.ocrrecord_link.Source_Bank_Account)
+            purchaseorder_string = str(record.ocrrecord_link.PurchaseOrder_Number)
+            chequenumber_string = str(record.ocrrecord_link.Cheque_Number)
+            
+            field_content = sourcebankaccount_string
+            
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                sourcebankaccount_string = "Transference was made from Account " + field_content + ".\n"
+                sourcebankaccount = True
+                
+            else:
+            
+                sourcebankaccount = False
+                sourcebankaccount_string = ""
+                
+            field_content = purchaseorder_string
+            
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                purchaseorder_string = "The Purchase Order number is "+ field_content + ".\n"
+                purchaseorder = True
+                
+            else:
+            
+                purchaseorder = False
+                purchaseorder_string = ""   
+        
+            field_content = chequenumber_string
+            
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                chequenumber_string = "An additional Cheque Number was provided: "+field_content + ".\n"
+                chequenumber = True
+                
+            else:
+            
+                chequenumber = False
+                chequenumber_string = ", in an unknown Country"   
+            
+            actual_content = city_string + country_string
+
+            
+            if sourcebankaccount == True or purchaseorder == True or chequenumber == True:
+            
+                actual_content = "\n\n  Extra information: \n    " + sourcebankaccount_string + purchaseorder_string + chequenumber_string + "\n"
+        except:
+
+            actual_content = ""
+    
     return actual_content
     
 def add_icr_entry_content(exhibit_count, record):
@@ -2615,11 +2668,16 @@ def add_icr_entry_content(exhibit_count, record):
     pdf_string = test_length_add_line(pdf_string, test_icr_content("Location",record))
     pdf_string += ". "
     
-    
+
     # [sourcepdf_uid]
 
     pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
 
+    # Extra fields: Cheque Number, Purchase Order Number, Source Bank Account
+    
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("ExtraFields",record))
+    
+    
     
 
     return_string = pdf_string
