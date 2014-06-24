@@ -2538,6 +2538,7 @@ def test_icr_content(field_name,record):
     
     
     if field_name == "ExtraFields":
+    
         try:
             sourcebankaccount_string = str(record.ocrrecord_link.Source_Bank_Account)
             purchaseorder_string = str(record.ocrrecord_link.PurchaseOrder_Number)
@@ -2549,7 +2550,7 @@ def test_icr_content(field_name,record):
            
                 sourcebankaccount_string = "Transference was made from Account " + field_content + ".\n"
                 sourcebankaccount = True
-                
+
             else:
             
                 sourcebankaccount = False
@@ -2561,7 +2562,7 @@ def test_icr_content(field_name,record):
            
                 purchaseorder_string = "The Purchase Order number is "+ field_content + ".\n"
                 purchaseorder = True
-                
+
             else:
             
                 purchaseorder = False
@@ -2573,22 +2574,21 @@ def test_icr_content(field_name,record):
            
                 chequenumber_string = "An additional Cheque Number was provided: "+field_content + ".\n"
                 chequenumber = True
-                
+
             else:
             
                 chequenumber = False
-                chequenumber_string = ", in an unknown Country"   
+                chequenumber_string = ""   
             
-            actual_content = city_string + country_string
 
-            
             if sourcebankaccount == True or purchaseorder == True or chequenumber == True:
-            
-                actual_content = "\n\n  Extra information: \n    " + sourcebankaccount_string + purchaseorder_string + chequenumber_string + "\n"
+         
+                actual_content = "Extra information: \n      " + sourcebankaccount_string + purchaseorder_string + chequenumber_string
+                
         except:
 
             actual_content = ""
-    
+
     return actual_content
     
 def add_icr_entry_content(exhibit_count, record):
@@ -2599,6 +2599,98 @@ def add_icr_entry_content(exhibit_count, record):
     doctype_pretty_name = record.modified_document_type.pretty_name
            
     ocr_record_final = record.ocrrecord_link
+    sourcedoc_final = record.sourcedoc_link
+
+    record_uid = record.affidavit_uid_string
+    sourcepdf_uid = sourcedoc_final.affidavit_uid_string
+
+    pdf_string = ""
+    
+    '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
+
+        7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
+
+        in the 2006 accounting of NA Solid Petroserve Ltd.'s Tunisian Branch with journal entry 474 as 
+
+        having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
+    #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
+
+    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"], "+str(doctype_pretty_name)+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("IssueDate",record))
+
+    pdf_string += " "
+    
+    pdf_string = test_length_add_line(pdf_string, "a "+doctype_pretty_name+" document of number ")
+    
+
+    # X Document_Number / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Document_Number",record))
+    pdf_string = test_length_add_line(pdf_string, " and piece number ")
+    
+    
+    
+    # X Piece Number/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Piece_Number",record))
+    pdf_string = test_length_add_line(pdf_string, " was processed, transferring ")
+
+    
+
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, " of Currency ")
+    
+    
+    # X Currency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Currency",record))
+    pdf_string = test_length_add_line(pdf_string, " to ")
+    
+  
+    # X Company / an unknown Recipient
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Company",record))
+    pdf_string = test_length_add_line(pdf_string, ", with Address ")
+    
+    
+    # X Address / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Address",record))
+    pdf_string = test_length_add_line(pdf_string, " and Phone Number ")
+    
+    
+    # X Telephone / unknown
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Telephone",record))
+    pdf_string = test_length_add_line(pdf_string, " residing in ")
+    
+    
+    # X City, Country / an unknown Location
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("Location",record))
+    pdf_string += ". "
+    
+
+    # [sourcepdf_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
+
+    # Extra fields: Cheque Number, Purchase Order Number, Source Bank Account
+    
+    pdf_string = test_length_add_line(pdf_string, test_icr_content("ExtraFields",record))
+    
+    
+    
+
+    return_string = pdf_string
+
+    return return_string
+    
+def add_sourcepdfs_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    doctype_pretty_name = record.modified_document_type.pretty_name
+           
     sourcedoc_final = record.sourcedoc_link
 
     record_uid = record.affidavit_uid_string
