@@ -282,14 +282,19 @@ def dataentryui_savedata(request):
     memo,translation_memo,arabic,sourcedoc,file_name,purch_order_num,piece_number,receiver,sender,page_number,accountnum,chequenum,
     the_user)
     
-    handle = new_pdf.sourcedoc_link.assigndata.get(assigneduser=the_user)
+    handles = new_pdf.sourcedoc_link.assigndata.filter(assigneduser=the_user)
   
-    try:
-        lot_num = LotNumber.objects.get(lot_number = handle.lot_number)
-    except:
-        lot_num = LotNumber(lot_number = handle.lot_number)
+    from django.db import transaction
+  
+    with transaction.commit_on_success():
+        for handle in handles:
+  
+            try:
+                lot_num = LotNumber.objects.get(lot_number = handle.lot_number)
+            except:
+                lot_num = LotNumber(lot_number = handle.lot_number)
         
-    lot_num.save()
+            lot_num.save()
         
     new_pdf.AssignedLotNumber = lot_num
     new_pdf.save()

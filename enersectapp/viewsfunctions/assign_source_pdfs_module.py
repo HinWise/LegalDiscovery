@@ -1,4 +1,3 @@
-
 from enersectapp.models import *
 from enersectapp.viewsfunctions import common_functions_module
 

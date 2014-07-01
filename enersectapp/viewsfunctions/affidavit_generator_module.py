@@ -886,12 +886,17 @@ def generate_sourcepdfs_output(request,watermark_name):
             pdf_string +="\n\n\n"
             page_count +=1
              
-            pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(doctype_name)+":"
+
+            record = selected_entry_item
+       
+            pdf_string += add_sourcepdfs_entry_content(exhibit_count,record)
+         
+            '''pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+", "+str(doctype_name)+":"
             pdf_string += "\n"
             pdf_string += "\n"
             
                         
-            pdf_string += ".  - File Name is: "+str(filename)+", on Directory: "+str(job_directory)
+            pdf_string += ".  - File Name is: "+str(filename)+", on Directory: "+str(job_directory)'''
             
             
             '''Write command to finish and save new page'''
@@ -1137,56 +1142,8 @@ def generate_grandelivre_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                record_uid = record.affidavit_uid_string
-                
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
-                pdf_string += "\n"
-                pdf_string += "\n"
-                
-                show_date = str(record.Day)+"/"+str(record.Month)+"/"+str(record.Year)
-                if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date)"
-                show_amount = record.Credit    
-                if show_amount == "":
-                    show_amount = "(No Amount)"
-                show_currency = record.BankCurrency    
-                if show_currency == "":
-                    show_currency = "(No Currency)"
-                
-                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
-                pdf_string += "\n"
-                pdf_string += "\n"
-                pdf_string += ".              -"
-                
-                for field_name in corpus_include_fields:
-                    
-                    try:
-                        field_content = str(getattr(record, field_name))
-                    except:
-                        field_content = ""
-                    
-                    
-                    try:
+                pdf_string += add_grandelivre_entry_content(exhibit_count,record)
                         
-                        try:
-                            
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
-                                test_string = "\n"
-                                test_string2 = ".              -"
-                            else:
-                                test_string = ""
-                                test_string2 = ""
-                            
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content != "*":
-                                pdf_string += " "+test_string+test_string2+field_name+" "+field_content
-                              
-                        except:
-                            test_string = ""
-                        
-                    except:
-                        pdf_string += " "
-                        
-                
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
                 pdf_string += '\n'
@@ -1387,14 +1344,6 @@ def generate_albaraka_output(request,watermark_name):
                     pdf_string = ""
                 
 
-            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
-    
-    
-                pdf_string = ""
-                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                pdf_string +="\n\n\n"
-                page_count +=1
-
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 print "---------"+str("albaraka")+"--------"
                 
@@ -1408,6 +1357,16 @@ def generate_albaraka_output(request,watermark_name):
                 created_page = True
                 
                 db.reset_queries()
+                
+            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
+    
+    
+                pdf_string = ""
+                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
+
+                
                 
 
             print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
@@ -1426,58 +1385,9 @@ def generate_albaraka_output(request,watermark_name):
 
             for record in corpus_final:
                 
-                record_uid = record.affidavit_uid_string
-                
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
-                pdf_string += "\n"
-                pdf_string += "\n"
-                
-                show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
-                if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date)"
-                show_amount = record.Amount    
-                if show_amount == "":
-                    show_amount = "(No Amount)"
-                show_currency = record.BankCurrency    
-                if show_currency == "":
-                    show_currency = "(No Currency)"
-                
-                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
-                pdf_string += "\n"
-                pdf_string += "\n"
-                pdf_string += ".              -"
-                
-                for field_name in corpus_include_fields:
-                    
-                    try:
-                        field_content = str(getattr(record, field_name))
-                    except:
-                        field_content = ""
-                    
-                    
-                    try:
-                        
-                        try:
-                            
-                            if (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
-                                test_string = "\n"
-                                test_string2 = ".              -"
-                            else:
-                                test_string = ""
-                                test_string2 = ""
-                            
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content != "*":
-                                pdf_string += " "+test_string+test_string2+field_name+" "+field_content
-                              
-                        except:
-                            test_string = ""
-                        
-                    except:
-                        pdf_string += " "
-                        
-                
-                '''Write command to output the existing pdf_string variable as a new row, then line break'''
-                
+
+                pdf_string += add_albaraka_entry_content(exhibit_count,record)
+
                 pdf_string += '\n'
                 pdf_string += '\n'
                 
@@ -2124,8 +2034,14 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             corpus_final = corpus_base.order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day')
 
             corpus_icr = corpus_icr | corpus_final'''
-     
-    corpus_icr = PdfRecord.objects.filter(audit_mark = "None").exclude(EntryByCompany__name = "TestGroup").exclude(EntryAuthor__username = "nemot").exclude(sourcedoc_link__corrupt = "yes").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').distinct()
+    
+    
+    blank = SourceDocType.objects.get(name = "blank")
+    blank_probable = SourceDocType.objects.get(clean_name = "blank_probable")
+    other = SourceDocType.objects.get(name = "other")
+    misc = SourceDocType.objects.get(name = "misc")
+    
+    corpus_icr = PdfRecord.objects.filter(audit_mark = "None").exclude(EntryByCompany__name = "TestGroup").exclude(EntryAuthor__username = "nemot").exclude(sourcedoc_link__corrupt = "yes").order_by('ocrrecord_link__Year','ocrrecord_link__Month','ocrrecord_link__Day').exclude(modified_document_type__name = blank).exclude(modified_document_type__name = other).exclude(modified_document_type__name = blank_probable).exclude(modified_document_type__name = misc).distinct()
     
     #corpus_sourcepdfs will be represented in the corpus_icr loop, by the field sourcedoc_link
     #corpus_sourcepdfs = SourcePdf.objects.all().distinct()
@@ -2438,7 +2354,7 @@ def test_icr_content(field_name,record):
         try:
             field_content = str(record.ocrrecord_link.Company)
         
-            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+            if field_content != "MISSING" and field_content != "UNREADABLE" and field_content != "MISSING NAME" and field_content != "UNREADABLE NAME" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
            
                 actual_content = field_content
 
@@ -2683,6 +2599,58 @@ def add_icr_entry_content(exhibit_count, record):
     return_string = pdf_string
 
     return return_string
+
+def test_sourcepdfs_content(field_name,record):
+
+    actual_content = ""
+
+    if field_name == "Filename":
+        try:
+            field_content = str(record.filename)
+        
+            actual_content = field_content
+
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "JobDirectory":
+        try:
+            field_content = str(record.job_directory)
+        
+            actual_content = field_content
+
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "JobDirectory":
+        try:
+            field_content = str(record.job_directory)
+        
+            actual_content = field_content
+
+        except:
+        
+            actual_content = "unknown"
+    
+    
+    if field_name == "icr_uid":
+        try:
+            field_content = str(record.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_Icr"
+        except:
+        
+            actual_content = "No_Linked_Icr"
+    
+    return actual_content
     
 def add_sourcepdfs_entry_content(exhibit_count, record):
 
@@ -2690,14 +2658,17 @@ def add_sourcepdfs_entry_content(exhibit_count, record):
     return_string = ""
 
     doctype_pretty_name = record.modified_document_type.pretty_name
-           
+
     sourcedoc_final = record.sourcedoc_link
 
     record_uid = record.affidavit_uid_string
+
     sourcepdf_uid = sourcedoc_final.affidavit_uid_string
 
     pdf_string = ""
-    
+
+    pdf_record = PdfRecord.objects.filter(sourcedoc_link = sourcedoc_final)[0]
+
     '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
 
         7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
@@ -2763,12 +2734,537 @@ def add_sourcepdfs_entry_content(exhibit_count, record):
 
     # [sourcepdf_uid]
 
-    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
+    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_sourcepdfs_content("icr_uid",record)+"]")
 
     # Extra fields: Cheque Number, Purchase Order Number, Source Bank Account
     
-    pdf_string = test_length_add_line(pdf_string, test_icr_content("ExtraFields",record))
+    pdf_string += '\n'
+    pdf_string += '\n'
+    pdf_string = test_length_add_line(pdf_string, "    In Directory ")
+    pdf_string = test_length_add_line(pdf_string, test_sourcepdfs_content("JobDirectory",sourcedoc_final))
+    pdf_string = test_length_add_line(pdf_string, " with Filename ")
+    pdf_string = test_length_add_line(pdf_string, test_sourcepdfs_content("Filename",sourcedoc_final))
+    pdf_string += '.'
     
+    
+
+    return_string = pdf_string
+
+    return return_string
+    
+def test_albaraka_content(field_name,record):
+
+    actual_content = ""
+    
+    if field_name == "IssueDate":
+        try:
+            
+            day_bool = False
+            if record.PostDay != "NaN" and record.PostDay != "" and record.PostDay != "*":
+                day_string = str(record.PostDay)
+                day_bool = True
+            else:
+                day_string = "an unknown Day"
+                
+            month_bool = False
+            if record.PostMonth != "NaN" and record.PostMonth != "" and record.PostMonth != "*":
+                
+                try:
+                
+                    month_string = Month_Dictionary[str(record.PostMonth)]
+                    
+                except:
+                
+                    month_string = str(record.PostMonth)
+                    
+                month_bool = True
+            else:
+                month_string = "an unknown Month"
+                
+            year_bool = False
+            if record.PostYear != "NaN" and record.PostYear != "" and record.PostYear != "*":
+                year_string = str(record.PostYear)
+                year_bool = True
+            else:
+                year_string = "an unknown Year"
+
+            actual_content = month_string + " " + day_string + ", " + year_string
+        
+        
+            if not day_bool and not month_bool and not year_bool:
+                
+                actual_content = "an unknown Date"
+            
+        except:
+        
+            actual_content = "an unknown Date"
+    
+    if field_name == "BankName":
+        try:
+            field_content = str(record.BankName)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content +" Bank"
+
+            else:
+            
+                actual_content = "an unknown Bank"
+        except:
+        
+            actual_content = "an unknown Bank"
+    
+    if field_name == "Reference":
+        try:
+            field_content = str(record.Reference)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content +"'"
+
+            else:
+            
+                actual_content = "an unknown Bank"
+        except:
+        
+            actual_content = "unknown"
+
+    if field_name == "Amount":
+        try:
+            field_content = str(record.Amount)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Amount"
+        except:
+        
+            actual_content = "an unknown Amount"
+            
+    if field_name == "BankCurrency":
+        try:
+            field_content = str(record.BankCurrency)
+        
+            if field_content !="" and field_content != "no" and field_content != " " and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+         
+        except:
+        
+            actual_content = "unknown"
+            
+
+    if field_name == "BankAccount":
+        try:
+            field_content = str(record.BankAccount)
+
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content+"'"
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+            
+    if field_name == "ExtraFields":
+    
+        try:
+        
+            reftran_string = str(record.Reftran)
+            libelle_string = str(record.Libelle)
+            libdesc_string = str(record.Libdesc)
+            provenance_string = str(record.Provenance)
+            description_string = str(record.Description)
+            
+            field_content = reftran_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                reftran_string = "      Reftran is '" + field_content + "'.\n"
+                reftran = True
+
+            else:
+            
+                reftran = False
+                reftran_string = ""
+            
+            field_content = libelle_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                libelle_string = "      Libelle is " + field_content + ".\n"
+                libelle = True
+
+            else:
+            
+                libelle = False
+                libelle_string = ""
+                
+            field_content = libdesc_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                libdesc_string = "      Libdesc is "+ field_content + ".\n"
+                libdesc = True
+
+            else:
+            
+                libdesc = False
+                libdesc_string = ""   
+        
+            field_content = provenance_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                provenance_string = "      Provenance is : ' "+field_content + "'.\n"
+                provenance = True
+
+            else:
+            
+                provenance = False
+                provenance_string = ""   
+            
+            field_content = description_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                description_string = "      Description contains : ' "+field_content + "'.\n    "
+                description = True
+
+            else:
+            
+                description = False
+                description_string = "" 
+
+            if reftran == True or libelle == True or libdesc == True or provenance == True or description == True:
+         
+                actual_content = "\n    Extra information: \n" + reftran_string + libelle_string + libdesc_string + provenance_string + description_string
+                
+        except:
+
+            actual_content = ""
+
+    return actual_content
+    
+def add_albaraka_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    record_uid = record.affidavit_uid_string
+
+
+    pdf_string = ""
+    
+    '''    
+    Item 1.
+    
+       On April 17, 2006, (Issuedate), Al Baraka Bank (BankName) processed a transfer, Reference 174 (Reference), of 7000 (Amount)
+       of Currency USD (BankCurrency).
+
+       Extra Fields:
+       
+           -The Reftran is 578 (Reftran).
+           -The Libelle is u28 (Libelle).
+           -The Libdesc is 745 (Libdesc).
+           -The Provenance is 745 (Provenance).
+           -The Description contains 'lalala' (Description).
+    
+    '''
+
+
+    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("IssueDate",record))
+
+    # X BankName Bank/ an unknown Bank
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankName",record))
+    pdf_string = test_length_add_line(pdf_string, " processed a transfer, Reference ")
+    # X Reference / unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Reference",record))
+    pdf_string = test_length_add_line(pdf_string, ", of ")
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, " of Currency ")
+    
+    # X BankCurrency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankCurrency",record))
+    pdf_string = test_length_add_line(pdf_string, " to Account ")
+    # X BankAccount/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankAccount",record)+".")
+
+    # Extra fields: NoMvt, Lett, Memo
+    
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("ExtraFields",record))
+    
+    
+
+    return_string = pdf_string
+
+    return return_string
+    
+def test_transactions_content(field_name,record):
+
+    actual_content = ""
+    
+    if field_name == "IssueDate":
+        try:
+            
+            day_bool = False
+            if record.PostDay != "NaN" and record.PostDay != "" and record.PostDay != "*":
+                day_string = str(record.PostDay)
+                day_bool = True
+            else:
+                day_string = "an unknown Day"
+                
+            month_bool = False
+            if record.PostMonth != "NaN" and record.PostMonth != "" and record.PostMonth != "*":
+                
+                try:
+                
+                    month_string = Month_Dictionary[str(record.PostMonth)]
+                    
+                except:
+                
+                    month_string = str(record.PostMonth)
+                    
+                month_bool = True
+            else:
+                month_string = "an unknown Month"
+                
+            year_bool = False
+            if record.PostYear != "NaN" and record.PostYear != "" and record.PostYear != "*":
+                year_string = str(record.PostYear)
+                year_bool = True
+            else:
+                year_string = "an unknown Year"
+
+            actual_content = month_string + " " + day_string + ", " + year_string
+        
+        
+            if not day_bool and not month_bool and not year_bool:
+                
+                actual_content = "an unknown Date"
+            
+        except:
+        
+            actual_content = "an unknown Date"
+    
+    if field_name == "BankName":
+        try:
+            field_content = str(record.BankName)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content +" Bank"
+
+            else:
+            
+                actual_content = "an unknown Bank"
+        except:
+        
+            actual_content = "an unknown Bank"
+    
+    if field_name == "Reference":
+        try:
+            field_content = str(record.Reference)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content +"'"
+
+            else:
+            
+                actual_content = "an unknown Bank"
+        except:
+        
+            actual_content = "unknown"
+
+    if field_name == "Amount":
+        try:
+            field_content = str(record.Amount)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Amount"
+        except:
+        
+            actual_content = "an unknown Amount"
+            
+    if field_name == "BankCurrency":
+        try:
+            field_content = str(record.BankCurrency)
+        
+            if field_content !="" and field_content != "no" and field_content != " " and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+         
+        except:
+        
+            actual_content = "unknown"
+            
+
+    if field_name == "BankAccount":
+        try:
+            field_content = str(record.BankAccount)
+
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content+"'"
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+            
+    if field_name == "ExtraFields":
+    
+        try:
+        
+            reftran_string = str(record.Reftran)
+            libelle_string = str(record.Libelle)
+            libdesc_string = str(record.Libdesc)
+            provenance_string = str(record.Provenance)
+            description_string = str(record.Description)
+            
+            field_content = reftran_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                reftran_string = "      Reftran is '" + field_content + "'.\n"
+                reftran = True
+
+            else:
+            
+                reftran = False
+                reftran_string = ""
+            
+            field_content = libelle_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                libelle_string = "      Libelle is " + field_content + ".\n"
+                libelle = True
+
+            else:
+            
+                libelle = False
+                libelle_string = ""
+                
+            field_content = libdesc_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                libdesc_string = "      Libdesc is "+ field_content + ".\n"
+                libdesc = True
+
+            else:
+            
+                libdesc = False
+                libdesc_string = ""   
+        
+            field_content = provenance_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                provenance_string = "      Provenance is : ' "+field_content + "'.\n"
+                provenance = True
+
+            else:
+            
+                provenance = False
+                provenance_string = ""   
+            
+            field_content = description_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                description_string = "      Description contains : ' "+field_content + "'.\n    "
+                description = True
+
+            else:
+            
+                description = False
+                description_string = "" 
+
+            if reftran == True or libelle == True or libdesc == True or provenance == True or description == True:
+         
+                actual_content = "\n    Extra information: \n" + reftran_string + libelle_string + libdesc_string + provenance_string + description_string
+                
+        except:
+
+            actual_content = ""
+
+    return actual_content
+    
+def add_transactions_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    record_uid = record.affidavit_uid_string
+
+
+    pdf_string = ""
+    
+    '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
+
+        7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
+
+        in the 2006 accounting of NA Solid Petroserve Ltd.'s Tunisian Branch with journal entry 474 as 
+
+        having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
+
+
+    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("IssueDate",record))
+
+    # X BankName Bank/ an unknown Bank
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankName",record))
+    pdf_string = test_length_add_line(pdf_string, " processed a transfer, Reference ")
+    # X Reference / unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Reference",record))
+    pdf_string = test_length_add_line(pdf_string, ", of ")
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, " of Currency ")
+    
+    # X BankCurrency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankCurrency",record))
+    pdf_string = test_length_add_line(pdf_string, " to Account ")
+    # X BankAccount/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankAccount",record)+".")
+
+    # Extra fields: NoMvt, Lett, Memo
+    
+    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("ExtraFields",record))
     
     
 
