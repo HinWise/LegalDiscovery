@@ -132,8 +132,6 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
     with transaction.commit_on_success():
         for handle in handles:
   
-            handle = ""
-        
             if(the_user.is_superuser == True):
                 
                 handle.checked = "checked"
