@@ -124,26 +124,28 @@ def save_new_data_entry(doctype,doctype2,currency,amount,company_name,company_ad
         source.modified_document_type = doctype_class
         source.save()
     
-    try:
     
-        handle = ""
+    handles = source.assigndata.filter(assigneduser=the_user)
+    
+    from django.db import transaction
+  
+    with transaction.commit_on_success():
+        for handle in handles:
+  
+            handle = ""
         
-        if(the_user.is_superuser == True):
-            handle = source.assigndata.get(assigneduser=the_user)
-            handle.checked = "checked"
-            handle.times_checked = int(handle.times_checked) + 1
-            
-        else:
-            handle = source.assigndata.get(assigneduser=the_user)
-            handle.checked = "checked"
-            handle.times_checked = int(handle.times_checked) + 1
-    
-        handle.save()
-         
-    
-    except:
-    
-        handle = ""
+            if(the_user.is_superuser == True):
+                handle = source.assigndata.get(assigneduser=the_user)
+                handle.checked = "checked"
+                handle.times_checked = int(handle.times_checked) + 1
+                
+            else:
+                handle = source.assigndata.get(assigneduser=the_user)
+                handle.checked = "checked"
+                handle.times_checked = int(handle.times_checked) + 1
+        
+            handle.save()
+
     
     source.save()
     
