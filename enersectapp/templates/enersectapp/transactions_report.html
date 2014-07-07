@@ -727,9 +727,13 @@
                         <tr>
                             <th><div class="tableInner">Relevance</div></th>
                             <th><div class="tableInner">Transaction ID</div></th>
+                            <th><div class="tableInner">Amount</div></th>
+                            <th><div class="tableInner">Complete Date</div></th>
                             
                                 {% for tag_name in non_repeated_searchtags %}
+                                   {% if tag_name != "Amount" and tag_name != "Complete Date" %}
                                    <th><div class="tableInner">{{tag_name}}</div></th>
+                                   {% endif %}
                                 {% endfor %}
                         </tr>
 
@@ -743,12 +747,13 @@
                             <!-- here we have to list all the tags and relevant data -->
                             <td><span class="star{{ordered_list.score_index}}"></span><span class="starNumber">{{ordered_list.score_index}}</span></td>
                             <td>{{candidate.TransactionIndex}}</td>
-                            
+                            <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td>
+                            <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td>
                             <!-- Filling column content depending on the chosen search tags -->
                             
                             {% for tag_name in non_repeated_searchtags %}
                                
-                               {% if tag_name == "Amount" %} <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td> {%endif%}
+                               
                                {% if tag_name == "Piece Number" %}
                                     <td>
                                     {% if candidate.internal_records|length == 1 %}
@@ -774,7 +779,6 @@
                                {% if tag_name == "Day" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}</td> {%endif%}
                                {% if tag_name == "Month" %} <td>{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}</td> {%endif%}
                                {% if tag_name == "Year" %} <td>{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Complete Date" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
                                {% if tag_name == "Libdesc" %} <td>{% if candidate.complete_item.Libdesc %}{{candidate.complete_item.Libdesc}}{%else%}-{%endif%}</td> {%endif%}
                                {% if tag_name == "Description" %}
                                     <td>

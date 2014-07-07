@@ -371,7 +371,7 @@ def transactions_report(request):
     
     coincident_transactions_list = []
     
-    base_fields_searched = ["TransactionIndex"]
+    base_fields_searched = ["TransactionIndex","Amount","CompleteValueDate"]
     internal_fields_searched = []
     bank_fields_searched = []
     

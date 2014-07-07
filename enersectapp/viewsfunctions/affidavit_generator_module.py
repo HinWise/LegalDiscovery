@@ -1627,7 +1627,13 @@ def generate_transactions_output(request,watermark_name):
                 
                 record_uid = record.affidavit_uid_string
                 
-                pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
+                pdf_string += add_transactions_entry_content(exhibit_count,record)
+                pdf_string += add_transactions_entry_content_internal(record)
+
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                '''pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
                 pdf_string += "\n"
                 pdf_string += "\n"
                 
@@ -1799,15 +1805,14 @@ def generate_transactions_output(request,watermark_name):
                             test_string = ""
                         
                     except:
-                        pdf_string += " "
+                        pdf_string += " "'''
                         
                 
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
                 pdf_string += '\n'
-                pdf_string += '\n'
                 
-                '''if pdf_string.count('\n') > 45:
+                if pdf_string.count('\n') > 45:
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1824,8 +1829,12 @@ def generate_transactions_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
+                    
+                    pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1
 
-                    did_page_jump = True'''
+                    did_page_jump = True
                     
                 exhibit_count += 1
                 doc_iterator = exhibit_count - 1
@@ -2284,10 +2293,10 @@ def test_icr_content(field_name,record):
             
             else:
                 
-                actual_content = "an unknown Date"
+                actual_content = "an unknown Date, "
         except:
         
-            actual_content = "an unknown Date"
+            actual_content = "an unknown Date, "
     
     if field_name == "Document_Number":
         try:
@@ -2793,11 +2802,11 @@ def test_albaraka_content(field_name,record):
         
             if not day_bool and not month_bool and not year_bool:
                 
-                actual_content = "an unknown Date"
+                actual_content = "an unknown Date, "
             
         except:
         
-            actual_content = "an unknown Date"
+            actual_content = "an unknown Date, "
     
     if field_name == "BankName":
         try:
@@ -3057,11 +3066,11 @@ def test_transactions_content(field_name,record):
         
             if not day_bool and not month_bool and not year_bool:
                 
-                actual_content = "an unknown Date"
+                actual_content = "an unknown Date, "
             
         except:
         
-            actual_content = "an unknown Date"
+            actual_content = "an unknown Date, "
     
     if field_name == "BankName":
         try:
@@ -3139,85 +3148,145 @@ def test_transactions_content(field_name,record):
         except:
         
             actual_content = "unknown"
-            
-    if field_name == "ExtraFields":
     
+
+    
+    if field_name == "DocType":
         try:
+            field_content = str(record.BestIcrMatch.modified_document_type.pretty_name)
         
-            reftran_string = str(record.Reftran)
-            libelle_string = str(record.Libelle)
-            libdesc_string = str(record.Libdesc)
-            provenance_string = str(record.Provenance)
-            description_string = str(record.Description)
-            
-            field_content = reftran_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
+            if field_content != "None" and field_content !="":
            
-                reftran_string = "      Reftran is '" + field_content + "'.\n"
-                reftran = True
+                actual_content = field_content
 
             else:
             
-                reftran = False
-                reftran_string = ""
-            
-            field_content = libelle_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
-           
-                libelle_string = "      Libelle is " + field_content + ".\n"
-                libelle = True
-
-            else:
-            
-                libelle = False
-                libelle_string = ""
-                
-            field_content = libdesc_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
-           
-                libdesc_string = "      Libdesc is "+ field_content + ".\n"
-                libdesc = True
-
-            else:
-            
-                libdesc = False
-                libdesc_string = ""   
-        
-            field_content = provenance_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
-           
-                provenance_string = "      Provenance is : ' "+field_content + "'.\n"
-                provenance = True
-
-            else:
-            
-                provenance = False
-                provenance_string = ""   
-            
-            field_content = description_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
-           
-                description_string = "      Description contains : ' "+field_content + "'.\n    "
-                description = True
-
-            else:
-            
-                description = False
-                description_string = "" 
-
-            if reftran == True or libelle == True or libdesc == True or provenance == True or description == True:
-         
-                actual_content = "\n    Extra information: \n" + reftran_string + libelle_string + libdesc_string + provenance_string + description_string
-                
+                actual_content = "a Document"
         except:
+        
+            actual_content = "a Document"
+    
+    if field_name == "Document_Number":
+        try:
+            field_content = str(record.BestIcrMatch.ocrrecord_link.Document_Number)
+        
+            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content != "no" and field_content != "Blank":
+           
+                actual_content = field_content
 
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "icr_uid":
+        try:
+            field_content = str(record.BestIcrMatch.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_Entry"
+        except:
+        
+            actual_content = "No_Linked_Entry"
+    
+    if field_name == "sourcepdf_uid":
+        try:
+            field_content = str(record.BestIcrMatch.sourcedoc_link.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_SourceDoc"
+        except:
+        
+            actual_content = "No_Linked_SourceDoc"
+    
+    #In the following ones, the "record" being received is an Internal Record, not an Icr
+    if field_name == "LedgerYear":
+        try:
+            field_content = str(record.LedgerYear)
+        
+            if field_content != "None" and field_content !="" and field_content !="*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "NoPiece":
+        try:
+            field_content = str(record.NoPiece)
+        
+            if field_content != "None" and field_content !="" and field_content !="*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "Company":
+        try:
+            field_content = str(record.Company)
+        
+            if field_content != "None" and field_content !="" and field_content !="*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Recipient"
+        except:
+        
+            actual_content = "an unknown Recipient"
+    
+    if field_name == "grandelivre_uid":
+        try:
+            field_content = str(record.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_Int.Record"
+        except:
+        
+            actual_content = "No_Linked_Int.Record"
+
+    if field_name == "Libdesc":
+        try:
+            field_content = str(record.Libdesc)
+        
+            if field_content == "GLCANCELLEDCHEQUES":
+           
+                actual_content = "    Note: The extended date range of this records is due to a cancellation/adjustment\n    of Cheques."
+
+            else:
+            
+                actual_content = ""
+        except:
+        
             actual_content = ""
-
+            
     return actual_content
     
 def add_transactions_entry_content(exhibit_count, record):
@@ -3227,47 +3296,115 @@ def add_transactions_entry_content(exhibit_count, record):
 
     record_uid = record.affidavit_uid_string
 
-
     pdf_string = ""
     
     '''Item 1. On April 17, 2006, Al Baraka Bank processed Payment Order FT224 transferring EUR
 
-        7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-SOURCE] These funds were recorded 
+        7,100.00 (CDN $9,976.21) to Bachar El Ghussein. [BFG-1-ICR] (icr_uid) [BFG-1-SOURCE] (sourcepdf_uid) These funds were recorded 
 
-        in the 2006 accounting of NA Solid Petroserve Ltd.'s Tunisian Branch with journal entry 474 as 
-
-        having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
-
+        in the following 2006 (LedgerYear) accounting of NA Solid Petroserve Ltd.'s Tunisian Branch records: 
+        
+        - Journal entry 474 (NoPiece), sent to Fluid Control Europe (Company). [BFG-1-ACCT] (grandelivreh_uid)
+        - Journal entry 475 (NoPiece), sent to Fluid Control Europe (Company). [BFG-1-ACCT] (grandelivreh_uid)
+        - Journal entry 476 (NoPiece), sent to Fluid Control Europe (Company). [BFG-1-ACCT] (grandelivreh_uid)'''
+        
 
     pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
     pdf_string += "\n"
 
     pdf_string += "    On "
     #On April 17, 2006, / On an unknown Date,
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("IssueDate",record))
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("IssueDate",record))
 
     # X BankName Bank/ an unknown Bank
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankName",record))
-    pdf_string = test_length_add_line(pdf_string, " processed a transfer, Reference ")
-    # X Reference / unknown
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Reference",record))
-    pdf_string = test_length_add_line(pdf_string, ", of ")
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("BankName",record))
+    pdf_string = test_length_add_line(pdf_string, " processed ")
+    
+    # X DocType/ a Document
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("DocType",record))
+    pdf_string = test_length_add_line(pdf_string, " with Document Number ")
+    
+    # X Document_Number/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("Document_Number",record))
+    pdf_string = test_length_add_line(pdf_string, " transferring ")
+    
+    
     # X Amount/ an unknown Amount
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("Amount",record))
     pdf_string = test_length_add_line(pdf_string, " of Currency ")
     
     # X BankCurrency/ unknown
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankCurrency",record))
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("BankCurrency",record))
     pdf_string = test_length_add_line(pdf_string, " to Account ")
     # X BankAccount/ unknown
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankAccount",record)+".")
-
-    # Extra fields: NoMvt, Lett, Memo
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("BankAccount",record)+".")
     
-    pdf_string = test_length_add_line(pdf_string, test_albaraka_content("ExtraFields",record))
+    pdf_string += "\n    "
+    
+    # [icr_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Extracted Data UID: ["+test_transactions_content("icr_uid",record)+"]")
+    
+    pdf_string += "\n    "
+    
+    # [sourcepdf_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_transactions_content("sourcepdf_uid",record)+"]")
+    
+    pdf_string += "\n"
+    
+    # X Libdesc ## This is an special case, look up the code in the function
+    pdf_string = test_length_add_line(pdf_string, test_transactions_content("Libdesc",record))
+        
+    # Extra fields: NoMvt, Lett, Memo
+        
+    #pdf_string = test_length_add_line(pdf_string, test_transactions_content("ExtraFields",record))
     
     
 
     return_string = pdf_string
 
+    return return_string
+    
+def add_transactions_entry_content_internal(record):
+
+    return_string = ""
+    
+    pdf_string = ""
+    
+    internal_records = record.internal_records_list.all()
+    
+    if len(internal_records) == 0:
+    
+        pdf_string = test_length_add_line(pdf_string, "    There were no internal accounting records found linking to this data. ")
+    
+    else:
+    
+        pdf_string = test_length_add_line(pdf_string, "    These funds were recorded in the following accounting records of NA Solid Petroserve Ltd.'s Tunisian Branch:")
+
+        pdf_string += "\n"
+        
+        with transaction.commit_on_success():
+            for int_record in internal_records:
+        
+                pdf_string += "\n      -"
+                # X LedgerYear/ unknown
+                pdf_string = test_length_add_line(pdf_string, test_transactions_content("LedgerYear",int_record)+" Ledger Year,")
+                pdf_string = test_length_add_line(pdf_string, " journal entry " )
+    
+                # X NoPiece/ unknown
+                pdf_string = test_length_add_line(pdf_string, test_transactions_content("NoPiece",int_record))
+                pdf_string = test_length_add_line(pdf_string, ", sent to " )
+                
+                # X Company/ an unknown Recipient
+                pdf_string = test_length_add_line(pdf_string, test_transactions_content("Company",int_record)+".")
+                
+                pdf_string += "\n            "
+    
+                # [icr_uid]
+
+                pdf_string = test_length_add_line(pdf_string, "Record UID: ["+test_transactions_content("grandelivre_uid",int_record)+"]")
+                
+    return_string = pdf_string
+    
     return return_string
