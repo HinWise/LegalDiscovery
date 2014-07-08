@@ -18,6 +18,9 @@
 <script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/js/jquery.tablesorter.widgets.js' %}"></script>
 <script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/addons/pager/jquery.tablesorter.pager.min.js' %}"></script>
 <script  type="text/javascript" src="{% static 'enersectapp/floatThead.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/tablesorter-master/js/widgets/widget-build-table.js' %}"></script>
+
+
 
 
 
@@ -60,7 +63,7 @@
         
         {% autoescape off %}
         
-        console.log("STARTING PROGRAM");
+        console.log("STARTING PROGGGGGRAM");
         
                 
         //var searchtags = {{searchtags}};
@@ -71,16 +74,337 @@
         var selected_candidates_list = {{selected_candidates_list}};
         console.log(selected_candidates_list);
       
-        console.log("-----------------------------");
+        //Saving all data from candidates into a javascript variable, to use later in the tablesorter as "data"
+        
+        all_candidates_data = {{final_list_ordered_score}};
+        
+        all_search_tags = {{non_repeated_searchtags}};
+      
+        console.log("------------!!!!!-----------------");
         
         {% endautoescape %}
         
         createLeftGraph();
         
         createRightGraph();
-    
-        initiateListeners();
 
+        candidateDatatoTablesorterFormat()
+        
+        setTimeout(continueSetup, 100);
+        
+        function continueSetup()
+        {
+            setTimeout(moreSetup, 100);
+            setTimeout(initiateListeners, 100);
+            //setupPager();
+            
+        }
+        
+        //Building the rows for the table, so can pass the object to TableSorter later
+        function candidateDatatoTablesorterFormat() {
+        
+            rows_list = []
+            
+            if(all_candidates_data)
+            {
+            
+                for(var i = 0; i < all_candidates_data.length;i++)
+                {
+                    if(all_candidates_data[i].transactions_list)
+                    {
+                        
+                        for(var j = 0; j < all_candidates_data[i].transactions_list.length; j++)
+                        {   
+                            
+                            row = {class:"candidate transaction_search_candidate", candidate_id:all_candidates_data[i].transactions_list[j].complete_item.TransactionIndex}
+                            
+                            row.cells = []
+                            row.cells.push({ text: all_candidates_data[i].score_index+" ", class: 'star'+all_candidates_data[i].score_index });
+                            row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.TransactionIndex });
+                            row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.Amount });
+                            row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.CompleteValueDate });
+                            
+                            if(all_search_tags)
+                            {
+                            
+                                for(var k = 0; k < all_search_tags.length; k++)
+                                {
+                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date")
+                                    {
+                                        row.cells.push({ text: evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]) });
+                                        //row.cells.push(evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]));
+                                    }
+                                
+                                }
+                            
+                            }
+                            
+                            //console.log(row);
+                            rows_list.push(row);
+                        }
+                        
+                    }
+                }
+            }
+            
+            headers_list = []
+            
+            headers_row = [
+                    // each object/string is a cell
+                    
+                    { text: 'Relevance', class: 'tableInner'}, // row 0 cell 1
+                    { text: 'Transaction ID', class: 'tableInner'},                                        // row 0 cell 2
+                    { text: 'Amount', class: 'tableInner'},  // row 0 cell 3
+                    { text: 'Complete Date', class: 'tableInner'}, 
+            ]
+            
+            if(all_search_tags)
+            {
+            
+                for(var k = 0; k < all_search_tags.length; k++)
+                {
+                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date")
+                    {
+                        headers_row.push({text: all_search_tags[k], class: 'theader'});
+                    }
+                
+                }
+            
+            }
+            
+            headers_list.push(headers_row);
+            
+            console.log(rows_list);
+            
+            dataObject = {
+                
+                headers : headers_list,
+
+                rows : rows_list
+            
+            
+            }
+            
+        }
+        
+        function evaluateAddToRow(tag_name,complete_item){
+
+            var final_value = "-";
+            
+            if(tag_name == "Piece Number")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].NoPiece;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].NoPiece;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Company")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].Company;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].Company;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Day")
+            {
+                final_value = complete_item.ValueDay;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Month")
+            {
+                final_value = complete_item.ValueMonth;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Year")
+            {
+                final_value = complete_item.ValueYear;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Libdesc")
+            {
+                final_value = complete_item.Libdesc;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Description")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].Description;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].Description;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Reftran")
+            {
+                final_value = complete_item.Reftran;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Bank Name")
+            {
+                final_value = complete_item.BankName;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Bank Account")
+            {
+                final_value = complete_item.BankAccount;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Bank Currency")
+            {
+                final_value = complete_item.BankCurrency;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Movement Number")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].NoMvt;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].NoMvt;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "INT Account Number")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].AccountNum;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].AccountNum;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Exchange Rate")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].ExchangeRate;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].ExchangeRate;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Memo")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].Memo;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].Memo;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Lett")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].Lett;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].Lett;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            
+            if(!final_value) final_value = "-";
+            
+            return final_value
+        }
+        
         function createLeftGraph(){
              
         
@@ -178,9 +502,7 @@
                 
                 if($(this).hasClass("been-clicked") == false) { $(this).addClass("been-clicked1"); $(this).addClass("been-clicked"); }
                 
-                
-                
-
+  
                 $("#transaction_graph").remove();
                 
                 var frame_width = $("#iframe_test").width()-10+"px";
@@ -358,163 +680,262 @@
         
         }
         
-        //$(".button").button();
-        $( ".sortable_transaction_search" ).selectable({
-        
-            selected: function( event, ui ) {
+        function moreSetup()
+        {
+            //$(".button").button();
+            $( ".sortable_transaction_search" ).selectable({
             
-                if($(ui.selected ).hasClass("transactions_list_description"))
-                {
-                    var score_id = $(ui.selected).attr("score_id");
-                    
-                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
-                    
-                        if($(this).hasClass("ui-selected") == false)
-                        {
-                            $(this).addClass("ui-selected");
-                        }
+                selected: function( event, ui ) {
+                
+                    if($(ui.selected ).hasClass("transactions_list_description"))
+                    {
+                        var score_id = $(ui.selected).attr("score_id");
                         
-                    });
-                    
-                    
-                }
-                
-            },
-            unselected: function( event, ui ) {
-            
-                if($(ui.unselected ).hasClass("transactions_list_description"))
-                {
-                    var score_id = $(ui.unselected).attr("score_id");
-                    
-                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
-                    
-                        if($(this).hasClass("ui-selected") == true)
-                        {
-                            $(this).removeClass("ui-selected");
-                        }
+                        $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
                         
-                    });
-                    
-                    
-                }
-                
-            }
-        });
-        
-       $( "#select_saved_template_menu" ).menu({ position: { my: "left top", at: "left top+30" },
-            select: function( event, ui ) {
-                                    
-                var first_elem = ui.item.parent().is($( "#select_saved_template_menu" ));
-                
-                if(!first_elem)
-                {
-                    
-                    var new_text = ui.item.text();
-                    $(".selectoption[value='"+new_text+"']").click();
-                } 
-            } 
-        });
-        
-        $('.selectoption').click(function(){
-        
-            var new_text = $(this).text();
-        
-            $('#selected_template').unbind('copy paste', function (e) {
+                            if($(this).hasClass("ui-selected") == false)
+                            {
+                                $(this).addClass("ui-selected");
+                            }
                             
-            });
-              
-              $('#selected_template_link').text(new_text);
-              $('#selected_template').attr("value",new_text);
-              $('#selected_template').val(new_text);
-              
+                        });
+                        
+                        
+                    }
+                    
+                },
+                unselected: function( event, ui ) {
                 
-            $('#selected_template').bind('copy paste', function (e) {
-                    e.preventDefault();
+                    if($(ui.unselected ).hasClass("transactions_list_description"))
+                    {
+                        var score_id = $(ui.unselected).attr("score_id");
+                        
+                        $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
+                        
+                            if($(this).hasClass("ui-selected") == true)
+                            {
+                                $(this).removeClass("ui-selected");
+                            }
+                            
+                        });
+                        
+                        
+                    }
+                    
+                }
             });
             
-                $('#selected_template').click();
-        });
-        
-        $('#select_saved_template_menu').removeClass('ui-menu-divider');
-        
-        $('#selected_template').unbind('click').click(function(event) {
-        event.stopPropagation();
-        $(this).unbind('focus').focus();
-        $("#select_saved_template_menu").unbind('keydown');
-        $(this).unbind('focusout').focusout(function(event) {
-                                      
-                var new_value = event.currentTarget.value;
+           $( "#select_saved_template_menu" ).menu({ position: { my: "left top", at: "left top+30" },
+                select: function( event, ui ) {
+                                        
+                    var first_elem = ui.item.parent().is($( "#select_saved_template_menu" ));
+                    
+                    if(!first_elem)
+                    {
+                        
+                        var new_text = ui.item.text();
+                        $(".selectoption[value='"+new_text+"']").click();
+                    } 
+                } 
+            });
+            
+            $('.selectoption').click(function(){
+            
+                var new_text = $(this).text();
+            
+                $('#selected_template').unbind('copy paste', function (e) {
+                                
+                });
+                  
+                  $('#selected_template_link').text(new_text);
+                  $('#selected_template').attr("value",new_text);
+                  $('#selected_template').val(new_text);
+                  
+                    
+                $('#selected_template').bind('copy paste', function (e) {
+                        e.preventDefault();
+                });
                 
-                $('#selected_template_link').text(new_value);
-                $(this).attr("value",new_value);
-                
-        
-            }); 
-        });
-       
-        loadCandidateSelection(selected_candidates_list);
-        
-        function loadCandidateSelection(selected_candidates){
-        
-            for(i=0;i<selected_candidates.length;i++)
-            {
-                $(".transaction_search_candidate[candidate_id='"+selected_candidates[i]+"']").addClass("ui-selected");
+                    $('#selected_template').click();
+            });
+            
+            $('#select_saved_template_menu').removeClass('ui-menu-divider');
+            
+            $('#selected_template').unbind('click').click(function(event) {
+            event.stopPropagation();
+            $(this).unbind('focus').focus();
+            $("#select_saved_template_menu").unbind('keydown');
+            $(this).unbind('focusout').focusout(function(event) {
+                                          
+                    var new_value = event.currentTarget.value;
+                    
+                    $('#selected_template_link').text(new_value);
+                    $(this).attr("value",new_value);
+                    
+            
+                }); 
+            });
+           
+            loadCandidateSelection(selected_candidates_list);
+            
+            function loadCandidateSelection(selected_candidates){
+            
+                for(i=0;i<selected_candidates.length;i++)
+                {
+                    $(".transaction_search_candidate[candidate_id='"+selected_candidates[i]+"']").addClass("ui-selected");
 
+                }
+            
             }
-        
+            
+            // JACOB ADDED 
+            
+
+            
+            var tablesorter_options = {
+                widthFixed : true,
+                showProcessing: true,
+                headerTemplate : '{content} {icon}', // Add icon for jui theme; new in v2.7!
+
+                widgets: ['stickyHeaders', 'filter','pager'],
+
+                data: dataObject,
+                
+                widgetOptions: {
+
+                  // *** build object options ***
+                  build_objectRowKey    : 'rows',    // object key containing table rows
+                  build_objectCellKey   : 'cells',   // object key containing table cells (within the rows object)
+                  build_objectHeaderKey : 'headers', // object key containing table headers
+                  build_objectFooterKey : 'footers',  // object key containing table footers
+                  
+                
+                  // extra class name added to the sticky header row
+                  stickyHeaders : '',
+                  // number or jquery selector targeting the position:fixed element
+                  stickyHeaders_offset : 0,
+                  // added to table ID, if it exists
+                  stickyHeaders_cloneId : '-sticky',
+                  // trigger "resize" event on headers
+                  stickyHeaders_addResizeEvent : true,
+                  // if false and a caption exist, it won't be included in the sticky header
+                  stickyHeaders_includeCaption : true,
+                  // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
+                  stickyHeaders_zIndex : 2,
+                  // jQuery selector or object to attach sticky header to
+                  stickyHeaders_attachTo : null,
+                  // scroll table top into view after filtering
+                  stickyHeaders_filteredToTop: true,
+
+                  // adding zebra striping, using content and default styles - the ui css removes the background from default
+                  // even and odd class names included for this demo to allow switching themes
+                  zebra   : ["ui-widget-content even", "ui-state-default odd"],
+                  // use uitheme widget to apply defauly jquery ui (jui) class names
+                  // see the uitheme demo for more details on how to change the class names
+                  uitheme : 'black'
+                }
+              };
+            
+            tablesorter_options.widgetOptions.stickyHeaders_attachTo = $('.wrapper'); // or $('.wrapper')
+                    
+            $("#transaction_search_candidates .tablesorter").tablesorter(tablesorter_options).bind("sortStart",function() { 
+                $("#tableLoader").show(); 
+               }).bind("sortEnd",function() { 
+                $("#tableLoader").hide(); 
+                
+            });
+            
+     
+            $('tr').on('click', function(){
+
+                if(!$('tr.ui-selected').length) {
+                
+                    
+                    if($('#add_to_template_button').hasClass("active") == true)
+                    {
+                        $('#add_to_template_button').removeClass('active');
+                    
+                    }
+                
+                } else {
+                
+                    if($('#add_to_template_button').hasClass("active") == false)
+                    {
+                        $('#add_to_template_button').addClass('active');
+                    }
+                
+                    
+                
+                }
+            })  
+            
+            $( "#transaction_search_candidates .tablesorter tbody" ).selectable({
+                filter: "tr",
+                selected: function( event, ui ) {
+                
+                    if($(ui.selected ).hasClass("transactions_list_description"))
+                    {
+                    
+                        var score_id = $(ui.selected).attr("score_id");
+                        
+                        $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
+                        
+                            if($(this).hasClass("ui-selected") == false)
+                            {
+                                $(this).addClass("ui-selected");
+                            }
+                            
+                            
+                            
+                        });
+                        
+                        
+                    }
+                    
+                },
+                unselected: function( event, ui ) {
+                
+                    if($(ui.unselected ).hasClass("transactions_list_description"))
+                    {
+                        var score_id = $(ui.unselected).attr("score_id");
+                        
+                        $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
+                        
+                            if($(this).hasClass("ui-selected") == true)
+                            {
+                                $(this).removeClass("ui-selected");
+                            }
+                            
+                        });
+                        
+                        
+                    }
+                    
+                }
+            });
+            
+            /*$('table.tablesorter').floatThead({
+        scrollContainer: function($table){
+            return $table.closest('.wrapper');
+        }
+    })*/
+            // END JACOB ADDED
         }
         
-        // JACOB ADDED 
+        function setupPager()
+        {
         
-        var tablesorter_options = {
-            widthFixed : true,
-            showProcessing: true,
-            headerTemplate : '{content} {icon}', // Add icon for jui theme; new in v2.7!
-
-            widgets: ['stickyHeaders', 'filter','pager' ],
-
-            widgetOptions: {
-
-              // extra class name added to the sticky header row
-              stickyHeaders : '',
-              // number or jquery selector targeting the position:fixed element
-              stickyHeaders_offset : 0,
-              // added to table ID, if it exists
-              stickyHeaders_cloneId : '-sticky',
-              // trigger "resize" event on headers
-              stickyHeaders_addResizeEvent : true,
-              // if false and a caption exist, it won't be included in the sticky header
-              stickyHeaders_includeCaption : true,
-              // The zIndex of the stickyHeaders, allows the user to adjust this to their needs
-              stickyHeaders_zIndex : 2,
-              // jQuery selector or object to attach sticky header to
-              stickyHeaders_attachTo : null,
-              // scroll table top into view after filtering
-              stickyHeaders_filteredToTop: true,
-
-              // adding zebra striping, using content and default styles - the ui css removes the background from default
-              // even and odd class names included for this demo to allow switching themes
-              zebra   : ["ui-widget-content even", "ui-state-default odd"],
-              // use uitheme widget to apply defauly jquery ui (jui) class names
-              // see the uitheme demo for more details on how to change the class names
-              uitheme : 'black'
-            }
-          };
+            $('.tablesorter').trigger('update');
         
-        tablesorter_options.widgetOptions.stickyHeaders_attachTo = $('.wrapper'); // or $('.wrapper')
-        
-        $("#transaction_search_candidates .tablesorter").tablesorter(tablesorter_options).bind("sortStart",function() { 
-            $("#tableLoader").show(); 
-           }).bind("sortEnd",function() { 
-            $("#tableLoader").hide(); 
-        })
-        .tablesorterPager({
+            $(".tablesorter").tablesorterPager({
 
             // target the pager markup - see the HTML block below
             container: $(".pager"),
-
+            
+            
             // use this url format "http:/mydatabase.com?page={page}&size={size}" 
             ajaxUrl: null,
+
 
             // process ajax so that the data object is returned along with the
             // total number of rows; example:
@@ -523,10 +944,25 @@
             //   "total_rows" : 100 
             // } 
             ajaxProcessing: function(ajax) {
-                if (ajax && ajax.hasOwnProperty('data')) {
-                    // return [ "data", "total_rows" ]; 
-                    return [ajax.data, ajax.total_rows];
+                
+                /*formatted_data = []
+                
+                number_columns = dataObject.headers[0].length
+
+                for(row in dataObject.rows)
+                {
+                    temp_row = {}
+                    for(row_item in dataObject.rows[row].cells)
+                    {
+                        temp_row.dataObject.headers[row_item] = dataObject.rows[row].cells[row_item]
+                    }
+                    formatted_data.append(temp_row)
                 }
+                
+                total_rows = dataObject.rows.length*/
+
+                return [dataObject.rows.length,dataObject.rows,dataObject.headers]
+                
             },
 
             // output string - default is '{page}/{totalPages}';
@@ -573,87 +1009,12 @@
             // (i.e. prev/first arrows are "disabled" when on the first page)
             // Note there is no period "." in front of this class name
             cssDisabled: 'disabled'
-
-        });
         
-
-        
-        $('tr').on('click', function(){
-
-            if(!$('tr.ui-selected').length) {
+            });
             
-                
-                if($('#add_to_template_button').hasClass("active") == true)
-                {
-                    $('#add_to_template_button').removeClass('active');
-                
-                }
+            $('.tablesorter').trigger('update');
             
-            } else {
-            
-                if($('#add_to_template_button').hasClass("active") == false)
-                {
-                    $('#add_to_template_button').addClass('active');
-                }
-            
-                
-            
-            }
-        })  
-        
-        $( "#transaction_search_candidates .tablesorter tbody" ).selectable({
-            filter: "tr",
-            selected: function( event, ui ) {
-            
-                if($(ui.selected ).hasClass("transactions_list_description"))
-                {
-                
-                    var score_id = $(ui.selected).attr("score_id");
-                    
-                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
-                    
-                        if($(this).hasClass("ui-selected") == false)
-                        {
-                            $(this).addClass("ui-selected");
-                        }
-                        
-                        
-                        
-                    });
-                    
-                    
-                }
-                
-            },
-            unselected: function( event, ui ) {
-            
-                if($(ui.unselected ).hasClass("transactions_list_description"))
-                {
-                    var score_id = $(ui.unselected).attr("score_id");
-                    
-                    $(".transaction_search_candidate[score_id="+score_id+"]").each(function(){
-                    
-                        if($(this).hasClass("ui-selected") == true)
-                        {
-                            $(this).removeClass("ui-selected");
-                        }
-                        
-                    });
-                    
-                    
-                }
-                
-            }
-        });
-        
-        /*$('table.tablesorter').floatThead({
-    scrollContainer: function($table){
-		return $table.closest('.wrapper');
-	}
-})*/
-        // END JACOB ADDED
-        
-        
+        }
     
         
     });
@@ -712,159 +1073,12 @@
                 </div>
                 <div id="transaction_search_candidates">
                         
-                        
-                      
-                                     
-                        
-                        
                     <img id ="tableLoader"  src ="/static/enersectapp/images/ajax-loader.gif"/>
                     <div style="overflow:auto;height:99.9%;" class="wrapper" >
-                    <table class="tablesorter">
                     
-                        
-                        
-                        <thead>
-                        <tr>
-                            <th><div class="tableInner">Relevance</div></th>
-                            <th><div class="tableInner">Transaction ID</div></th>
-                            <th><div class="tableInner">Amount</div></th>
-                            <th><div class="tableInner">Complete Date</div></th>
-                            
-                                {% for tag_name in non_repeated_searchtags %}
-                                   {% if tag_name != "Amount" and tag_name != "Complete Date" %}
-                                   <th><div class="tableInner">{{tag_name}}</div></th>
-                                   {% endif %}
-                                {% endfor %}
-                        </tr>
-
-                        </thead>
-                        
-                        <tbody>
-                        
-                        {% for ordered_list in final_list_ordered_score %}
-                            {% for candidate in ordered_list.transactions_list %}
-                        <tr class="candidate transaction_search_candidate" candidate_id={{candidate.TransactionIndex}} >
-                            <!-- here we have to list all the tags and relevant data -->
-                            <td><span class="star{{ordered_list.score_index}}"></span><span class="starNumber">{{ordered_list.score_index}}</span></td>
-                            <td>{{candidate.TransactionIndex}}</td>
-                            <td>{% if candidate.complete_item.Amount %}{{candidate.complete_item.Amount}}{%else%}-{%endif%}</td>
-                            <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}/{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td>
-                            <!-- Filling column content depending on the chosen search tags -->
-                            
-                            {% for tag_name in non_repeated_searchtags %}
-                               
-                               
-                               {% if tag_name == "Piece Number" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.NoPiece%}{{record.NoPiece}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.NoPiece%}{{record.NoPiece}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Company" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Company%}{{record.Company}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Company%}{{record.Company}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Day" %} <td>{% if candidate.complete_item.ValueDay %}{{candidate.complete_item.ValueDay}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Month" %} <td>{% if candidate.complete_item.ValueMonth %}{{candidate.complete_item.ValueMonth}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Year" %} <td>{% if candidate.complete_item.ValueYear %}{{candidate.complete_item.ValueYear}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Libdesc" %} <td>{% if candidate.complete_item.Libdesc %}{{candidate.complete_item.Libdesc}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Description" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.bank_records %}{% if record.Description%}{{record.Description}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.bank_records %}{% if record.Description%}{{record.Description}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Reftran" %} <td>{% if candidate.complete_item.Reftran %}{{candidate.complete_item.Reftran}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Bank Name" %} <td>{% if candidate.complete_item.BankName %}{{candidate.complete_item.BankName}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Bank Account" %} <td>{% if candidate.complete_item.BankAccount %}{{candidate.complete_item.BankAccount}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Bank Currency" %} <td>{% if candidate.complete_item.BankCurrency %}{{candidate.complete_item.BankCurrency}}{%else%}-{%endif%}</td> {%endif%}
-                               {% if tag_name == "Movement Number" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.NoMvt%}{{record.NoMvt}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.NoMvt%}{{record.NoMvt}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "INT Account Number" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.AccountNum%}{{record.AccountNum}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.AccountNum%}{{record.AccountNum}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Exchange Rate" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.ExchangeRate%}{{record.ExchangeRate}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.ExchangeRate%}{{record.ExchangeRate}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Memo" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Memo%}{{record.Memo}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Memo%}{{record.Memo}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               {% if tag_name == "Lett" %}
-                                    <td>
-                                    {% if candidate.internal_records|length == 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Lett%}{{record.Lett}}{%else%}-{%endif%}{% endfor %}
-                                    {% elif candidate.internal_records|length > 1 %}
-                                    {% for record in candidate.internal_records %}{% if record.Lett%}{{record.Lett}}{%else%}-{%endif%} | {% endfor %}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                    </td>
-                               {%endif%}
-                               
-                            {% endfor %}
-                            
-                        </tr>
-                        
-                            {% endfor %}
-                        {% endfor %}
-    
-                        <!-- End of table content -->
-                        
-                        </tbody>
-                        
-                    </table>
+                    <div class="tablesorter"></div>
                     
-                    <div id="pager" class="pager">
+                    <!-- <div id="pager" class="pager">
                                 <form>
                                     <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/first.png" class="first">
                                     <img src="/static/enersectapp/tablesorter-master/addons/pager/icons/prev.png" class="prev">
@@ -879,7 +1093,7 @@
                                     </select>
                                     <select class="gotoPage" title="Select page number"></select>
                                 </form>
-                    </div>
+                    </div> -->
                     
                     
                     </div>
@@ -940,14 +1154,14 @@
                         
                         
                         <ul>
-                            <li>Select: <a href="#" data-event="selectAll">All</a> <a href="#" data-event="selectNone">None</a></li>
+                            <li>Select: <a href="#" data-event="selectAll" id="selectAll">All</a> <a href="#" id="selectNone" data-event="selectNone">None</a></li>
                             <li>By Relevance: </li>
                             <li>
                                 <select multiple="" style=" height: 21px; width: 70px; ">
                                    
                                      {% for ordered_list in final_list_ordered_score %}
                                              <option>{{ordered_list.score_index}} ★</option>
-                                         {% endfor %}
+                                     {% endfor %}
                                     
                                 </select>
                             </li>

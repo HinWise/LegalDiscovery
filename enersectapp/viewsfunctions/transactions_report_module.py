@@ -19,6 +19,9 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 import tempfile
 
+import json
+from django.core import serializers
+
 import time
 from django.views import generic
 from django.utils import timezone
@@ -793,8 +796,13 @@ def transactions_report(request):
     
     coincident_transactions_complete = all_coincident_transactions
     coincident_transactions_complete_values = coincident_transactions_complete.values(*base_fields_searched) #Values limited to chosen search tags
+        
+    #Converting the unicode strings to strings, so javascript doesn't whine when receiving the object    
+        
+    coincident_transactions_complete_values = unicode_to_str_list(coincident_transactions_complete_values)
     
-    
+
+    #print coincident_transactions_complete_values
     
     
     #Create a dictionary to convert the ValuesQuerySet into a dict, accesible by keys
@@ -815,6 +823,8 @@ def transactions_report(request):
         
         element_dict["complete_info"] = transaction_dict_queryset
         
+        #print element_dict
+        
         coincident_transactions_dict_complete_values[str(transaction_dict_queryset["TransactionIndex"])] = element_dict
         
     
@@ -822,14 +832,20 @@ def transactions_report(request):
     #Basically, it's like a QuerySet, but in a dictionary with keys, to allow for instant access by ID later, instead of using a shit ton of "get" Queries
     ## This is THE BIG TIME SAVER
     
+    
     for transaction_temp_item in coincident_transactions_complete:
     
         element_dict = {}
 
         element_dict["complete_item"] = coincident_transactions_dict_complete_values[str(transaction_temp_item.TransactionIndex)]["complete_info"]
-        element_dict["internal_records"] = transaction_temp_item.internal_records_list.all().values(*internal_fields_searched)
-        element_dict["bank_records"] = transaction_temp_item.bank_records_list.all().values(*bank_fields_searched)
-
+        if len(internal_fields_searched):
+            element_dict["internal_records"] = unicode_to_str_list(transaction_temp_item.internal_records_list.all().values(*internal_fields_searched))
+        else:
+            element_dict["internal_records"] = []
+        if len(bank_fields_searched):
+            element_dict["bank_records"] = unicode_to_str_list(transaction_temp_item.bank_records_list.all().values(*bank_fields_searched))
+        else:
+            element_dict["bank_records"] = []
         coincident_transactions_complete_dict[str(transaction_temp_item.TransactionIndex)] = element_dict
 
 
@@ -881,14 +897,37 @@ def transactions_report(request):
         
         non_repeated_searchtags.append(tag["tag_name"])
     
-    non_repeated_searchtags = list(set(non_repeated_searchtags))
+    temp_repeated_searchtags = list(set(non_repeated_searchtags))
+
+    #Converting the search tags in strings so javascript won't whine when passing the object
     
+    non_repeated_searchtags = []
     
+    for tag in temp_repeated_searchtags:
+    
+        non_repeated_searchtags.append(str(tag))
+    
+    print non_repeated_searchtags
 
     context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
                 'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,
-                'non_repeated_searchtags':non_repeated_searchtags,'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list}
+                'non_repeated_searchtags':non_repeated_searchtags,'user_templates_list':user_templates_list,"selected_template":selected_template,'selected_candidates_list':selected_candidates_list,
+                }
     return render(request,'enersectapp/transactions_report.html',context)
+
+def unicode_to_str_list(final_list):
+
+    from django.db import transaction
+
+    with transaction.commit_on_success():
+        for item in final_list:
+            for key,value in item.iteritems():
+                
+                if type(value) is not int:
+                   
+                    item[key] = str(value)
+                
+    return final_list
     
 def string_to_pdf(canvas,string):
 
