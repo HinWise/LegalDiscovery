@@ -22,6 +22,8 @@ import tempfile
 import json
 from django.core import serializers
 
+import csv
+
 import time
 from django.views import generic
 from django.utils import timezone
@@ -33,13 +35,13 @@ import django.utils.simplejson as json
 
 def transactions_report(request):
     
+    
     if not request.user.is_authenticated():
         
         return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
     
     the_user = request.user
-   
-       
+
     #searchtags = ['amount','doctype','date','account','memo','reftran','libelle','account']
     
     searchtags = []
@@ -75,6 +77,108 @@ def transactions_report(request):
         chosen_template = TransactionsReportTemplate.objects.none()
     
     selected_candidates_list = []
+
+    if action_button_pressed == "content_list_export":
+
+        date = datetime.datetime.now().strftime("%d_%m_%Y")
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="content_list_export_'+date+'".csv"'
+
+        writer = csv.writer(response)
+
+        writer.writerow(["Amounts List","Piece Number List","Company List","Day List","Month List","Year List","Complete Date List","Libdesc List","Description List","Reftran List",
+    "Bank Name List","Bank Account List","Bank Currency List","Unique Transaction Index List","Movement Number List","INT Account Number List","Exchange Rate List","Memo List","Lett List"])
+
+        all_lists = []
+        
+        amount_list = TransactionTable.objects.all().values_list('Amount',flat=True).order_by('Amount').distinct()
+        all_lists.append(amount_list)
+ 
+        piecenumber_list = InternalRecord.objects.all().values_list('NoPiece',flat=True).order_by('NoPiece').distinct()
+        all_lists.append(piecenumber_list)
+
+        company_list = InternalRecord.objects.all().values_list('Company',flat=True).order_by('Company').distinct()
+        all_lists.append(company_list)
+  
+        day_list = TransactionTable.objects.all().values_list('ValueDay',flat=True).order_by('ValueDay').distinct()
+        all_lists.append(day_list)
+       
+        month_list = TransactionTable.objects.all().values_list('ValueMonth',flat=True).order_by('ValueMonth').distinct()
+        all_lists.append(month_list)
+     
+        year_list = TransactionTable.objects.all().values_list('ValueYear',flat=True).order_by('ValueYear').distinct()
+        all_lists.append(year_list)
+        
+        completedate_list = TransactionTable.objects.all().values_list('CompleteValueDate',flat=True).order_by('CompleteValueDate').distinct()
+        all_lists.append(completedate_list)
+        
+        libdesc_list = TransactionTable.objects.all().values_list('Libdesc',flat=True).order_by('Libdesc').distinct()
+        all_lists.append(libdesc_list)
+        
+        description_list = BankRecord.objects.all().values_list('Description',flat=True).order_by('Description').distinct()
+        all_lists.append(description_list)
+        
+        reftran_list = TransactionTable.objects.all().values_list('Reftran',flat=True).order_by('Reftran').distinct()
+        all_lists.append(reftran_list)
+       
+        bankname_list = TransactionTable.objects.all().values_list('BankName',flat=True).order_by('BankName').distinct()
+        all_lists.append(bankname_list)
+        
+        bankaccount_list = TransactionTable.objects.all().values_list('BankAccount',flat=True).order_by('BankAccount').distinct()
+        all_lists.append(bankaccount_list)
+        
+        bankcurrency_list = TransactionTable.objects.all().values_list('BankCurrency',flat=True).order_by('BankCurrency').distinct()
+        all_lists.append(bankcurrency_list)
+        
+        unique_transaction_index_list = TransactionTable.objects.all().values_list('TransactionIndex',flat=True).order_by('TransactionIndex').distinct()
+        all_lists.append(unique_transaction_index_list)
+        
+        movementnumber_list = InternalRecord.objects.all().values_list('NoMvt',flat=True).order_by('NoMvt').distinct()
+        all_lists.append(movementnumber_list)
+        
+        accountnum_list = InternalRecord.objects.all().values_list('AccountNum',flat=True).order_by('AccountNum').distinct()
+        all_lists.append(accountnum_list)
+        
+        exchangerate_list = InternalRecord.objects.all().values_list('ExchangeRate',flat=True).order_by('ExchangeRate').distinct()
+        all_lists.append(exchangerate_list)
+      
+        memo_list = InternalRecord.objects.all().values_list('Memo',flat=True).order_by('Memo').distinct()
+        all_lists.append(memo_list)
+        
+        lett_list = InternalRecord.objects.all().values_list('Lett',flat=True).order_by('Lett').distinct()
+        all_lists.append(lett_list)
+       
+        biggest_length = 0
+        
+        #Getting the maximum length of the lists (to determine number of rows)
+        for item in all_lists:
+        
+            biggest_length = max(biggest_length,len(item))
+        #Getting all lists filled with empty cells to make all lengths equal
+        new_all_lists = []
+        
+        for item in all_lists:
+        
+            new_list = list(item) + [''] * (biggest_length - len(item))
+            new_all_lists.append(new_list)
+            
+        
+        import itertools
+        
+
+        rows = itertools.izip(new_all_lists[0],new_all_lists[1],new_all_lists[2],new_all_lists[3],new_all_lists[4],new_all_lists[5],new_all_lists[6],new_all_lists[7],new_all_lists[8],new_all_lists[9],new_all_lists[10],new_all_lists[11],new_all_lists[12],new_all_lists[13],new_all_lists[14],new_all_lists[15],new_all_lists[16],new_all_lists[17],new_all_lists[18])
+        
+        #For some reason this second option doesn't work. That's why I went with the manual, clunky one
+        #rows = itertools.izip(new_all_lists)
+        
+        for row in rows:
+            try:
+                writer.writerow(row)
+            except:
+                print "FAILED"
+
+        return response
     
     if action_button_pressed == "generate_report":
   
@@ -375,7 +479,7 @@ def transactions_report(request):
     coincident_transactions_list = []
     
     base_fields_searched = ["TransactionIndex","Amount","CompleteValueDate"]
-    internal_fields_searched = []
+    internal_fields_searched = ["NoPiece","Company","NoMvt"]
     bank_fields_searched = []
     
     all_coincident_transactions = TransactionTable.objects.none()

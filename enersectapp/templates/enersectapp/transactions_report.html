@@ -123,13 +123,16 @@
                             row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.TransactionIndex });
                             row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.Amount });
                             row.cells.push({ text: all_candidates_data[i].transactions_list[j].complete_item.CompleteValueDate });
+                            row.cells.push({ text: evaluateAddToRow("Piece Number",all_candidates_data[i].transactions_list[j]) });
+                            row.cells.push({ text: evaluateAddToRow("Company",all_candidates_data[i].transactions_list[j]) });
+                            row.cells.push({ text: evaluateAddToRow("Movement Number",all_candidates_data[i].transactions_list[j]) });
                             
                             if(all_search_tags)
                             {
                             
                                 for(var k = 0; k < all_search_tags.length; k++)
                                 {
-                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date")
+                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number")
                                     {
                                         row.cells.push({ text: evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]) });
                                         //row.cells.push(evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]));
@@ -155,7 +158,10 @@
                     { text: 'Relevance', class: 'tableInner'}, // row 0 cell 1
                     { text: 'Transaction ID', class: 'tableInner'},                                        // row 0 cell 2
                     { text: 'Amount', class: 'tableInner'},  // row 0 cell 3
-                    { text: 'Complete Date', class: 'tableInner'}, 
+                    { text: 'Complete Date', class: 'tableInner'},
+                    { text: 'Piece Number', class: 'tableInner'},
+                    { text: 'Company', class: 'tableInner'},
+                    { text: 'Movement Number', class: 'tableInner'},
             ]
             
             if(all_search_tags)
@@ -163,7 +169,7 @@
             
                 for(var k = 0; k < all_search_tags.length; k++)
                 {
-                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date")
+                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number")
                     {
                         headers_row.push({text: all_search_tags[k], class: 'theader'});
                     }
@@ -233,40 +239,82 @@
             }
             if(tag_name == "Day")
             {
-                final_value = complete_item.ValueDay;
+                if(complete_item.internal_records.length == 1)
+                {
+                    console.log(complete_item.internal_records[0].ValueDay)
+                    final_value = complete_item.internal_records[0].ValueDay;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].ValueDay;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
                 
-                if(final_value == "*") final_value = "-";
+                }
             }
             if(tag_name == "Month")
             {
-                final_value = complete_item.ValueMonth;
-                
-                if(final_value == "*") final_value = "-";
-            }
-            if(tag_name == "Year")
-            {
-                final_value = complete_item.ValueYear;
-                
-                if(final_value == "*") final_value = "-";
-            }
-            if(tag_name == "Libdesc")
-            {
-                final_value = complete_item.Libdesc;
-                
-                if(final_value == "*") final_value = "-";
-            }
-            if(tag_name == "Description")
-            {
                 if(complete_item.internal_records.length == 1)
                 {
-                    final_value = complete_item.internal_records[0].Description;
+                    final_value = complete_item.internal_records[0].ValueMonth;
                     
                 }
                 else if(complete_item.internal_records.length > 1)
                 {
                     for(record in complete_item.internal_records)
                     {
-                        temp_value = complete_item.internal_records[record].Description;
+                        temp_value = complete_item.internal_records[record].ValueMonth;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "Day")
+            {
+                final_value = complete_item.complete_item.ValueDay;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Month")
+            {
+                final_value = complete_item.complete_item.ValueMonth;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Year")
+            {
+                final_value = complete_item.complete_item.ValueYear;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Libdesc")
+            {
+                final_value = complete_item.complete_item.Libdesc;
+                
+                if(final_value == "*") final_value = "-";
+            }
+            if(tag_name == "Description")
+            {
+                if(complete_item.bank_records.length == 1)
+                {
+                    final_value = complete_item.bank_records[0].Description;
+                    
+                }
+                else if(complete_item.bank_records.length > 1)
+                {
+                    for(record in complete_item.bank_records)
+                    {
+                        temp_value = complete_item.bank_records[record].Description;
                         
                         if(!temp_value) temp_value = "-";
                         
@@ -277,25 +325,25 @@
             }
             if(tag_name == "Reftran")
             {
-                final_value = complete_item.Reftran;
+                final_value = complete_item.complete_item.Reftran;
                 
                 if(final_value == "*") final_value = "-";
             }
             if(tag_name == "Bank Name")
             {
-                final_value = complete_item.BankName;
+                final_value = complete_item.complete_item.BankName;
                 
                 if(final_value == "*") final_value = "-";
             }
             if(tag_name == "Bank Account")
             {
-                final_value = complete_item.BankAccount;
+                final_value = complete_item.complete_item.BankAccount;
                 
                 if(final_value == "*") final_value = "-";
             }
             if(tag_name == "Bank Currency")
             {
-                final_value = complete_item.BankCurrency;
+                final_value = complete_item.complete_item.BankCurrency;
                 
                 if(final_value == "*") final_value = "-";
             }
@@ -676,6 +724,52 @@
                 $("#fields_form").submit();
             
             });
+            
+            $("#selectAll").click(function(){
+            
+            
+                $("tr").each(function(){
+                
+                    self = $(this);
+                    
+                    if(self.hasClass("ui-selected") == false)
+                    {
+                    
+                        self.addClass("ui-selected");
+                    
+                    }
+                
+                });
+ 
+            });
+            
+            $("#selectNone").click(function(){
+            
+            
+                $("tr").each(function(){
+                
+                    self = $(this);
+                    
+                    if(self.hasClass("ui-selected") == true)
+                    {
+                    
+                        self.removeClass("ui-selected");
+                    
+                    }
+                
+                });
+ 
+            });
+            
+            $("#content_list_button").click(function(){
+            
+            
+                $("#action_button_pressed").attr("value","content_list_export");
+            
+                $("#fields_form").submit();
+ 
+            });
+            
             
         
         }
@@ -1196,8 +1290,10 @@
                         {% endfor %}
                         <a href="{% url 'enersectapp:transactions_report' %}" id="clearSearch">Clear All</a>
                     </div>
+                    
                     <div id="search_tags_create_panel"><img id="logo" src="/static/enersectapp/images/enersect-transaction-explorer.png" search_tags_tools_line"="">
-                            
+                     <input type="button" class="button" name="content_list_button" id="content_list_button" value="L">  
+                     <img id="icon-list" src="/static/enersectapp/images/icon-list.png">
 <select name="select_tagtype_menu" id="select_tagtype_menu" value="">
                                 
                                     <option value="Amount">Amount</option>
@@ -1251,6 +1347,7 @@
                                     <option value="exclude"> &#8855 (Exclude)</option>
 
                             </select>
+                            
                             <input type="text" name="searchtags_input" id="searchtags_input" value="" placeholder="search...">
                             <input type="button" class="button" name="searchtag_add_button" id="searchtag_add_button" value="Search">
                             <input type="button" class="button" name="generate_report_button" id="generate_report_button" value="Generate Report">
@@ -1274,6 +1371,7 @@
                                 </div>
                                 <input type="button" class="button" name="remove_template_button" id="remove_template_button" value="Remove">
                                 
+                                <input type="input" class="invisible" name="action_button_pressed" id="action_button_pressed" value="">
                             </div>
                 </div>
                 

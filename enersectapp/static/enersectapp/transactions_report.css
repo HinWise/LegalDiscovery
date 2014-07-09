@@ -379,6 +379,28 @@
         
     }
     
+    input#content_list_button {
+    height: 38px;
+    padding: 10px;
+    width: 40px;
+    font-weight: bold !important;
+    background: white;
+    
+    }
+    
+    #icon-list
+        {
+        height: 16px;
+        padding: 10px;
+        width: 18px;
+        font-weight: bold !important;
+        background: white;
+        position: absolute;
+        top: 51px;
+        left: inherit;
+        border-radius: 20%;
+        pointer-events:none;
+    }
     
     
     #searchtags_string {
