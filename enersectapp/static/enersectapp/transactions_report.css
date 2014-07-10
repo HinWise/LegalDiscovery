@@ -92,11 +92,17 @@
         #transaction_search_candidates  {
 
         position: absolute;
-        width: 45%;
-        height: 419px !important;/*431px*/
+        /*width: 45%;*/
+        width:100%;
+        height:410px !important;
+        /*height: 419px !important;*/
+        /*431px*/
         z-index: 200;
         overflow: auto;
 
+        -webkit-transition: width 1s; /* For Safari 3.1 to 6.0 */
+        transition: width 1s;
+        
         }
         
             .transactions_list_description {
@@ -413,6 +419,22 @@
     width:50%;
 
 
+    }
+    
+    th.tablesorter-header.resizable-false {
+      background-color: #e6bf99;
+    }
+    /* ensure box-sizing is set to content-box, if using jQuery versions older than 1.8;
+     this page is using jQuery 1.4 */
+    .tablesorter {
+      -moz-box-sizing: content-box;
+      -webkit-box-sizing: content-box;
+      box-sizing: content-box;
+    }
+    
+    .tablesorter-resizer
+        {
+        z-index:2000;
     }
 
     

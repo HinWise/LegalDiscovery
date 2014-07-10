@@ -142,7 +142,6 @@
                             
                             }
                             
-                            //console.log(row);
                             rows_list.push(row);
                         }
                         
@@ -171,7 +170,7 @@
                 {
                     if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number")
                     {
-                        headers_row.push({text: all_search_tags[k], class: 'theader'});
+                        headers_row.push({text: all_search_tags[k], class: 'theader' });
                     }
                 
                 }
@@ -543,6 +542,8 @@
             
             $(".candidate").click(function(){
                 
+                $("#transaction_search_candidates").css("width","45%");
+                
                 if($(this).hasClass("been-clicked4")) { $(this).addClass("been-clicked5");  $(this).removeClass("been-clicked4");}
                 if($(this).hasClass("been-clicked3")) { $(this).addClass("been-clicked4"); $(this).removeClass("been-clicked3"); }
                 if($(this).hasClass("been-clicked2")) { $(this).addClass("been-clicked3"); $(this).removeClass("been-clicked2"); }
@@ -728,7 +729,7 @@
             $("#selectAll").click(function(){
             
             
-                $("tr").each(function(){
+                $("tbody tr").each(function(){
                 
                     self = $(this);
                     
@@ -746,7 +747,7 @@
             $("#selectNone").click(function(){
             
             
-                $("tr").each(function(){
+                $("tbody tr").each(function(){
                 
                     self = $(this);
                     
@@ -887,15 +888,16 @@
 
             
             var tablesorter_options = {
-                widthFixed : true,
+                widthFixed : false,
                 showProcessing: true,
-                headerTemplate : '{content} {icon}', // Add icon for jui theme; new in v2.7!
+                //headerTemplate : '{content} {icon}', // Add icon for jui theme; new in v2.7!
 
-                widgets: ['stickyHeaders', 'filter','pager'],
+                widgets: ['stickyHeaders', 'filter'],
 
                 data: dataObject,
                 
                 widgetOptions: {
+
 
                   // *** build object options ***
                   build_objectRowKey    : 'rows',    // object key containing table rows
@@ -940,9 +942,9 @@
             });
             
      
-            $('tr').on('click', function(){
+            $('tbody tr').on('click', function(){
 
-                if(!$('tr.ui-selected').length) {
+                if(!$('tbody tr.ui-selected').length) {
                 
                     
                     if($('#add_to_template_button').hasClass("active") == true)
@@ -1108,9 +1110,9 @@
             
             $('.tablesorter').trigger('update');
             
+            
         }
     
-        
     });
         
 </script>
