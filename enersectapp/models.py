@@ -78,13 +78,18 @@ class InternalRecord(models.Model):
     MECutoff = models.CharField('If Memo is cut off in the document scan',max_length=31)
     MEFactureNum = models.CharField('Memo extracted Facture Number',max_length=31)
     
+    MELedgerPage = models.CharField('MELedgerPage',max_length=31,default = "")
+    MELedgerSize = models.CharField('MELedgerSize',max_length=31,default = "")
+    Filename = models.CharField('Filename',max_length=63,default = "")
+    
     ExchangeRate = models.CharField('Exchange Rate',max_length=31)
     
     ExistingBankEntry = models.CharField('If it has a Bank Entry',max_length=31)
     BankAccount = models.CharField('Existing Bank Account',max_length=31)
     BankName = models.CharField('Existing Bank Name',max_length=31)
     BankCurrency = models.CharField('Existing Bank Currency',max_length=31)
-
+    BankEntry = models.CharField('Existing Bank Entry',max_length=31,default = "")
+    
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
     affidavit_uid_string = models.CharField(max_length=63,default="None")
@@ -318,6 +323,22 @@ class SourcePdfToHandle(models.Model):
         return str(self.id) + " | " + str(self.assignedcompany.name) + " | " + str(self.assigneduser.username) + " | " + str(self.checked)
     class Meta:
         ordering = ['assignedcompany']         
+
+
+class Packet(models.Model):
+    
+    PacketLabel = models.IntegerField(default=0)
+    MultipartFilenameStub = models.CharField(max_length=63, default="")
+    NumPackets = models.IntegerField(default=0)
+    MaxPages = models.IntegerField(default=0)
+    FromPage = models.IntegerField(default=0)
+    ToPage = models.IntegerField(default=0)
+    Description = models.CharField(max_length=63, default="")
+    
+    def __unicode__(self):
+        return str(self.PacketLabel)
+    class Meta:
+        ordering = ['PacketLabel']  
         
 class SourcePdf(models.Model):
     job_directory = models.CharField('Job directory',max_length=255)
@@ -377,6 +398,9 @@ class SourcePdf(models.Model):
     
 
 class OcrRecord(models.Model):
+
+    OcrRecordIndex = models.IntegerField('OcrRecordIndex_Reference')
+
     Document_Type = models.CharField('Document Type',max_length=255)
     Amount = models.CharField('Amount',max_length=255)
     Currency = models.CharField('Currency',max_length=255)
@@ -402,9 +426,19 @@ class OcrRecord(models.Model):
     Receiver = models.CharField('Receiver Email/Fax/Letter',max_length=255, default="NoReceiverField")
     Blank = models.CharField('Blank',max_length=255)
     Unreadable = models.CharField('Unreadable',max_length=255)
+    
+    OldCompanyLine = models.CharField('OldCompanyLine',max_length=255,default = "MISSING NAME")
+    SecondVersionCompanyLine = models.CharField('SecondVersionCompanyLine',max_length=255,default = "MISSING NAME")
+    OldCompanyLineIndexInteger = models.IntegerField('OldCompanyLineIndexInteger',default = 0)
+    SecondVersionCompanyLineIndexInteger = models.IntegerField('SecondVersionCompanyLineIndexInteger',default = 0)
+    
     OcrByCompany = models.ForeignKey(Group)
     OcrAuthor = models.ForeignKey(User)
     OcrCreationDate = models.CharField('OcrCreationDate',max_length=255)
+    
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
     
     def __unicode__(self):
         return self.Company

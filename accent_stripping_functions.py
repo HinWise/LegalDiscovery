@@ -12,8 +12,7 @@ def strip_accents(s): ## for alphanumeric input
     s = re.sub(ur'\u00a3', '(GBPOUNDS)', s,re.UNICODE) # £ -> (GBPOUNDS)   
     s = re.sub(ur'\x87', 'c', s,re.UNICODE) # ç -> c   
     s = re.sub(r'\x80', '(EUR)', s) # eurosymbol -> (EUR)
-
-    s = ''.join(c for c in unicodedata.normalize('NFKD', s.decode(encoding='Windows-1252')) if unicodedata.category(c) != 'Mn')
+    s = ''.join(c for c in unicodedata.normalize('NFKD', s) if unicodedata.category(c) != 'Mn')
     return s.encode('utf-8')
     
 
@@ -31,11 +30,11 @@ with transaction.commit_on_success():
         
         count +=1
         
-        item.Address = strip_accents(str(item.Address))
-        item.City = strip_accents(str(item.City))
-        item.Country = strip_accents(str(item.Country))
-        item.Company = strip_accents(str(item.Company))
-        item.Currency = strip_accents(str(item.Currency))
+        item.Address = strip_accents(item.Address)
+        item.City = strip_accents(item.City)
+        item.Country = strip_accents(item.Country)
+        item.Company = strip_accents(item.Company)
+        item.Currency = strip_accents(item.Currency)
         
         item.save()
         

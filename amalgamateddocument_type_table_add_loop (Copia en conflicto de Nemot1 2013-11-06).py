@@ -356,6 +356,57 @@ with transaction.commit_on_success():
 
       
         
+## Delete the Ocr Entries that don't have a Pdf Entry associated, as those weren't supossed to be there any way
+## Deleting duplicate Ocr
+
+from django.db import transaction
+from enersectapp.models import *
+
+all_ocr = OcrRecord.objects.all()
+all_icr = PdfRecord.objects.all()
+
+related_ocr_id_list = []
+
+with transaction.commit_on_success():
+ for item in all_icr:
+
+    related_ocr_id_list.append(item.ocrrecord_link.pk)
+
+duplicated_ocr_id_list = []
+count = 0
+
+all_ocr = OcrRecord.objects.all()
+
+with transaction.commit_on_success():
+    for item in all_ocr[:50000]:
+        
+        if item.pk not in related_ocr_id_list:
+            duplicated_ocr_id_list.append(item.pk)
+        count += 1
+        print count
+
+
+count = 0
+        
+with transaction.commit_on_success():
+    for item in duplicated_ocr_id_list:
+        
+        chosen = OcrRecord.objects.get(pk = item)
+        chosen.delete()
+        count += 1
+        print count
+
+    
+'''
+count = 0
+iterator = 0
+
+with transaction.commit_on_success():
+ for item in all_ocr:
+   if len(item.pdfrecord_set.all()) > 0:
+    count += 1
+   iterator += 1
+   print iterator'''
 
 
 

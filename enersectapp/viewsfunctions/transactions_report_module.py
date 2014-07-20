@@ -915,8 +915,8 @@ def transactions_report(request):
     
     #Transforming the "coincident_transactions_complete_values" dictionary into json
     
-    with io.open('jsondata.txt', 'w', encoding='utf-8') as f:
-        f.write(unicode(coincident_transactions_complete_values))
+    '''with io.open('jsondata.txt', 'w', encoding='utf-8') as f:
+        f.write(unicode(coincident_transactions_complete_values))'''
         #f.write(unicode(json.dumps(coincident_transactions_complete_values, ensure_ascii=False)))
     
     #Loop that takes the id of every item in the queryset and makes it's own searchable dict item that contains that info to be accesed later

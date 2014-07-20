@@ -471,6 +471,11 @@ table.tablesorter.tablesorter-default.hasFilters.containsStickyHeaders.tablesort
 
 }
 
+.tablesorter, .tablesorter .tablesorter-filter {
+    /*Change this to allow resizing of tables and such*/
+    /*width: 50px;*/
+}
+
 #pager {
 
     position:fixed;
