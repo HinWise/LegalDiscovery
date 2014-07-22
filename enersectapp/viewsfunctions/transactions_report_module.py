@@ -88,7 +88,7 @@ def transactions_report(request):
         writer = csv.writer(response)
 
         writer.writerow(["Amounts List","Piece Number List","Company List","Day List","Month List","Year List","Complete Date List","Libdesc List","Description List","Reftran List",
-    "Bank Name List","Bank Account List","Bank Currency List","Unique Transaction Index List","Movement Number List","INT Account Number List","Exchange Rate List","Memo List","Lett List"])
+    "Bank Name List","Bank Account List","Bank Currency List","Unique Transaction Index List","Movement Number List","INT Account Number List","Exchange Rate List","Memo List","Lett List","PDF Filenames List"])
 
         all_lists = []
         
@@ -149,6 +149,9 @@ def transactions_report(request):
         lett_list = InternalRecord.objects.all().values_list('Lett',flat=True).order_by('Lett').distinct()
         all_lists.append(lett_list)
        
+        pdfviews_list = InternalRecord.objects.all().values_list('Filename',flat=True).order_by('Filename').distinct()
+        all_lists.append(pdfviews_list)
+       
         biggest_length = 0
         
         #Getting the maximum length of the lists (to determine number of rows)
@@ -162,12 +165,13 @@ def transactions_report(request):
         
             new_list = list(item) + [''] * (biggest_length - len(item))
             new_all_lists.append(new_list)
+
             
         
         import itertools
         
 
-        rows = itertools.izip(new_all_lists[0],new_all_lists[1],new_all_lists[2],new_all_lists[3],new_all_lists[4],new_all_lists[5],new_all_lists[6],new_all_lists[7],new_all_lists[8],new_all_lists[9],new_all_lists[10],new_all_lists[11],new_all_lists[12],new_all_lists[13],new_all_lists[14],new_all_lists[15],new_all_lists[16],new_all_lists[17],new_all_lists[18])
+        rows = itertools.izip(new_all_lists[0],new_all_lists[1],new_all_lists[2],new_all_lists[3],new_all_lists[4],new_all_lists[5],new_all_lists[6],new_all_lists[7],new_all_lists[8],new_all_lists[9],new_all_lists[10],new_all_lists[11],new_all_lists[12],new_all_lists[13],new_all_lists[14],new_all_lists[15],new_all_lists[16],new_all_lists[17],new_all_lists[18],new_all_lists[19])
         
         #For some reason this second option doesn't work. That's why I went with the manual, clunky one
         #rows = itertools.izip(new_all_lists)
@@ -479,7 +483,7 @@ def transactions_report(request):
     coincident_transactions_list = []
     
     base_fields_searched = ["TransactionIndex","Amount","CompleteValueDate"]
-    internal_fields_searched = ["NoPiece","Company","NoMvt"]
+    internal_fields_searched = ["NoPiece","Company","NoMvt","Filename"]
     bank_fields_searched = []
     
     all_coincident_transactions = TransactionTable.objects.none()
@@ -878,6 +882,23 @@ def transactions_report(request):
                 if "Lett" not in internal_fields_searched:
                     internal_fields_searched.append("Lett")
     
+            if item["tag_name"] == "Filename":
+            
+                if item["tag_operator"] == "exact":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Filename__exact = item["tag_content"]).order_by()
+                if item["tag_operator"] == "contains":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Filename__icontains = item["tag_content"]).order_by()
+                if item["tag_operator"] == "greater_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Filename__gt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "less_than":
+                    coincident_transactions = TransactionTable.objects.filter(internal_records_list__Filename__lt = item["tag_content"]).order_by()
+                if item["tag_operator"] == "exclude":
+                    coincident_transactions = TransactionTable.objects.exclude(internal_records_list__Filename__icontains = item["tag_content"]).order_by()
+                    
+                coincident_transactions_list.extend(coincident_transactions.values_list('Filename',flat=True)) 
+                all_coincident_transactions = all_coincident_transactions | coincident_transactions
+                if "Filename" not in internal_fields_searched:
+                    internal_fields_searched.append("Filename")
 
     ## Prepares a dictionary that counts the number of duplicates in the list "coincident_transactions_list" made before
     #It is important to have this dictionary as it keeps duplicates, that we will use later to add the Relevance Score to the dicts
@@ -989,7 +1010,7 @@ def transactions_report(request):
     
 
     tag_types = ["Amount","Piece Number","Company","Day","Month","Year","Complete Date","Libdesc","Description","Reftran",
-    "Bank Name","Bank Account","Bank Currency","Unique Transaction Index","Movement Number","INT Account Number","Exchange Rate","Memo","Lett"]
+    "Bank Name","Bank Account","Bank Currency","Unique Transaction Index","Movement Number","INT Account Number","Exchange Rate","Memo","Lett","PDF Views"]
     
     user_templates_list = user_profile.created_transactionsreport_templates.all().values_list('name',flat=True)
     

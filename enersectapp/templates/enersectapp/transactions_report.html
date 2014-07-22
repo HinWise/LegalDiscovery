@@ -92,12 +92,14 @@
         
         setTimeout(continueSetup, 100);
         
+
         function continueSetup()
         {
             setTimeout(moreSetup, 100);
             setTimeout(initiateListeners, 100);
+            setTimeout(pdfPathnamesToButtons, 100);
             //setupPager();
-            
+
         }
         
         //Building the rows for the table, so can pass the object to TableSorter later
@@ -132,7 +134,7 @@
                             
                                 for(var k = 0; k < all_search_tags.length; k++)
                                 {
-                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number")
+                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number" && all_search_tags[k] != "PDF Views")
                                     {
                                         row.cells.push({ text: evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]) });
                                         //row.cells.push(evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]));
@@ -141,6 +143,8 @@
                                 }
                             
                             }
+                            
+                            row.cells.push({ text: evaluateAddToRow("PDF Views",all_candidates_data[i].transactions_list[j]) });
                             
                             rows_list.push(row);
                         }
@@ -176,6 +180,8 @@
                 }
             
             }
+            
+            headers_row.push({text: "PDF Views", class: 'theader' });
             
             headers_list.push(headers_row);
             
@@ -446,10 +452,87 @@
                 
                 }
             }
+            if(tag_name == "PDF Views")
+            {
+                if(complete_item.internal_records.length == 1)
+                {
+                    final_value = complete_item.internal_records[0].Filename;
+                    
+                }
+                else if(complete_item.internal_records.length > 1)
+                {
+                    for(record in complete_item.internal_records)
+                    {
+                        temp_value = complete_item.internal_records[record].Filename;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
             
             if(!final_value) final_value = "-";
             
             return final_value
+        }
+        
+        
+        
+        function pdfPathnamesToButtons(){
+        
+            $('td:contains(".pdf")').each(function() {
+  
+                different_pathnames = $(this).text().split("|");
+                console.log(different_pathnames);
+                s = ""
+                
+                for(i=0;i<different_pathnames.length;i++)
+                {
+                    
+                    path = different_pathnames[i]
+                    
+                    s += '<div path_filename="'+path+'" class="pdf_button ui-icon ui-icon-document"><div>';
+                    if(i!=different_pathnames.length-1)
+                    {
+                        xanto = i
+                    }
+                }
+                $(this).text("");
+                $(this).append(s);
+            });
+        
+            $(".pdf_button").click(function(event){
+              event.stopPropagation();
+              
+              if($(this).hasClass("activated_pdf"))
+              {
+                  $("#transaction_search_candidates").css("width","90%");
+                  $(this).removeClass("activated_pdf");
+                  
+                  $("iframe").remove();
+              }
+              else
+              {
+                  $(this).addClass("activated_pdf");
+              
+                  $("#transaction_search_candidates").css("width","45%");
+                  
+                  $("#transaction_graph").remove();
+                    
+                    var frame_width = $("#iframe_test").width()-10+"px";
+                    var frame_height = $("#iframe_test").height()-10+"px";
+                    
+                    var path_filename = $(this).attr("path_filename");
+                    
+                    var frame = '<iframe id="transaction_graph" src="http://54.200.180.182/sourcepdfs/grandelivreglobale/'+path_filename+'" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
+                    
+                    $("#iframe_test").append(frame);
+                  //alert("The span element was clicked.");
+              }
+            });
+        
         }
         
         function createLeftGraph(){

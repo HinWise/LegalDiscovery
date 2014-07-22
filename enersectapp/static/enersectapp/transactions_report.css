@@ -516,5 +516,20 @@
     overflow: hidden;
 }
 
+.pdf_button {
 
+    position: relative;
+    width: 8px;
+    height: 17px;
+    padding-right: 8px;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 20%;
+    
+}
 
+.pdf_button:hover{
+
+    background-color: rgb(205, 226, 235);
+
+}
