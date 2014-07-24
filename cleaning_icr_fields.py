@@ -530,6 +530,7 @@ with transaction.commit_on_success():
 ###Importing the Company Name synonyms from a .csv that I wrote (around 9000 lines, "different" companies)
 
 csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/companynames_secondrow.csv"
+
 # Full path to the directory immediately above your django project directory
 #your_djangoproject_home="/srv/enersectapp/app/ProjectFolder"
 your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"

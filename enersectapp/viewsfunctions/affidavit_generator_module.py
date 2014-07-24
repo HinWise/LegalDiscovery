@@ -46,7 +46,7 @@ import shutil
 import string
 import random
 
-Month_Dictionary = {"01":"January","02":"February","03":"March","04":"April","05":"May","06":"June","07":"July","08":"August","09":"September","10":"October","11":"November","12":"December"}
+Month_Dictionary = {"01":"January","1":"January","02":"February","2":"February","03":"March","3":"March","04":"April","4":"April","05":"May","5":"May","06":"June","6":"June","07":"July","7":"July","08":"August","8":"August","09":"September","9":"September","10":"October","11":"November","12":"December"}
 max_characters_line = 95
 
 def affidavit_generator(request):
@@ -112,7 +112,7 @@ def affidavit_generator(request):
 
 def document_corpus_maker():
     
-    corpus_list = ["icr","sourcepdfs","grandelivre","albaraka","transactions"]
+    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN"]
     
     all_documents = []
     
@@ -142,34 +142,34 @@ def document_corpus_maker():
         
         file_dict = {}
         
-        if "icr" in file:
+        if "ICR" in file:
             file_dict["file_name"] = file
             file_dict["downloaded"] = "Not Downloaded"
             
             icr_corpus_contents_list.append(file_dict)
             
-        if "sourcepdfs" in file:
+        if "SRC" in file:
 
             file_dict["file_name"] = file
             file_dict["downloaded"] = "Not Downloaded"
             
             sourcepdfs_corpus_contents_list.append(file_dict)
             
-        if "grandelivre" in file:
+        if "GRLV" in file:
 
             file_dict["file_name"] = file
             file_dict["downloaded"] = "Not Downloaded"
             
             grandelivre_corpus_contents_list.append(file_dict)
             
-        if "albaraka" in file:
+        if "ALBK" in file:
 
             file_dict["file_name"] = file
             file_dict["downloaded"] = "Not Downloaded"
             
             albaraka_corpus_contents_list.append(file_dict)
             
-        if "transactions" in file:
+        if "TRN" in file:
 
             file_dict["file_name"] = file
             file_dict["downloaded"] = "Not Downloaded"
@@ -178,19 +178,19 @@ def document_corpus_maker():
             
             
             
-    icr_corpus_dict["corpus_name"] = "icr"
+    icr_corpus_dict["corpus_name"] = "ICR"
     icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
     
-    sourcepdfs_corpus_dict["corpus_name"] = "sourcepdfs"
+    sourcepdfs_corpus_dict["corpus_name"] = "SRC"
     sourcepdfs_corpus_dict["corpus_contents"] = sourcepdfs_corpus_contents_list
     
-    grandelivre_corpus_dict["corpus_name"] = "grandelivre"
+    grandelivre_corpus_dict["corpus_name"] = "GRLV"
     grandelivre_corpus_dict["corpus_contents"] = grandelivre_corpus_contents_list
     
-    albaraka_corpus_dict["corpus_name"] = "albaraka"
+    albaraka_corpus_dict["corpus_name"] = "ALBK"
     albaraka_corpus_dict["corpus_contents"] = albaraka_corpus_contents_list
     
-    transactions_corpus_dict["corpus_name"] = "transactions"
+    transactions_corpus_dict["corpus_name"] = "TRN"
     transactions_corpus_dict["corpus_contents"] = transactions_corpus_contents_list
     
     document_corpus_list.append(icr_corpus_dict)
@@ -365,16 +365,16 @@ def generate_corpus_output(request,watermark_name):
     print corpus_to_include
     print documents_corpus_to_include_in_output
     
-    if "icr" in documents_corpus_to_include_in_output:
+    if "ICR" in documents_corpus_to_include_in_output:
         
-        delete_temp_affidavit_files("icr","cover")
-        delete_temp_affidavit_files("icr","partial")
-        delete_temp_affidavit_files("icr","merge")
+        delete_temp_affidavit_files("ICR","cover")
+        delete_temp_affidavit_files("ICR","partial")
+        delete_temp_affidavit_files("ICR","merge")
         
         generate_icr_output(request,watermark_name)
         
     
-    if "sourcepdfs" in documents_corpus_to_include_in_output:
+    if "SRC" in documents_corpus_to_include_in_output:
         
         try:
             complete_corpus_mark = request.POST['complete_corpus_mark']
@@ -383,33 +383,33 @@ def generate_corpus_output(request,watermark_name):
         
         if complete_corpus_mark != "complete":
         
-            delete_temp_affidavit_files("sourcepdfs","cover")
-            delete_temp_affidavit_files("sourcepdfs","partial")
-            delete_temp_affidavit_files("sourcepdfs","merge")
+            delete_temp_affidavit_files("SRC","cover")
+            delete_temp_affidavit_files("SRC","partial")
+            delete_temp_affidavit_files("SRC","merge")
         
         generate_sourcepdfs_output(request,watermark_name)
-        
-    if "grandelivre" in documents_corpus_to_include_in_output:
-        
-        delete_temp_affidavit_files("grandelivre","cover")
-        delete_temp_affidavit_files("grandelivre","partial")
-        delete_temp_affidavit_files("grandelivre","merge")
-        
+    
+    if "GRLV" in documents_corpus_to_include_in_output:
+
+        delete_temp_affidavit_files("GRLV","cover")
+        delete_temp_affidavit_files("GRLV","partial")
+        delete_temp_affidavit_files("GRLV","merge")
+
         generate_grandelivre_output(request,watermark_name)
+
+    if "ALBK" in documents_corpus_to_include_in_output:
         
-    if "albaraka" in documents_corpus_to_include_in_output:
-        
-        delete_temp_affidavit_files("albaraka","cover")
-        delete_temp_affidavit_files("albaraka","partial")
-        delete_temp_affidavit_files("albaraka","merge")
+        delete_temp_affidavit_files("ALBK","cover")
+        delete_temp_affidavit_files("ALBK","partial")
+        delete_temp_affidavit_files("ALBK","merge")
         
         generate_albaraka_output(request,watermark_name)
         
-    if "transactions" in documents_corpus_to_include_in_output:
+    if "TRN" in documents_corpus_to_include_in_output:
         
-        delete_temp_affidavit_files("transactions","cover")
-        delete_temp_affidavit_files("transactions","partial")
-        delete_temp_affidavit_files("transactions","merge")
+        delete_temp_affidavit_files("TRN","cover")
+        delete_temp_affidavit_files("TRN","partial")
+        delete_temp_affidavit_files("TRN","merge")
         
         generate_transactions_output(request,watermark_name)
 
@@ -493,7 +493,7 @@ def generate_icr_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"ICR"+"/"+"ICR__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -566,7 +566,7 @@ def generate_icr_output(request,watermark_name):
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"ICR"+"/"+"ICR__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -583,7 +583,7 @@ def generate_icr_output(request,watermark_name):
                       
 
                     pdf_string = ""
-                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                                 "+"ICR__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1    
                 
@@ -630,7 +630,7 @@ def generate_icr_output(request,watermark_name):
                     
                     
                     '''pdf_string = ""
-                    pdf_string += "                                                                                                                                 "+"icr__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                                 "+"ICR__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string += '\n'
                     page_count +=1'''
                     
@@ -662,7 +662,7 @@ def generate_icr_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/"+"icr"+"/"+"icr__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"ICR"+"/"+"ICR__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -757,7 +757,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         exhibit_count = 1
         corpus_doccount = 1
         
-        temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"SRC"+"/"+"SRC__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
         output.write(temp_filename)
 
@@ -808,7 +808,7 @@ def generate_sourcepdfs_output(request,watermark_name):
         
         #500 is the only possible partition size
  
-        corpus_type = "sourcepdfs"
+        corpus_type = "SRC"
 
         temp_list = os.listdir('legaldiscoverytemp/output_files/'+corpus_type+"/")
       
@@ -853,7 +853,7 @@ def generate_sourcepdfs_output(request,watermark_name):
                 
                 print "<-------------------------- "+str(doc_iterator)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"SRC"+"/"+"SRC__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -882,7 +882,7 @@ def generate_sourcepdfs_output(request,watermark_name):
             record_uid = selected_entry_item.sourcedoc_link.affidavit_uid_string
 
             pdf_string = ""
-            pdf_string += "                                                                                                                    "+"sourcepdfs__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+            pdf_string += "                                                                                                                    "+"SRC__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
             pdf_string +="\n\n\n"
             page_count +=1
              
@@ -960,7 +960,7 @@ def generate_sourcepdfs_output(request,watermark_name):
    
     try:
     
-        temp_filename = "legaldiscoverytemp/output_files/"+"sourcepdfs"+"/"+"sourcepdfs__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"SRC"+"/"+"SRC__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1051,8 +1051,8 @@ def generate_grandelivre_output(request,watermark_name):
     exhibit_count = 1
     corpus_doccount = 1
     
-
-    temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    
+    temp_filename = "legaldiscoverytemp/output_files/"+"GRLV"+"/"+"GRLV__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -1087,7 +1087,7 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 if did_page_jump == False:
                 
-
+                    
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
@@ -1107,7 +1107,7 @@ def generate_grandelivre_output(request,watermark_name):
                 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
                 
-                temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"GRLV"+"/"+"GRLV__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1122,7 +1122,7 @@ def generate_grandelivre_output(request,watermark_name):
             if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
        
                 pdf_string = ""
-                pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string += "                                                                                                                    "+"GRLV__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1    
                 
@@ -1143,7 +1143,7 @@ def generate_grandelivre_output(request,watermark_name):
             for record in corpus_final:
                 
                 pdf_string += add_grandelivre_entry_content(exhibit_count,record)
-                        
+      
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
                 pdf_string += '\n'
@@ -1168,7 +1168,7 @@ def generate_grandelivre_output(request,watermark_name):
                     output.append(input1)
                     
                     pdf_string = ""
-                    pdf_string += "                                                                                                                    "+"grandelivre__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                    "+"GRLV__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1
 
@@ -1199,7 +1199,7 @@ def generate_grandelivre_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/"+"grandelivre"+"/"+"grandelivre__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"GRLV"+"/"+"GRLV__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1291,7 +1291,7 @@ def generate_albaraka_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"ALBK"+"/"+"ALBK__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -1345,9 +1345,9 @@ def generate_albaraka_output(request,watermark_name):
                 
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
-                print "---------"+str("albaraka")+"--------"
+                print "---------"+str("ALBK")+"--------"
                 
-                temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"ALBK"+"/"+"ALBK__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1362,7 +1362,7 @@ def generate_albaraka_output(request,watermark_name):
     
     
                 pdf_string = ""
-                pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string += "                                                                                                                      "+"ALBK__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1
 
@@ -1411,7 +1411,7 @@ def generate_albaraka_output(request,watermark_name):
                     
                     pdf_string = ""
 
-                    pdf_string += "                                                                                                                      "+"albaraka__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                      "+"ALBK__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1
 
@@ -1442,7 +1442,7 @@ def generate_albaraka_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/"+"albaraka"+"/"+"albaraka__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"ALBK"+"/"+"ALBK__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -1534,7 +1534,7 @@ def generate_transactions_output(request,watermark_name):
     corpus_doccount = 1
     
 
-    temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+    temp_filename = "legaldiscoverytemp/output_files/"+"TRN"+"/"+"TRN__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
 
     output.write(temp_filename)
 
@@ -1590,9 +1590,9 @@ def generate_transactions_output(request,watermark_name):
                 
 
                 print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
-                print "---------"+str("transactions")+"--------"
+                print "---------"+str("TRN")+"--------"
                 
-                temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                temp_filename = "legaldiscoverytemp/output_files/"+"TRN"+"/"+"TRN__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
                 corpus_doccount += 1
                 output.write(temp_filename)
                 output_temp_documents_created.append(temp_filename)
@@ -1608,7 +1608,7 @@ def generate_transactions_output(request,watermark_name):
         
             if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
             
-                pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1
                 
@@ -1627,8 +1627,14 @@ def generate_transactions_output(request,watermark_name):
                 
                 record_uid = record.affidavit_uid_string
                 
-                pdf_string += add_transactions_entry_content(exhibit_count,record)
-                pdf_string += add_transactions_entry_content_internal(record)
+                pdf_content = add_transactions_entry_content(exhibit_count,record)
+                
+                if len(pdf_content) > 0:
+                    pdf_string += pdf_content
+                    
+                    pdf_string += add_transactions_entry_content_internal(record)
+                    
+                    pdf_string += "\n\n     -Transaction Reference UID: ["+record_uid+"]"
 
                 pdf_string += '\n'
                 pdf_string += '\n'
@@ -1668,9 +1674,9 @@ def generate_transactions_output(request,watermark_name):
                             if field_name == "BankRecordsUIDArray" or field_name == "InternalRecordUIDArray":
                             
                                 if field_name == "BankRecordsUIDArray":
-                                    corpus_tempname = "albaraka"
+                                    corpus_tempname = "ALBK"
                                 else:
-                                    corpus_tempname = "grandelivre"
+                                    corpus_tempname = "GRLV"
                             
                                 test_string = "\n"
                                 test_string2 = ".              -"
@@ -1793,7 +1799,7 @@ def generate_transactions_output(request,watermark_name):
                                             pdf_string_temp = ""
                                             temp_str = pdf_string
                                             pdf_string =""
-                                            pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                                            pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                                             pdf_string +="\n\n\n"
                                             pdf_string += temp_str
                                             page_count +=1
@@ -1830,7 +1836,7 @@ def generate_transactions_output(request,watermark_name):
                     
                     pdf_string = ""
                     
-                    pdf_string += "                                                                                                                  "+"transactions__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1
 
@@ -1861,7 +1867,7 @@ def generate_transactions_output(request,watermark_name):
 
     try:
 
-        temp_filename = "legaldiscoverytemp/output_files/"+"transactions"+"/"+"transactions__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        temp_filename = "legaldiscoverytemp/output_files/"+"TRN"+"/"+"TRN__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
         corpus_doccount += 1
         output.write(temp_filename)
         output_temp_documents_created.append(temp_filename)
@@ -2065,8 +2071,8 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
         
         db.reset_queries()
         
-        corpus_tag = "icr"
-        corpus_tag2 = "sourcepdfs"
+        corpus_tag = "ICR"
+        corpus_tag2 = "SRC"
         corpus_doccount = 1
    
         for element in corpus_icr:
@@ -2076,7 +2082,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.affidavit_watermark_string = watermark_name
             #element.actual_affidavit_watermark = watermark_instance
             element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + actual_count
-
+            
             element.save()
             
             element.sourcedoc_link.affidavit_watermark_string = watermark_name
@@ -2084,6 +2090,16 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.sourcedoc_link.affidavit_uid_string = corpus_tag2 + "__" + str(watermark_name) + "__element__" + actual_count
             
             element.sourcedoc_link.save()
+            '''try:
+                element.ocrrecord_link.Day = element.ocrrecord_link.Day.zfill(2)
+                element.ocrrecord_link.Month = element.ocrrecord_link.Month.zfill(2)
+            except:
+                filler = 0
+            element.ocrrecord_link.affidavit_watermark_string = watermark_name
+            #element.sourcedoc_link.actual_affidavit_watermark = watermark_instance
+            element.ocrrecord_link.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + actual_count
+            
+            element.ocrrecord_link.save()'''
     
             corpus_doccount += 1
             print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
@@ -2094,7 +2110,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
         
         db.reset_queries()
         
-        corpus_tag = "grandelivre"
+        corpus_tag = "GRLV"
         corpus_doccount = 1
     
     
@@ -2103,7 +2119,11 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.affidavit_watermark_string = watermark_name
             #element.actual_affidavit_watermark = watermark_instance
             element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
-
+            try:
+                element.Day = element.Day.zfill(2)
+                element.Month = element.Month.zfill(2)
+            except:
+                filler = 0
             element.save()
             
             corpus_doccount += 1
@@ -2115,7 +2135,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
     
         db.reset_queries()
         
-        corpus_tag = "albaraka"   
+        corpus_tag = "ALBK"   
         corpus_doccount = 1  
     
         for element in corpus_albaraka:
@@ -2123,7 +2143,14 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.affidavit_watermark_string = watermark_name
             #element.actual_affidavit_watermark = watermark_instance
             element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
-
+            try:
+                element.PostDay = element.PostDay.zfill(2)
+                element.PostMonth = element.PostMonth.zfill(2)
+                element.ValueDay = element.ValueDay.zfill(2)
+                element.ValueMonth = element.ValueMonth.zfill(2)
+            except:
+                filler = 0
+            
             element.save()
             
             corpus_doccount += 1
@@ -2135,22 +2162,32 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
     
         db.reset_queries()
         
-        corpus_tag = "transactions"
+        corpus_tag = "TRN"
         corpus_doccount = 1
     
         for element in corpus_transactions:
         
-            element.affidavit_watermark_string = watermark_name
-            #element.actual_affidavit_watermark = watermark_instance
-            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
-    
-            element.BankRecordsUIDArray = str(element.bank_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("albaraka" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")
+            if len(element.AffidavitString) > 0:
+                element.affidavit_watermark_string = watermark_name
+                #element.actual_affidavit_watermark = watermark_instance
+                element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+        
+                element.BankRecordsUIDArray = str(element.bank_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("ALBK" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")
+                
+                element.InternalRecordUIDArray = str(element.internal_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("GRLV" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")   
+                try:
+                    element.PostDay = element.PostDay.zfill(2)
+                    element.PostMonth = element.PostMonth.zfill(2)
+                    element.ValueDay = element.ValueDay.zfill(2)
+                    element.ValueMonth = element.ValueMonth.zfill(2)
+                except:
+                    filler = 0
+                    
+                element.save()
+                
+                prepareAffidavitString(element,corpus_doccount)
             
-            element.InternalRecordUIDArray = str(element.internal_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("grandelivre" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")   
-            
-            element.save()
-            
-            corpus_doccount += 1
+                corpus_doccount += 1
             print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
     
 
@@ -2158,7 +2195,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
     
 def delete_temp_affidavit_files(corpus,partial_or_merge):
 
-    corpus_list = ["icr","sourcepdfs","grandelivre","albaraka","transactions"]
+    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN"]
 
     file_list = []
     
@@ -2540,7 +2577,7 @@ def add_icr_entry_content(exhibit_count, record):
         having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
     #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
 
-    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"], "+str(doctype_pretty_name)+":"
+    pdf_string += "Item #"+str(exhibit_count)+". "+str(doctype_pretty_name)+":"
     pdf_string += "\n"
 
     pdf_string += "    On "
@@ -2594,15 +2631,19 @@ def add_icr_entry_content(exhibit_count, record):
     pdf_string += ". "
     
 
-    # [sourcepdf_uid]
-
-    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
-
     # Extra fields: Cheque Number, Purchase Order Number, Source Bank Account
     
     pdf_string = test_length_add_line(pdf_string, test_icr_content("ExtraFields",record))
     
+    pdf_string += "\n\n     "
     
+    # [sourcepdf_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Associated SRC Document UID: ["+test_icr_content("sourcepdf_uid",record)+"]")
+    
+    pdf_string += "\n     "
+    
+    pdf_string = test_length_add_line(pdf_string, "ICR Item Reference UID: ["+str(record_uid)+"]")
     
 
     return_string = pdf_string
@@ -2687,7 +2728,7 @@ def add_sourcepdfs_entry_content(exhibit_count, record):
         having been sent to Fluid Control Europe. [BFG-1-ACCT]'''
     #corpus_include_fields = ["Month","Day","Year","Amount","Currency","Company","Piece_Number","Document_Number","Source_Bank_Account","PurchaseOrder_Number","Cheque_Number","Address","City","Country","Telephone","Page_Number","Notes","Translation_Notes"]
 
-    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"], "+str(doctype_pretty_name)+":"
+    pdf_string += "Item #"+str(exhibit_count)+". "+str(doctype_pretty_name)+":"
     pdf_string += "\n"
 
     pdf_string += "    On "
@@ -2741,9 +2782,6 @@ def add_sourcepdfs_entry_content(exhibit_count, record):
     pdf_string += ". "
     
 
-    # [sourcepdf_uid]
-
-    pdf_string = test_length_add_line(pdf_string, "Associated Document UID: ["+test_sourcepdfs_content("icr_uid",record)+"]")
 
     # Extra fields: Cheque Number, Purchase Order Number, Source Bank Account
     
@@ -2755,7 +2793,289 @@ def add_sourcepdfs_entry_content(exhibit_count, record):
     pdf_string = test_length_add_line(pdf_string, test_sourcepdfs_content("Filename",sourcedoc_final))
     pdf_string += '.'
     
+    pdf_string += "\n\n     "
     
+    # [icr_uid]
+
+    pdf_string = test_length_add_line(pdf_string, "Associated ICR Document UID: ["+test_sourcepdfs_content("icr_uid",record)+"]")
+    
+    pdf_string += "\n     "
+    
+    pdf_string = test_length_add_line(pdf_string, "SRC Item Reference UID: ["+str(sourcepdf_uid)+"]")
+
+    return_string = pdf_string
+
+    return return_string
+
+
+def test_grandelivre_content(field_name,record):
+
+    actual_content = ""
+    
+    if field_name == "IssueDate":
+        try:
+            
+            day_bool = False
+            if record.Day != "NaN" and record.Day != "" and record.Day != "*":
+                day_string = str(record.Day)
+                day_bool = True
+            else:
+                day_string = "an unknown Day"
+                
+            month_bool = False
+            if record.Month != "NaN" and record.Month != "" and record.Month != "*":
+                
+                try:
+                
+                    month_string = Month_Dictionary[str(record.Month)]
+                    
+                except:
+                
+                    month_string = str(record.Month)
+                    
+                month_bool = True
+            else:
+                month_string = "an unknown Month"
+                
+            year_bool = False
+            if record.Year != "NaN" and record.Year != "" and record.Year != "*":
+                year_string = str(record.Year)
+                year_bool = True
+            else:
+                year_string = "an unknown Year"
+
+            actual_content = month_string + " " + day_string + ", " + year_string
+        
+        
+            if not day_bool and not month_bool and not year_bool:
+                
+                actual_content = "an unknown Date, "
+            
+        except:
+        
+            actual_content = "an unknown Date, "
+    
+    if field_name == "BankName":
+        try:
+            field_content = str(record.BankName)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content +" Bank"
+
+            else:
+            
+                actual_content = "an unknown Bank"
+        except:
+        
+            actual_content = "an unknown Bank"
+    
+
+    if field_name == "Credit":
+        try:
+            field_content = str(record.Credit)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "0"
+        except:
+        
+            actual_content = "0"
+    
+    if field_name == "Debit":
+        try:
+            field_content = str(record.Debit)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "0"
+        except:
+        
+            actual_content = "0"
+    
+    if field_name == "NoMvt":
+        try:
+            field_content = str(record.NoMvt)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+    
+    if field_name == "BankCurrency":
+        try:
+            field_content = str(record.BankCurrency)
+        
+            if field_content !="" and field_content != "no" and field_content != " " and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Currency"
+         
+        except:
+        
+            actual_content = "an unknown Currency"
+            
+
+    if field_name == "BankAccount":
+        try:
+            field_content = str(record.BankAccount)
+
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content+"'"
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+            
+    if field_name == "ExtraFields":
+        
+        try:
+        
+            accountnum_string = str(record.AccountNum)
+            company_string = str(record.Company)
+            journal_string = str(record.Journal)
+            nopiece_string = str(record.NoPiece)
+            
+            field_content = accountnum_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+
+                accountnum_string = "      Account Number is '" + field_content + "'.\n"
+                accountnum = True
+        
+
+            else:
+
+                accountnum = False
+                accountnum_string = ""
+            
+            
+            field_content = company_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+
+                company_string = "      Company is " + field_content + ".\n"
+                company = True
+
+            else:
+            
+                company = False
+                company_string = ""
+                
+        
+            field_content = journal_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                journal_string = "      Journal is : ' "+field_content + "'.\n"
+                journal = True
+
+            else:
+            
+                journal = False
+                journal_string = ""   
+            
+            field_content = nopiece_string
+            
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                nopiece_string = "      Piece Number is : ' "+field_content + "'.\n    "
+                nopiece = True
+
+            else:
+            
+                nopiece = False
+                nopiece_string = "" 
+            
+            
+            if accountnum == True or company == True or journal == True or nopiece == True:
+
+                actual_content = "\n    Extra information: \n" + accountnum_string + company_string + journal_string + nopiece_string
+                
+        except:
+
+            actual_content = ""
+
+    return actual_content
+    
+def add_grandelivre_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    record_uid = record.affidavit_uid_string
+
+
+    pdf_string = ""
+    
+    '''    
+    Item 1.
+    
+       On April 17, 2006, (Issuedate), NA Solid Petroserve Internal Account Records account for a transfer, Movement Number 174 (NoMvt), of 7000(Credit)/6000(Debit)
+       of Currency USD (BankCurrency).
+
+       Extra Fields(ExtraFields):
+       
+           -The Account Number is 578 (AccountNum).
+           -The Jou is 745 (Journal).
+           -The Company is 745 (Company).
+           -The Piece Number is 158 (NoPiece).
+    
+    '''
+
+
+    pdf_string += "Item #"+str(exhibit_count)+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("IssueDate",record))
+    pdf_string = test_length_add_line(pdf_string, " NA Solid Petroserve Internal Account Records account for a transfer,")
+    pdf_string = test_length_add_line(pdf_string, " journal entry ")
+    
+    # X BankName Bank/ an unknown Bank
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("NoMvt",record))
+    pdf_string = test_length_add_line(pdf_string, ", of ")
+    # X Reference / unknown
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("Credit",record))
+    pdf_string = test_length_add_line(pdf_string, " Credit/")
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("Debit",record))
+    pdf_string = test_length_add_line(pdf_string, " Debit of ")
+    
+    # X BankCurrency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("BankCurrency",record)+".")
+    
+    
+    # Extra fields: AccountNum, Journal, Company, Piece Number
+    
+    pdf_string = test_length_add_line(pdf_string, test_grandelivre_content("ExtraFields",record))
+    
+    
+    pdf_string += "\n     "
+    
+    pdf_string = test_length_add_line(pdf_string, "GRLV Item Reference UID: ["+str(record_uid)+"]")
 
     return_string = pdf_string
 
@@ -2918,19 +3238,7 @@ def test_albaraka_content(field_name,record):
             
                 libelle = False
                 libelle_string = ""
-                
-            field_content = libdesc_string
-            
-            if field_content !="" and field_content != "no" and field_content != "*":
-           
-                libdesc_string = "      Libdesc is "+ field_content + ".\n"
-                libdesc = True
 
-            else:
-            
-                libdesc = False
-                libdesc_string = ""   
-        
             field_content = provenance_string
             
             if field_content !="" and field_content != "no" and field_content != "*":
@@ -2955,9 +3263,9 @@ def test_albaraka_content(field_name,record):
                 description = False
                 description_string = "" 
 
-            if reftran == True or libelle == True or libdesc == True or provenance == True or description == True:
+            if reftran == True or libelle == True or provenance == True or description == True:
          
-                actual_content = "\n    Extra information: \n" + reftran_string + libelle_string + libdesc_string + provenance_string + description_string
+                actual_content = "\n    Extra information: \n" + reftran_string + libelle_string + provenance_string + description_string
                 
         except:
 
@@ -2992,7 +3300,7 @@ def add_albaraka_entry_content(exhibit_count, record):
     '''
 
 
-    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
+    pdf_string += "Item #"+str(exhibit_count)+":"
     pdf_string += "\n"
 
     pdf_string += "    On "
@@ -3000,6 +3308,7 @@ def add_albaraka_entry_content(exhibit_count, record):
     pdf_string = test_length_add_line(pdf_string, test_albaraka_content("IssueDate",record))
 
     # X BankName Bank/ an unknown Bank
+    pdf_string = test_length_add_line(pdf_string, " ")
     pdf_string = test_length_add_line(pdf_string, test_albaraka_content("BankName",record))
     pdf_string = test_length_add_line(pdf_string, " processed a transfer, Reference ")
     # X Reference / unknown
@@ -3019,7 +3328,9 @@ def add_albaraka_entry_content(exhibit_count, record):
     
     pdf_string = test_length_add_line(pdf_string, test_albaraka_content("ExtraFields",record))
     
+    pdf_string += "\n     "
     
+    pdf_string = test_length_add_line(pdf_string, "ALBK Item Reference UID: ["+str(record_uid)+"]")
 
     return_string = pdf_string
 
@@ -3309,7 +3620,7 @@ def add_transactions_entry_content(exhibit_count, record):
         - Journal entry 476 (NoPiece), sent to Fluid Control Europe (Company). [BFG-1-ACCT] (grandelivreh_uid)'''
         
 
-    pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
+    '''pdf_string += "Item #"+str(exhibit_count)+". ["+str(record_uid)+"]"+":"
     pdf_string += "\n"
 
     pdf_string += "    On "
@@ -3358,13 +3669,78 @@ def add_transactions_entry_content(exhibit_count, record):
         
     # Extra fields: NoMvt, Lett, Memo
         
-    #pdf_string = test_length_add_line(pdf_string, test_transactions_content("ExtraFields",record))
+    #pdf_string = test_length_add_line(pdf_string, test_transactions_content("ExtraFields",record))'''
     
-    
+    pdf_string = record.AffidavitString
 
     return_string = pdf_string
 
     return return_string
+
+def prepareAffidavitString(transaction_item,count):
+      
+    affi_date = ""
+    affi_amount = ""
+    affi_company = ""
+    
+    all_dates =  []
+    all_dates.append(transaction_item.CompletePostDate)
+    all_dates.append(transaction_item.CompleteValueDate)
+    
+    for internal in transaction_item.internal_records_list.all():
+        all_dates.append(internal.Day+"/"+internal.Month+"/"+internal.Year)
+    for bankrecord in transaction_item.bank_records_list.all():
+        all_dates.append(bankrecord.ValueDay+"/"+bankrecord.ValueMonth+"/"+bankrecord.ValueYear)
+        all_dates.append(bankrecord.PostDay+"/"+bankrecord.PostMonth+"/"+bankrecord.PostYear)
+    
+    if len(all_dates)>0:
+        all_dates.sort(reverse=True)
+        affi_date = all_dates[0]
+        
+    affi_amount = transaction_item.Amount + " " + transaction_item.BankCurrency
+    
+    #print "----> "+transaction_item.Libdesc+" <-----"
+    legend = TransactionLegend.objects.get(ReferenceType = transaction_item.Libdesc)
+    
+    affi_final = ""
+    
+    if legend.ConditionalRule == "No":
+        
+        affi_final = ""
+        
+    elif legend.ConditionalRule == "Yes":
+    
+        affi_final = legend.StringNoException
+    
+    elif legend.ConditionalRule == "Company":
+    
+        if affi_company != "":
+        
+            affi_final = legend.StringNoException
+        else:
+        
+            affi_final = legend.StringWithException
+    
+    if "(0)" in affi_final:
+        affi_final = affi_final.replace("(0)","#"+str(count))
+    
+    if "(1)" in affi_final:
+    
+        affi_final = affi_final.replace("(1)",affi_date)
+        
+    if "(2)" in affi_final:
+    
+        affi_final = affi_final.replace("(2)",affi_amount)
+        
+    if "(3)" in affi_final:
+    
+        affi_final = affi_final.replace("(3)",affi_company)
+        
+    if "(JUMP)" in affi_final:
+        
+            affi_final = affi_final.replace("(JUMP)","\n     ")    
+    transaction_item.AffidavitString = affi_final
+    transaction_item.save()
     
 def add_transactions_entry_content_internal(record):
 
@@ -3376,9 +3752,13 @@ def add_transactions_entry_content_internal(record):
     
     if len(internal_records) == 0:
     
-        pdf_string = test_length_add_line(pdf_string, "    There were no internal accounting records found linking to this data. ")
+        pdf_string += "\n"
+        
+        pdf_string = test_length_add_line(pdf_string, "     There were no internal accounting records found linking to this data. ")
     
     else:
+    
+        pdf_string += "\n"
     
         pdf_string = test_length_add_line(pdf_string, "    These funds were recorded in the following accounting records of NA Solid Petroserve Ltd.'s Tunisian Branch:")
 
@@ -3389,21 +3769,17 @@ def add_transactions_entry_content_internal(record):
         
                 pdf_string += "\n      -"
                 # X LedgerYear/ unknown
-                pdf_string = test_length_add_line(pdf_string, test_transactions_content("LedgerYear",int_record)+" Ledger Year,")
+                pdf_string = test_length_add_line(pdf_string, test_transactions_content("LedgerYear",int_record)+" Ledger,")
                 pdf_string = test_length_add_line(pdf_string, " journal entry " )
     
                 # X NoPiece/ unknown
-                pdf_string = test_length_add_line(pdf_string, test_transactions_content("NoPiece",int_record))
-                pdf_string = test_length_add_line(pdf_string, ", sent to " )
-                
-                # X Company/ an unknown Recipient
-                pdf_string = test_length_add_line(pdf_string, test_transactions_content("Company",int_record)+".")
-                
+                pdf_string = test_length_add_line(pdf_string, test_transactions_content("NoPiece",int_record)+".")
+                                
                 pdf_string += "\n            "
     
                 # [icr_uid]
 
-                pdf_string = test_length_add_line(pdf_string, "Record UID: ["+test_transactions_content("grandelivre_uid",int_record)+"]")
+                pdf_string = test_length_add_line(pdf_string, "Record Reference UID: ["+test_transactions_content("grandelivre_uid",int_record)+"]")
                 
     return_string = pdf_string
     

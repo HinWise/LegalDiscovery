@@ -438,12 +438,16 @@
                             {% for document_corpus in document_corpus_list %}
                             
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
+                                    {% if document_corpus.corpus_name == "TRN" %}
+                                    <div>Corpus : Affidavit Transaction Corpus</div>
+                                    {%else%}
                                     <div>Corpus : {{document_corpus.corpus_name}} corpus</div>
+                                    {%endif%}
                                     
                                     
                                     <select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
                                             <option value="" disabled selected>Nº Max Documents</option>
-                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
+                                            {% if document_corpus.corpus_name != "SRC" %}
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="5">5</option>
@@ -452,7 +456,7 @@
                                             <option value="50">50</option>
                                             {% endif %}
                                             <option value="100">100</option>
-                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
+                                            {% if document_corpus.corpus_name != "SRC" %}
                                             <option value="250">250</option>
                                             <option value="500">500</option>
                                             <option value="1000">1000</option>
@@ -466,8 +470,8 @@
                                     
                                     <select class="select_docs_per_pdf" name="select_docs_per_pdf{{document_corpus.corpus_name}}" id="select_docs_per_pdf{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
                                             <option value="" disabled selected>Nº Documents per Pdf</option>
-                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
-                                            {% if document_corpus.corpus_name != "transactions" %}
+                                            {% if document_corpus.corpus_name != "SRC" %}
+                                            {% if document_corpus.corpus_name != "TRN" %}
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="5">5</option>
@@ -479,7 +483,7 @@
                                             <option value="250">250</option>
                                             {% endif %}
                                             <option value="500">500</option>
-                                            {% if document_corpus.corpus_name != "sourcepdfs" %}
+                                            {% if document_corpus.corpus_name != "SRC" %}
                                             <option value="1000">1000</option>
                                             <option value="2500">2500</option>
                                             <option value="5000">5000</option>
@@ -490,8 +494,8 @@
                                     
                                     
                                     <button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="{{document_corpus.corpus_name}}">Generate Corpus Files</button>
-                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name != "sourcepdfs" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
-                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name == "sourcepdfs" %}<button id="complete_corpus_button" class="complete_corpus_button" corpus_name ="{{document_corpus.corpus_name}}">Complete Corpus Files</button>{%endif%}
+                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name != "SRC" %}<button id="merge_files_button" class="merge_files_button" corpus_name ="{{document_corpus.corpus_name}}">Merge into one Pdf/Zip</button>{%endif%}
+                                    {% if document_corpus.corpus_contents and document_corpus.corpus_name == "SRC" %}<button id="complete_corpus_button" class="complete_corpus_button" corpus_name ="{{document_corpus.corpus_name}}">Complete Corpus Files</button>{%endif%}
                                     
                                     
                                     {% for file in document_corpus.corpus_contents %}

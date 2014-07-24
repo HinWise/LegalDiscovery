@@ -97,6 +97,19 @@ class InternalRecord(models.Model):
     def __unicode__(self):
         return self.Memo  
 
+
+class TransactionLegend(models.Model):
+    
+    ReferenceType = models.CharField(max_length=31, default="")
+    StringNoException = models.CharField(max_length=31, default="")
+    StringWithException = models.CharField(max_length=31, default="")
+    IncludeListReferenceDocuments = models.CharField(max_length=15, default="No")
+    ConditionalRule = models.CharField(max_length=15, default="No")
+    
+    def __unicode__(self):
+        return str(self.ReferenceType)
+    class Meta:
+        ordering = ['pk']  
         
 class TransactionTable(models.Model):
 
@@ -133,9 +146,16 @@ class TransactionTable(models.Model):
 
     Libdesc = models.CharField('Lib Description',max_length=63)
     Reftran = models.CharField('Reference Transaction',max_length=31)
+    
     BankAccount = models.CharField('Bank Account',max_length=31)
     BankName = models.CharField('Bank Name',max_length=63)
     BankCurrency = models.CharField('Bank Currency',max_length=31)
+    
+    AffidavitDate = models.CharField('AffidavitDate',max_length=31,default="")
+    AffidavitAmount = models.CharField('AffidavitAmount',max_length=31,default="")
+    AffidavitBeneficiary = models.CharField('AffidavitBeneficiary',max_length=31,default="")
+    
+    AffidavitString = models.CharField('AffidavitString',max_length=127,default="")
     
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
@@ -339,7 +359,8 @@ class Packet(models.Model):
         return str(self.PacketLabel)
     class Meta:
         ordering = ['PacketLabel']  
-        
+
+
 class SourcePdf(models.Model):
     job_directory = models.CharField('Job directory',max_length=255)
     filename = models.CharField('Pdf filename',max_length=255)
