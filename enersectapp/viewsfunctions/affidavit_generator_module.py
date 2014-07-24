@@ -1314,8 +1314,6 @@ def generate_albaraka_output(request,watermark_name):
 
     #corpus_common_final = corpus_common_final[:max_documents]
 
-    
-    
     did_page_jump = False
     
     with transaction.commit_on_success():
@@ -1633,7 +1631,9 @@ def generate_transactions_output(request,watermark_name):
                     pdf_string += pdf_content
                     
                     pdf_string += add_transactions_entry_content_internal(record)
-                    
+
+                    pdf_string += add_transactions_entry_content_albaraka(record)
+       
                     pdf_string += "\n\n     -Transaction Reference UID: ["+record_uid+"]"
 
                 pdf_string += '\n'
@@ -1818,7 +1818,17 @@ def generate_transactions_output(request,watermark_name):
                 
                 pdf_string += '\n'
                 
+                #Before adding Albarakas, limit of lines was > 45
                 if pdf_string.count('\n') > 45:
+                
+                    temp_pdf_string = ""
+                
+                    if pdf_string.count('\n') > 60:
+                    
+                        temp_pdf_string = pdf_string.split('\n')[50:]
+                        temp_pdf_string = '\n'.join(temp_pdf_string)
+                        pdf_string = pdf_string.split('\n')[:50]
+                        pdf_string = '\n'.join(pdf_string)
                 
                     tmpfile = tempfile.SpooledTemporaryFile(1048576)
         
@@ -1838,6 +1848,10 @@ def generate_transactions_output(request,watermark_name):
                     
                     pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
+                    
+                    if len(temp_pdf_string) > 0:
+                        pdf_string += temp_pdf_string
+                    
                     page_count +=1
 
                     did_page_jump = True
@@ -3583,6 +3597,21 @@ def test_transactions_content(field_name,record):
         
             actual_content = "No_Linked_Int.Record"
 
+    if field_name == "albaraka_uid":
+        try:
+            field_content = str(record.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_Bank_Record"
+        except:
+        
+            actual_content = "No_Linked_Bank_Record"
+            
     if field_name == "Libdesc":
         try:
             field_content = str(record.Libdesc)
@@ -3779,7 +3808,40 @@ def add_transactions_entry_content_internal(record):
     
                 # [icr_uid]
 
-                pdf_string = test_length_add_line(pdf_string, "Record Reference UID: ["+test_transactions_content("grandelivre_uid",int_record)+"]")
+                pdf_string = test_length_add_line(pdf_string, "GRLV Record Reference UID: ["+test_transactions_content("grandelivre_uid",int_record)+"]")
+                
+    return_string = pdf_string
+    
+    return return_string
+    
+def add_transactions_entry_content_albaraka(record):
+
+    return_string = ""
+    
+    pdf_string = ""
+    
+    bank_records = record.bank_records_list.all()
+    
+    if len(bank_records) == 0:
+    
+        pdf_string += "\n\n"
+        
+        pdf_string = test_length_add_line(pdf_string, "     There were no bank records found linking to this data. ")
+    
+    else:
+    
+        pdf_string += "\n\n"
+    
+        pdf_string = test_length_add_line(pdf_string, "    These are the references of the Bank Records (ALBK) related to this transaction:")
+
+        pdf_string += "\n"
+        
+        with transaction.commit_on_success():
+            for bank_record in bank_records:
+        
+                pdf_string += "\n            "
+        
+                pdf_string = test_length_add_line(pdf_string, "ALBK Record Reference UID: ["+test_transactions_content("albaraka_uid",bank_record)+"]")
                 
     return_string = pdf_string
     
