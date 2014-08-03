@@ -88,7 +88,7 @@ def transactions_report(request):
         writer = csv.writer(response)
 
         writer.writerow(["Amounts List","Piece Number List","Company List","Day List","Month List","Year List","Complete Date List","Libdesc List","Description List","Reftran List",
-    "Bank Name List","Bank Account List","Bank Currency List","Unique Transaction Index List","Movement Number List","INT Account Number List","Exchange Rate List","Memo List","Lett List","PDF Filenames List"])
+    "Bank Name List","Bank Account List","Bank Currency List","Unique Transaction Index List","Movement Number List","INT Account Number List","Exchange Rate List","Memo List","Lett List","GRLV PDF Filenames List","ICR PDF Filenames List"])
 
         all_lists = []
         
@@ -149,8 +149,11 @@ def transactions_report(request):
         lett_list = InternalRecord.objects.all().values_list('Lett',flat=True).order_by('Lett').distinct()
         all_lists.append(lett_list)
        
-        pdfviews_list = InternalRecord.objects.all().values_list('Filename',flat=True).order_by('Filename').distinct()
-        all_lists.append(pdfviews_list)
+        grandelivrepdfviews_list = InternalRecord.objects.all().values_list('Filename',flat=True).order_by('Filename').distinct()
+        all_lists.append(grandelivrepdfviews_list)
+       
+        icrpdfviews_list = PdfRecord.objects.all().values_list('sourcedoc_link__filename',flat=True).order_by('sourcedoc_link__filename').distinct()
+        all_lists.append(icrpdfviews_list)
        
         biggest_length = 0
         
@@ -484,6 +487,7 @@ def transactions_report(request):
     
     base_fields_searched = ["TransactionIndex","Amount","CompleteValueDate"]
     internal_fields_searched = ["NoPiece","Company","NoMvt","Filename"]
+    icr_fields_searched = ["pdfrecord__sourcedoc_link__filename","pdfrecord__sourcedoc_link__job_directory"]
     bank_fields_searched = []
     
     all_coincident_transactions = TransactionTable.objects.none()
@@ -882,7 +886,7 @@ def transactions_report(request):
                 if "Lett" not in internal_fields_searched:
                     internal_fields_searched.append("Lett")
     
-            if item["tag_name"] == "Filename":
+            if item["tag_name"] == "GRLVFilename":
             
                 if item["tag_operator"] == "exact":
                     coincident_transactions = TransactionTable.objects.filter(internal_records_list__Filename__exact = item["tag_content"]).order_by()
@@ -897,9 +901,10 @@ def transactions_report(request):
                     
                 coincident_transactions_list.extend(coincident_transactions.values_list('Filename',flat=True)) 
                 all_coincident_transactions = all_coincident_transactions | coincident_transactions
-                if "Filename" not in internal_fields_searched:
-                    internal_fields_searched.append("Filename")
+                if "GRLVFilename" not in internal_fields_searched:
+                    internal_fields_searched.append("GRLVFilename")
 
+                    
     ## Prepares a dictionary that counts the number of duplicates in the list "coincident_transactions_list" made before
     #It is important to have this dictionary as it keeps duplicates, that we will use later to add the Relevance Score to the dicts
     
@@ -971,8 +976,12 @@ def transactions_report(request):
             element_dict["bank_records"] = unicode_to_str_list(transaction_temp_item.bank_records_list.all().values(*bank_fields_searched))
         else:
             element_dict["bank_records"] = []
+        if len(icr_fields_searched):
+            element_dict["ocr_records"] = unicode_to_str_list(transaction_temp_item.ocr_records_list.all().values(*icr_fields_searched))
+        else:
+            element_dict["ocr_records"] = []
         coincident_transactions_complete_dict[str(transaction_temp_item.TransactionIndex)] = element_dict
-
+        
 
     final_coincident_transactions_list = []
     
@@ -984,14 +993,14 @@ def transactions_report(request):
     for dict_key in coincident_transactions_dict.keys():
 
         transaction_item = coincident_transactions_complete_dict[dict_key]
-    
         temp_dict = {}
         temp_dict["TransactionIndex"] = dict_key
         temp_dict["score"] = coincident_transactions_dict[dict_key]
         temp_dict["complete_item"] = transaction_item["complete_item"]
         temp_dict["internal_records"] = transaction_item["internal_records"]
         temp_dict["bank_records"] = transaction_item["bank_records"]
-                
+        temp_dict["ocr_records"] = transaction_item["ocr_records"]
+        
         final_coincident_transactions_list.append(temp_dict)
 
         
@@ -1010,7 +1019,7 @@ def transactions_report(request):
     
 
     tag_types = ["Amount","Piece Number","Company","Day","Month","Year","Complete Date","Libdesc","Description","Reftran",
-    "Bank Name","Bank Account","Bank Currency","Unique Transaction Index","Movement Number","INT Account Number","Exchange Rate","Memo","Lett","PDF Views"]
+    "Bank Name","Bank Account","Bank Currency","Unique Transaction Index","Movement Number","INT Account Number","Exchange Rate","Memo","Lett","GRLV PDF Views","ICR PDF Views"]
     
     user_templates_list = user_profile.created_transactionsreport_templates.all().values_list('name',flat=True)
     

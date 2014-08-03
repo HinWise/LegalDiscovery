@@ -519,6 +519,7 @@
 .pdf_button {
 
     position: relative;
+    display: inline-block;
     width: 8px;
     height: 17px;
     padding-right: 8px;
@@ -530,6 +531,7 @@
 
 .pdf_button:hover{
 
+    display: inline-block;
     background-color: rgb(205, 226, 235);
 
 }

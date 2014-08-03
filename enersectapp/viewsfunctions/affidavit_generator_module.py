@@ -112,7 +112,7 @@ def affidavit_generator(request):
 
 def document_corpus_maker():
     
-    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN"]
+    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN","ALBSR"]
     
     all_documents = []
     
@@ -137,6 +137,8 @@ def document_corpus_maker():
     albaraka_corpus_contents_list = []
     transactions_corpus_dict = {}
     transactions_corpus_contents_list = []
+    albarakasource_corpus_dict = {}
+    albarakasource_corpus_contents_list = []
     
     for file in all_documents:
         
@@ -175,7 +177,13 @@ def document_corpus_maker():
             file_dict["downloaded"] = "Not Downloaded"
             
             transactions_corpus_contents_list.append(file_dict)
+        
+        if "ALBSR" in file:
+
+            file_dict["file_name"] = file
+            file_dict["downloaded"] = "Not Downloaded"
             
+            albarakasource_corpus_contents_list.append(file_dict)
             
             
     icr_corpus_dict["corpus_name"] = "ICR"
@@ -193,12 +201,16 @@ def document_corpus_maker():
     transactions_corpus_dict["corpus_name"] = "TRN"
     transactions_corpus_dict["corpus_contents"] = transactions_corpus_contents_list
     
+    albarakasource_corpus_dict["corpus_name"] = "ALBSR"
+    albarakasource_corpus_dict["corpus_contents"] = albarakasource_corpus_contents_list
+    
+    
     document_corpus_list.append(icr_corpus_dict)
     document_corpus_list.append(sourcepdfs_corpus_dict)
     document_corpus_list.append(grandelivre_corpus_dict)
     document_corpus_list.append(albaraka_corpus_dict)
     document_corpus_list.append(transactions_corpus_dict)
-    
+    document_corpus_list.append(albarakasource_corpus_dict)
     
     return document_corpus_list 
     
@@ -413,7 +425,15 @@ def generate_corpus_output(request,watermark_name):
         
         generate_transactions_output(request,watermark_name)
 
-
+    if "ALBSR" in documents_corpus_to_include_in_output:
+        
+        delete_temp_affidavit_files("ALBSR","cover")
+        delete_temp_affidavit_files("ALBSR","partial")
+        delete_temp_affidavit_files("ALBSR","merge")
+        
+        generate_albarakasource_output(request,watermark_name)
+    
+        
 def generate_icr_output(request,watermark_name):
 
     try:
@@ -1549,7 +1569,7 @@ def generate_transactions_output(request,watermark_name):
     page_count = 1
     pdf_string = ""
 
-               
+        
     corpus_common_final = TransactionTable.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
     #corpus_common_final = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
 
@@ -1628,191 +1648,21 @@ def generate_transactions_output(request,watermark_name):
                 pdf_content = add_transactions_entry_content(exhibit_count,record)
                 
                 if len(pdf_content) > 0:
+         
                     pdf_string += pdf_content
-                    
+     
+                    pdf_string += add_transactions_entry_content_icr(record)
+ 
                     pdf_string += add_transactions_entry_content_internal(record)
-
+     
                     pdf_string += add_transactions_entry_content_albaraka(record)
-       
+                    
+                    pdf_string += add_transactions_entry_content_albarakasource(record)
+                  
                     pdf_string += "\n\n     -Transaction Reference UID: ["+record_uid+"]"
 
                 pdf_string += '\n'
                 pdf_string += '\n'
-                
-                '''pdf_string += "Exhibit #"+str(exhibit_count)+" , UID: "+str(record_uid)+":"
-                pdf_string += "\n"
-                pdf_string += "\n"
-                
-                show_date = str(record.ValueDay)+"/"+str(record.ValueMonth)+"/"+str(record.ValueYear)
-                if show_date == "XX/XX/XXXX" or show_date == "":
-                    show_date = "(No Date)"
-                show_amount = record.Amount    
-                if show_amount == "":
-                    show_amount = "(No Amount)"
-                show_currency = record.BankCurrency    
-                if show_currency == "":
-                    show_currency = "(No Currency)"
-                
-                pdf_string += ".  -This Document is on Date: "+str(show_date)+" and refers to Amount: "+str(show_amount)+" "+str(show_currency)
-                pdf_string += "\n"
-                pdf_string += "\n"
-                pdf_string += ".              -"
-                
-                
-                for field_name in corpus_include_fields:
-                    
-                    try:
-                        field_content = str(getattr(record, field_name))
-                    except:
-                        field_content = ""
-                    
-                    
-                    try:
-                        
-                        try:
-                            
-                            if field_name == "BankRecordsUIDArray" or field_name == "InternalRecordUIDArray":
-                            
-                                if field_name == "BankRecordsUIDArray":
-                                    corpus_tempname = "ALBK"
-                                else:
-                                    corpus_tempname = "GRLV"
-                            
-                                test_string = "\n"
-                                test_string2 = ".              -"
-                                test_string3 = ".                   -"
-                                test_string4 = test_string + test_string3
-                                
-                                records_list = field_content.split(",")
-
-                                field_content = ""
-                                
-                                records_count = 0
-                                
-                                line_break_count = 1
-                                
-                                temp_sum_line = 0
-                                
-                                for actual_record in records_list:
-                                
-                                    if actual_record != "":
-                                        item_content = actual_record
-                                        actual_record = actual_record.replace(item_content,corpus_tempname+"__"+str(watermark_name)+"__element__"+item_content)
-                                        
-                                    if records_count == 0:
-                                        actual_record = "["+actual_record
-                                    if records_count == len(records_list)-1:
-                                        actual_record = actual_record + "]"
-                                
-                                    temp_sum_line = len(field_content) + len(actual_record)
-                                
-                                    #If length of string plus new content is greater than the line width with margin, introduce
-                                    #a new indented line
-                                
-                                    if temp_sum_line >= 60 * line_break_count:
-                                    
-                                        field_content += test_string4
-                                        line_break_count += 1
-                                    
-                                    field_content += str(actual_record)+","
-                                    
-                                    records_count += 1
-                                    
-                                
-                                field_content += test_string + test_string2
-                                
-                            
-                            elif (len(pdf_string.split("\n")[-1]) + len(" "+field_name+" "+field_content)) > max_characters_line:
-                                test_string = "\n"
-                                test_string2 = ".              -"
-                                test_string4 = ""
-                            else:
-                                test_string = ""
-                                test_string2 = ""
-                                test_string4 = ""
-                            
-                            if field_content != "MISSING" and field_content != "UNREADABLE" and "Field" not in field_content and field_content !="" and field_content !="None" and field_content !="XX/XX/XXXX" and field_content != "*":
-                                
-                                pdf_string += " "+test_string+test_string2+field_name+ test_string4 +" "+field_content
-                                
-                                if pdf_string.count('\n') >= 44:
-                
-                                    pdf_string_count = pdf_string.count('\n')
-                
-                                    #pdf_string += '\n'
-                    
-                                    pdf_string_templist = pdf_string.split('\n')
-                                    pdf_string_temp = ""
-                                    
-                                    iterator_index = 0
-                                    iterator_set = 0
-                                    
-                                    pdf_string = ""
-                                    
-                                    for list_element in pdf_string_templist:
-
-                                        iterator_index += 1
-                                        iterator_set += 1
-                                        
-                                        #Control so it will never start the output of an Exhibit at the end of a page.
-                                        #Instead, it will skip it for the next page.
-                                        
-                                        if iterator_set == len(pdf_string_templist):
-                                        
-                                            if "Exhibit" in list_element:
-
-                                                pdf_string = list_element
-                                                
-                                            else:    
-
-                                                pdf_string = ".              -"
-                                            
-                                                 
-
-                                        pdf_string_temp += list_element
-                                        pdf_string_temp += '\n'
-                                        
-                                        #Include all the strings contained in the page
-                                        
-                                        did_page_jump = False
-                                        
-                                        if iterator_set == len(pdf_string_templist):
-                                            
-                                            #pdf_string = ".              -"
-                                            
-                                            iterator_set = 0
-                                        
-                                            tmpfile = tempfile.SpooledTemporaryFile(1048576)
-                                
-                                            # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
-                                            tmpfile.rollover()
-                                          
-                                            the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
-                                            string_to_pdf(the_canvas,pdf_string_temp)
-                                                   
-                                            the_canvas.save()
-                                            
-                                            input1 = PdfFileReader(tmpfile)
-                                            
-                                            output.append(input1)
-                                            
-                                            pdf_string_temp = ""
-                                            temp_str = pdf_string
-                                            pdf_string =""
-                                            pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
-                                            pdf_string +="\n\n\n"
-                                            pdf_string += temp_str
-                                            page_count +=1
-
-                                            did_page_jump = True
-                                
-                              
-                        except:
-                            test_string = ""
-                        
-                    except:
-                        pdf_string += " "'''
-                        
                 
                 '''Write command to output the existing pdf_string variable as a new row, then line break'''
                 
@@ -1894,6 +1744,239 @@ def generate_transactions_output(request,watermark_name):
     
         print "empty"        
 
+def generate_albarakasource_output(request,watermark_name):
+    
+    
+    try:
+        max_documents = request.POST['select_max_documents']
+    except:
+        max_documents = "100"
+        
+    try:
+        docs_per_pdf = request.POST['select_docs_per_pdf']
+    except:
+        docs_per_pdf = "25"
+
+        
+    if max_documents == "":
+    
+        max_documents = "100"
+        
+    if docs_per_pdf == "":
+    
+        docs_per_pdf = "25"
+        
+    max_documents = int(max_documents)
+    docs_per_pdf = int(docs_per_pdf)
+   
+
+    max_characters_line = 95
+   
+    #Initialize the Pdf to be written
+    
+    output = PdfFileMerger()
+
+    #Creating a list to divide the output in various files before merging them in one, for memory purposes
+    
+    output_temp_documents_created = []
+
+    title_string = "AlBaraka Source Corpus Report\n\n"
+
+    local_tz = get_localzone()
+    
+    title_date = str(datetime.datetime.now().replace(tzinfo=local_tz).strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+
+    date_string = "   -This Corpus of Documents was generated on Date: "+title_date
+    
+    space_between = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    
+    affidavit_instance = AffidavitInstance.objects.all()[0]
+    affidavit_watermark = str(affidavit_instance.watermark_name)
+    affidavit_date = str(affidavit_instance.modification_date.strftime("%d-%m-%Y %H:%M:%S %Z%z"))
+    
+    affidavit_string = "Contents Instance goes by the watermark name "+affidavit_watermark+",\nand was frozen on Date:"+affidavit_date
+    
+    cover_content = title_string + date_string + space_between + affidavit_string
+    
+    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+
+    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+    tmpfile.rollover()
+
+            
+    the_canvas = canvas.Canvas(tmpfile,pagesize=A4 )
+
+    string_to_pdf(the_canvas,cover_content)
+
+           
+    the_canvas.save()
+    input1 = PdfFileReader(tmpfile)
+
+     
+    output.append(input1)
+
+    #output.append(input1)
+    
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    
+
+    temp_filename = "legaldiscoverytemp/output_files/"+"ALBSR"+"/"+"ALBSR__"+str(watermark_name)+"__cover__"+str(corpus_doccount).zfill(7)+".pdf"
+
+    output.write(temp_filename)
+
+    output_temp_documents_created.append(temp_filename)
+
+    output = PdfFileMerger()
+
+    
+    corpus_common_final = BankRecord.objects.none()
+    
+    exhibit_count = 1
+    corpus_doccount = 1
+    doc_iterator = exhibit_count - 1
+    page_count = 1
+    pdf_string = ""
+
+               
+    corpus_common_final = AlbarakaSource.objects.filter(affidavit_watermark_string = watermark_name).order_by('affidavit_uid_string')[:max_documents]
+    #corpus_common_final = BankRecord.objects.all().order_by('ValueYear','ValueMonth','ValueDay')
+
+    #corpus_common_final = corpus_common_final[:max_documents]
+
+    did_page_jump = False
+    
+    with transaction.commit_on_success():
+        for selected_entry_item in corpus_common_final:
+            
+            created_page = False
+        
+            if doc_iterator % docs_per_pdf == 0 and doc_iterator != 0:
+                
+                if did_page_jump == False:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+                
+
+                print "<--------------------------"+ str(exhibit_count)+" ---------------------->"
+                print "---------"+str("ALBSR")+"--------"
+                
+                temp_filename = "legaldiscoverytemp/output_files/"+"ALBSR"+"/"+"ALBSR__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+                corpus_doccount += 1
+                output.write(temp_filename)
+                output_temp_documents_created.append(temp_filename)
+                
+                output = PdfFileMerger()
+                
+                created_page = True
+                
+                db.reset_queries()
+                
+            if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
+    
+    
+                pdf_string = ""
+                pdf_string += "                                                                                                                      "+"ALBK__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                pdf_string +="\n\n\n"
+                page_count +=1
+
+                
+                
+
+            print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
+        
+
+            #Not making cut, because the entry is already decided upon
+            
+            corpus_final = AlbarakaSource.objects.filter(pk = selected_entry_item.pk)
+            
+
+            for record in corpus_final:
+                
+                pdf_string += add_albarakasource_entry_content(exhibit_count,record)
+
+                pdf_string += '\n'
+                pdf_string += '\n'
+                
+                did_page_jump = False
+                
+                if pdf_string.count('\n') > 44:
+                
+                    tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+                    # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+                    tmpfile.rollover()
+                  
+                    the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+                    string_to_pdf(the_canvas,pdf_string)
+                           
+                    the_canvas.save()
+                    
+                    input1 = PdfFileReader(tmpfile)
+                    
+                    output.append(input1)
+                    
+                    pdf_string = ""
+
+                    pdf_string += "                                                                                                                      "+"ALBK__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string +="\n\n\n"
+                    page_count +=1
+
+                    did_page_jump = True
+                    
+                exhibit_count += 1
+                doc_iterator = exhibit_count - 1
+        
+        
+        
+        tmpfile = tempfile.SpooledTemporaryFile(1048576)
+        
+        # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
+        tmpfile.rollover()
+      
+        the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
+        string_to_pdf(the_canvas,pdf_string)
+               
+        the_canvas.save()
+        
+        input1 = PdfFileReader(tmpfile)
+        
+        output.append(input1)
+       
+        
+        '''Write command to finish and save new page'''
+    
+
+    try:
+
+        temp_filename = "legaldiscoverytemp/output_files/"+"ALBSR"+"/"+"ALBSR__"+str(watermark_name)+"__partial__"+str(corpus_doccount).zfill(7)+".pdf"
+        corpus_doccount += 1
+        output.write(temp_filename)
+        output_temp_documents_created.append(temp_filename)
+        
+        output = PdfFileMerger()
+        
+        db.reset_queries()
+        
+    except:
+    
+        print "empty"        
+        
 def merge_corpus_output(request,watermark_name):
 
     try:
@@ -2081,6 +2164,8 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
 
     corpus_transactions = TransactionTable.objects.all().order_by('ValueYear','ValueMonth','ValueDay').distinct()
 
+    corpus_albarakasource = AlbarakaSource.objects.all().order_by('Year','Month','Day').distinct()
+    
     with transaction.commit_on_success():
         
         db.reset_queries()
@@ -2104,22 +2189,57 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             element.sourcedoc_link.affidavit_uid_string = corpus_tag2 + "__" + str(watermark_name) + "__element__" + actual_count
             
             element.sourcedoc_link.save()
-            '''try:
-                element.ocrrecord_link.Day = element.ocrrecord_link.Day.zfill(2)
-                element.ocrrecord_link.Month = element.ocrrecord_link.Month.zfill(2)
-            except:
-                filler = 0
-            element.ocrrecord_link.affidavit_watermark_string = watermark_name
-            #element.sourcedoc_link.actual_affidavit_watermark = watermark_instance
-            element.ocrrecord_link.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + actual_count
             
-            element.ocrrecord_link.save()'''
+            #try:
+                #element.ocrrecord_link.Day = element.ocrrecord_link.Day.zfill(2)
+                #element.ocrrecord_link.Month = element.ocrrecord_link.Month.zfill(2)
+            #except:
+                #filler = 0
+            #element.ocrrecord_link.affidavit_watermark_string = watermark_name
+            #element.ocrrecord_link.actual_affidavit_watermark = watermark_instance
+            #element.ocrrecord_link.affidavit_uid_string = element.affidavit_uid_string
+            
+            #element.ocrrecord_link.save()
     
             corpus_doccount += 1
             print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
 
-            
+    #Ocr watermark separated in another loop because together they excess the memory
+    with transaction.commit_on_success():
         
+        db.reset_queries()
+        
+        corpus_doccount = 1
+   
+        for element in corpus_icr[:80000]:        
+        
+            actual_count = str(corpus_doccount).zfill(7) 
+
+            element.ocrrecord_link.affidavit_watermark_string = watermark_name
+            element.ocrrecord_link.affidavit_uid_string = element.affidavit_uid_string
+
+            element.ocrrecord_link.save()
+  
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
+    
+    #Divided in two for memory reasons
+    with transaction.commit_on_success():
+        
+        db.reset_queries()
+   
+        for element in corpus_icr[80000:]:        
+        
+            actual_count = str(corpus_doccount).zfill(7) 
+
+            element.ocrrecord_link.affidavit_watermark_string = watermark_name
+            element.ocrrecord_link.affidavit_uid_string = element.affidavit_uid_string
+
+            element.ocrrecord_link.save()
+            
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
+    
     with transaction.commit_on_success():
         
         db.reset_queries()
@@ -2128,7 +2248,7 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
         corpus_doccount = 1
     
     
-        for element in corpus_grandelivre:
+        for element in corpus_grandelivre[:85000]:
         
             element.affidavit_watermark_string = watermark_name
             #element.actual_affidavit_watermark = watermark_instance
@@ -2142,13 +2262,34 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
             
             corpus_doccount += 1
             print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)+"----> PK : "+str(element.pk)
+    
+    #Divided in two for memory reasons    
+    with transaction.commit_on_success():
+        
+        db.reset_queries()
+        
+        corpus_tag = "GRLV"
+    
+        for element in corpus_grandelivre[85000:]:
+        
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+            try:
+                element.Day = element.Day.zfill(2)
+                element.Month = element.Month.zfill(2)
+            except:
+                filler = 0
+            element.save()
             
-              
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)+"----> PK : "+str(element.pk)          
+    
     
     with transaction.commit_on_success():
     
         db.reset_queries()
-        
+
         corpus_tag = "ALBK"   
         corpus_doccount = 1  
     
@@ -2181,35 +2322,57 @@ def affidavit_watermark_everything(watermark_name,watermark_instance):
     
         for element in corpus_transactions:
         
-            if len(element.AffidavitString) > 0:
-                element.affidavit_watermark_string = watermark_name
-                #element.actual_affidavit_watermark = watermark_instance
-                element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
-        
-                element.BankRecordsUIDArray = str(element.bank_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("ALBK" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")
-                
-                element.InternalRecordUIDArray = str(element.internal_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("GRLV" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")   
-                try:
-                    element.PostDay = element.PostDay.zfill(2)
-                    element.PostMonth = element.PostMonth.zfill(2)
-                    element.ValueDay = element.ValueDay.zfill(2)
-                    element.ValueMonth = element.ValueMonth.zfill(2)
-                except:
-                    filler = 0
-                    
-                element.save()
-                
-                prepareAffidavitString(element,corpus_doccount)
             
-                corpus_doccount += 1
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+
+            #element.BankRecordsUIDArray = str(element.bank_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("ALBK" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")
+            
+            #element.InternalRecordUIDArray = str(element.internal_records_list.all().values_list('affidavit_uid_string',flat=True)).replace("GRLV" + "__" + str(watermark_name) + "__element__","").replace("u","").replace("'","").replace("[","").replace("]","")   
+            try:
+                element.PostDay = element.PostDay.zfill(2)
+                element.PostMonth = element.PostMonth.zfill(2)
+                element.ValueDay = element.ValueDay.zfill(2)
+                element.ValueMonth = element.ValueMonth.zfill(2)
+            except:
+                filler = 0
+ 
+            element.save()
+            #if len(element.AffidavitString) > 0:
+
+            prepareAffidavitString(element,corpus_doccount)
+  
+            corpus_doccount += 1
             print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
     
 
-
+    with transaction.commit_on_success():
+    
+        db.reset_queries()
+        
+        corpus_tag = "ALBSR"   
+        corpus_doccount = 1  
+    
+        for element in corpus_albarakasource:
+        
+            element.affidavit_watermark_string = watermark_name
+            #element.actual_affidavit_watermark = watermark_instance
+            element.affidavit_uid_string = corpus_tag + "__" + str(watermark_name) + "__element__" + str(corpus_doccount).zfill(7) 
+            try:
+                element.Day = element.Day.zfill(2)
+                element.Month = element.Month.zfill(2)
+            except:
+                filler = 0
+            
+            element.save()
+            
+            corpus_doccount += 1
+            print "---->"+str(corpus_tag)+"--->"+str(corpus_doccount)
     
 def delete_temp_affidavit_files(corpus,partial_or_merge):
 
-    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN"]
+    corpus_list = ["ICR","SRC","GRLV","ALBK","TRN","ALBSR"]
 
     file_list = []
     
@@ -3582,6 +3745,21 @@ def test_transactions_content(field_name,record):
         
             actual_content = "an unknown Recipient"
     
+    if field_name == "icr_uid":
+        try:
+            field_content = str(record.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "No_Linked_ICR"
+        except:
+        
+            actual_content = "No_Linked_ICR"
+            
     if field_name == "grandelivre_uid":
         try:
             field_content = str(record.affidavit_uid_string)
@@ -3611,7 +3789,22 @@ def test_transactions_content(field_name,record):
         except:
         
             actual_content = "No_Linked_Bank_Record"
+    
+    if field_name == "albarakasource_uid":
+        try:
+            field_content = str(record.affidavit_uid_string)
+        
+            if field_content != "None" and field_content !="":
+           
+                actual_content = field_content
+
+            else:
             
+                actual_content = "No_Linked_Albaraka_Source"
+        except:
+        
+            actual_content = "No_Linked_Albaraka_Source"
+    
     if field_name == "Libdesc":
         try:
             field_content = str(record.Libdesc)
@@ -3706,31 +3899,216 @@ def add_transactions_entry_content(exhibit_count, record):
 
     return return_string
 
+def test_albarakasource_content(field_name,record):
+
+    actual_content = ""
+    
+    if field_name == "IssueDate":
+        try:
+            
+            day_bool = False
+            if record.Day != "NaN" and record.Day != "" and record.Day != "*":
+                day_string = str(record.Day)
+                day_bool = True
+            else:
+                day_string = "an unknown Day"
+                
+            month_bool = False
+            if record.Month != "NaN" and record.Month != "" and record.Month != "*":
+                
+                try:
+                
+                    month_string = Month_Dictionary[str(record.Month)]
+                    
+                except:
+                
+                    month_string = str(record.Month)
+                    
+                month_bool = True
+            else:
+                month_string = "an unknown Month"
+                
+            year_bool = False
+            if record.Year != "NaN" and record.Year != "" and record.Year != "*":
+                year_string = str(record.Year)
+                year_bool = True
+            else:
+                year_string = "an unknown Year"
+
+            actual_content = month_string + " " + day_string + ", " + year_string
+        
+        
+            if not day_bool and not month_bool and not year_bool:
+                
+                actual_content = "an unknown Date, "
+            
+        except:
+        
+            actual_content = "an unknown Date, "
+    
+    
+    if field_name == "Beneficiary":
+        try:
+            field_content = str(record.Beneficiary)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content +"'"
+
+            else:
+            
+                actual_content = "an unknown Beneficiary"
+        except:
+        
+            actual_content = "an unknown Beneficiary"
+
+    if field_name == "Amount":
+        try:
+            field_content = str(record.Amount)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "an unknown Amount"
+        except:
+        
+            actual_content = "an unknown Amount"
+            
+    if field_name == "Currency":
+        try:
+            field_content = str(record.Currency)
+        
+            if field_content !="" and field_content != "no" and field_content != " " and field_content != "*":
+           
+                actual_content = field_content
+
+            else:
+            
+                actual_content = "unknown"
+         
+        except:
+        
+            actual_content = "unknown"
+     
+    
+    if field_name == "DocType":
+        try:
+            field_content = str(record.Document_Type)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content +"'"
+
+            else:
+            
+                actual_content = "unknown"
+        except:
+        
+            actual_content = "unknown"
+     
+    if field_name == "Signed_By":
+        try:
+            field_content = str(record.Signed_By)
+        
+            if field_content !="" and field_content != "no" and field_content != "*":
+           
+                actual_content = "'"+field_content +"'"
+
+            else:
+            
+                actual_content = "an unknown Entity"
+        except:
+        
+            actual_content = "an unknown Entity"
+            
+    
+    return actual_content
+    
+def add_albarakasource_entry_content(exhibit_count, record):
+
+
+    return_string = ""
+
+    record_uid = record.affidavit_uid_string
+
+
+    pdf_string = ""
+    
+    '''    
+    Item 1.
+    
+       On April 17, 2006, (Issuedate), Al Baraka Bank processed a transfer to Al Ghussein (Beneficiary), of 7000 (Amount)
+       of Currency USD (Currency). The document containing this data was of the type Cheque (DocType), and was signed by Bachar (Signed_By).
+
+       ALBSR Item Reference UID: [ALBSR_element_001]
+    
+    '''
+
+
+    pdf_string += "Item #"+str(exhibit_count)+":"
+    pdf_string += "\n"
+
+    pdf_string += "    On "
+    #On April 17, 2006, / On an unknown Date,
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("IssueDate",record))
+    pdf_string = test_length_add_line(pdf_string, ", Al Baraka Bank processed a transfer to ")
+
+    # X Beneficiary / an unknown Beneficiary
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("Beneficiary",record))
+    pdf_string = test_length_add_line(pdf_string, ", of ")
+    # X Amount/ an unknown Amount
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("Amount",record))
+    pdf_string = test_length_add_line(pdf_string, " of Currency ")
+    
+    # X Currency/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("Currency",record))
+    pdf_string = test_length_add_line(pdf_string, ". The document containing this data was of type ")
+    
+    # X DocType/ unknown
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("DocType",record))
+    pdf_string = test_length_add_line(pdf_string, ", and was signed by ")
+    
+    # X Signed_By/ an unknown entity
+    pdf_string = test_length_add_line(pdf_string, test_albarakasource_content("Signed_By",record)+".")
+
+    pdf_string += "\n     "
+    
+    pdf_string = test_length_add_line(pdf_string, "ALBSR Item Reference UID: ["+str(record_uid)+"]")
+
+    return_string = pdf_string
+
+    return return_string
+    
 def prepareAffidavitString(transaction_item,count):
       
     affi_date = ""
     affi_amount = ""
     affi_company = ""
-    
+
     all_dates =  []
     all_dates.append(transaction_item.CompletePostDate)
     all_dates.append(transaction_item.CompleteValueDate)
-    
+
     for internal in transaction_item.internal_records_list.all():
         all_dates.append(internal.Day+"/"+internal.Month+"/"+internal.Year)
+
     for bankrecord in transaction_item.bank_records_list.all():
         all_dates.append(bankrecord.ValueDay+"/"+bankrecord.ValueMonth+"/"+bankrecord.ValueYear)
         all_dates.append(bankrecord.PostDay+"/"+bankrecord.PostMonth+"/"+bankrecord.PostYear)
-    
+
     if len(all_dates)>0:
         all_dates.sort(reverse=True)
         affi_date = all_dates[0]
-        
+  
     affi_amount = transaction_item.Amount + " " + transaction_item.BankCurrency
-    
+
     #print "----> "+transaction_item.Libdesc+" <-----"
+
     legend = TransactionLegend.objects.get(ReferenceType = transaction_item.Libdesc)
-    
+
     affi_final = ""
     
     if legend.ConditionalRule == "No":
@@ -3767,9 +4145,43 @@ def prepareAffidavitString(transaction_item,count):
         
     if "(JUMP)" in affi_final:
         
-            affi_final = affi_final.replace("(JUMP)","\n     ")    
+            affi_final = affi_final.replace("(JUMP)","\n     ") 
+        
     transaction_item.AffidavitString = affi_final
     transaction_item.save()
+
+def add_transactions_entry_content_icr(record):
+    
+    return_string = ""
+    
+    pdf_string = ""
+    
+    icr_records = record.ocr_records_list.all()
+    
+    if len(icr_records) == 0:
+    
+        pdf_string += "\n\n"
+        
+        pdf_string = test_length_add_line(pdf_string, "     There were no Extracted Data entries found linking to this data. ")
+   
+    else:
+
+        pdf_string += "\n\n"
+    
+        pdf_string = test_length_add_line(pdf_string, "    These are the references of the Extracted Data entries (ICR) related to this transaction:")
+
+        pdf_string += "\n"
+        
+        with transaction.commit_on_success():
+            for icr_record in icr_records:
+        
+                pdf_string += "\n            "
+       
+                pdf_string = test_length_add_line(pdf_string, "ICR Record Reference UID: ["+test_transactions_content("icr_uid",icr_record)+"]")
+
+    return_string = pdf_string
+    
+    return return_string
     
 def add_transactions_entry_content_internal(record):
 
@@ -3842,6 +4254,39 @@ def add_transactions_entry_content_albaraka(record):
                 pdf_string += "\n            "
         
                 pdf_string = test_length_add_line(pdf_string, "ALBK Record Reference UID: ["+test_transactions_content("albaraka_uid",bank_record)+"]")
+                
+    return_string = pdf_string
+    
+    return return_string
+    
+def add_transactions_entry_content_albarakasource(record):
+
+    return_string = ""
+    
+    pdf_string = ""
+    
+    albarakasource_records = record.albarakasource_records_list.all()
+    
+    if len(albarakasource_records) == 0:
+    
+        pdf_string += "\n\n"
+        
+        pdf_string = test_length_add_line(pdf_string, "     There were no Albaraka Source records found linking to this data. ")
+    
+    else:
+    
+        pdf_string += "\n\n"
+    
+        pdf_string = test_length_add_line(pdf_string, "    These are the references of the Albaraka Source records (ALBSR) related to this transaction:")
+
+        pdf_string += "\n"
+        
+        with transaction.commit_on_success():
+            for albarakasource_record in albarakasource_records:
+        
+                pdf_string += "\n            "
+        
+                pdf_string = test_length_add_line(pdf_string, "ALBSR Record Reference UID: ["+test_transactions_content("albarakasource_uid",albarakasource_record)+"]")
                 
     return_string = pdf_string
     

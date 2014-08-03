@@ -14,7 +14,7 @@ html,body {
 
 .ui-widget {
 
-    font-family: Arial,sans-serif;
+    font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 80%;
 }
 
@@ -237,7 +237,7 @@ html,body {
     top: 1%;
     left: 37%;
     width: 26%;
-    height: 20%;
+    height: 18%;
     pointer-events: all;
     
     overflow:auto;
@@ -252,7 +252,72 @@ html,body {
     height: 98%;
     border: 1px solid grey;
     overflow-y: auto;
+    white-space: normal;
     
+}
+
+#container_body {
+
+    background-color: rgba(238,238,238,1);
+    color: black;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.corpus_title {
+    background-color: rgb(205, 220, 255);
+    text-align: center;
+    font-weight: bold;
+}
+
+select {
+    margin-top: 10px;
+    /* padding-left: 10%; */
+    /* width: 50%; */
+    margin-left: 45px;
+    width: 150px;
+    background: aliceblue;
+    border: 1px solid darkgrey;
+}
+
+button {
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+#instance_name {
+
+    text-align: center;
+    /* font-weight: bold; */
+    font-size: 22px;
+    margin-top: 5px;
+
+}
+
+#create_new_instance_button {
+
+    margin-left: 43px;
+    margin-top: 12px;
+
+}
+.ui-dialog .ui-dialog-titlebar{
+    display:none;
+}
+.doctype_element {
+    list-style-type: none;
+    padding-left: -10px;
+    padding-left: 8px !important;
+    margin-left: -27px !important;
+    width: 100%;
+    font-family: Arial;
+}
+
+.ui-widget-header {
+
+    background: -webkit-linear-gradient(top, rgb(205, 226, 235) 0%,rgb(205, 226, 225) 100%);
+
 }
 
 div#document_lists_container {

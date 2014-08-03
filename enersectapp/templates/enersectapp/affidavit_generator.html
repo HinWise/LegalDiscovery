@@ -18,6 +18,7 @@
 <script type="text/javascript" src="{% static 'enersectapp/jquery-panelsnap/jquery.panelSnap.js' %}"></script>
 
 
+
 {% endblock config_libs %}
 
 {% block special_libs %}
@@ -26,6 +27,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/aristo/css/Aristo/Aristo.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'enersectapp/affidavit_generator.css' %}" />
+
 {% endblock special_libs %}
 
 {% block jqueryui_setups %}
@@ -306,7 +308,7 @@
         //Makes Corpus_list sortable and selectable
         
         
-        $( ".corpus_list" ).sortable({
+        /*$( ".corpus_list" ).sortable({
           placeholder: "ui-state-highlight-line",
           items: ".downloadable_element",
           handle: ".handle",
@@ -319,7 +321,7 @@
             })
         .find( ".downloadable_element" )
         .addClass( "selected_doctype_element")
-        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
+        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );*/
         
 
         function configLoadingScreen(){
@@ -439,9 +441,9 @@
                             
                                 <div class="document_list" corpus_type = "{{document_corpus.name}}">
                                     {% if document_corpus.corpus_name == "TRN" %}
-                                    <div>Corpus : Affidavit Transaction Corpus</div>
+                                    <div class="corpus_title">Affidavit Transaction Corpus</div>
                                     {%else%}
-                                    <div>Corpus : {{document_corpus.corpus_name}} corpus</div>
+                                    <div class="corpus_title">{{document_corpus.corpus_name}} corpus</div>
                                     {%endif%}
                                     
                                     
@@ -527,7 +529,7 @@
                     
                         <div id="affidavit_create_watermark_panel" title="Affidavit Instance Maker">
                             
-                            <div>{% if watermark_name%}{{watermark_name}}{% else %}No Instance{% endif %}</div>
+                            <div id="instance_name">{% if watermark_name%}{{watermark_name}}{% else %}No Instance{% endif %}</div>
                             
                             <button id="create_new_instance_button">Create New Instance</button>
                         

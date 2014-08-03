@@ -97,6 +97,94 @@ class InternalRecord(models.Model):
     def __unicode__(self):
         return self.Memo  
 
+class OcrRecord(models.Model):
+
+    OcrRecordIndex = models.IntegerField('OcrRecordIndex_Reference')
+
+    Document_Type = models.CharField('Document Type',max_length=255)
+    Amount = models.CharField('Amount',max_length=255)
+    Currency = models.CharField('Currency',max_length=255)
+    Company = models.CharField('Company',max_length=255)
+    Address = models.CharField('Address',max_length=255)
+    Telephone = models.CharField('Telephone',max_length=255)
+    City = models.CharField('City',max_length=255)
+    Country = models.CharField('City',max_length=255)
+    IssueDate = models.CharField('IssueDate',max_length=255)
+    Day = models.CharField('Issue Day',max_length=255)
+    Month = models.CharField('Issue Month',max_length=255)
+    Year = models.CharField('Issue Year',max_length=255)
+    Document_Number = models.CharField('Document Number',max_length=255)
+    PurchaseOrder_Number = models.CharField('Purchase Order Number',max_length=255)
+    Piece_Number = models.CharField('Piece Number',max_length=255)
+    ContainsArabic = models.CharField('ContainsArabic',max_length=255)
+    Page_Number = models.CharField('Page Number',max_length=255)
+    Notes = models.CharField('Notes',max_length=255)
+    Translation_Notes = models.CharField(max_length=255, default="NoTranslationField")
+    Source_Bank_Account = models.CharField('Source Bank Account',max_length=255)
+    Cheque_Number = models.CharField('Cheque Number for Remise de Cheques',max_length=255, default="NoChequeNumberField")
+    Sender = models.CharField('Sender Email/Fax/Letter',max_length=255, default="NoSenderField")
+    Receiver = models.CharField('Receiver Email/Fax/Letter',max_length=255, default="NoReceiverField")
+    Blank = models.CharField('Blank',max_length=255)
+    Unreadable = models.CharField('Unreadable',max_length=255)
+    
+    OldCompanyLine = models.CharField('OldCompanyLine',max_length=255,default = "MISSING NAME")
+    SecondVersionCompanyLine = models.CharField('SecondVersionCompanyLine',max_length=255,default = "MISSING NAME")
+    OldCompanyLineIndexInteger = models.IntegerField('OldCompanyLineIndexInteger',default = 0)
+    SecondVersionCompanyLineIndexInteger = models.IntegerField('SecondVersionCompanyLineIndexInteger',default = 0)
+    
+    OcrByCompany = models.ForeignKey(Group)
+    OcrAuthor = models.ForeignKey(User)
+    OcrCreationDate = models.CharField('OcrCreationDate',max_length=255)
+    
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
+    
+    def __unicode__(self):
+        return self.Company
+        
+class AlbarakaSource(models.Model):
+    
+    AlbarakaSourceIndex = models.IntegerField('AlbarakaSourceIndex_Reference')
+    
+    PagesOriginalArrayString = models.CharField('Pages original array string',max_length=255)
+    
+    FirstPage = models.CharField('FirstPage',max_length=7,default = "")
+    Document_Type = models.CharField('Document_Type',max_length=31,default = "")
+    Doc_ID_Num_Cheque = models.CharField('Doc_ID_Num_Cheque',max_length=15,default = "")
+    Doc_ID_Num_Invoice = models.CharField('Doc_ID_Num_Invoice',max_length=31,default = "")
+    
+    Beneficiary = models.CharField('Beneficiary',max_length=255,default = "")
+    Signed_By = models.CharField('Signed_By',max_length=255,default = "")
+    
+    Day = models.CharField('Day',max_length=3,default = "")
+    Month = models.CharField('Month',max_length=3,default = "")
+    Year = models.CharField('Year',max_length=7,default = "")
+    CompleteDate = models.CharField('CompleteDate',max_length=15,default = "")
+    
+
+    Amount = models.CharField('NetAmount',max_length=7,default = "")
+    Currency = models.CharField('Currency',max_length=7,default = "")
+    StringAmount = models.CharField('StringAmount',max_length=15,default = "")
+    
+    Description = models.CharField('Description',max_length=63,default = "")
+    
+    PageMarking = models.CharField('PageMarking',max_length=7,default = "")
+    
+    Filename = models.CharField('Filename',max_length=63,default = "")
+    FilenameUnclean = models.CharField('FilenameUnclean',max_length=63,default = "")
+    
+    Flagged = models.CharField('Flagged',max_length=63,default = "no")
+   
+    Entered_By = models.CharField('Entered_By',max_length=3,default = "")
+   
+   
+    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
+    affidavit_watermark_string = models.CharField(max_length=7,default="None")
+    affidavit_uid_string = models.CharField(max_length=63,default="None")
+    
+    def __unicode__(self):
+        return str(self.AlbarakaSourceIndex)
 
 class TransactionLegend(models.Model):
     
@@ -129,27 +217,40 @@ class TransactionTable(models.Model):
     
     InternalRecordUIDArray = models.CharField('Original Internal Record (Grande Livre) UID References',max_length=2047,default="")
     
-    Amount = models.CharField('Amount',max_length=31)
+    AlbarakaSourceListOriginalArray = models.CharField('Original Albaraka Source References',max_length=127,default="")
+    NumberAlbarakaSourceIndexes = models.IntegerField('Number Albaraka Source Indexes in Transaction',default=0)
+    
+    albarakasource_records_list = models.ManyToManyField(AlbarakaSource,related_name='albaraka sources list', null=True, blank=True, default=None)
+    
+    OcrRecordListOriginalArray = models.CharField('Original Ocr Record References',max_length=127,default="")
+    NumberOcrRecordIndexes = models.IntegerField('Number Ocr Record Indexes in Transaction',default=0)
+    
+    ocr_records_list = models.ManyToManyField(OcrRecord,related_name='ocr records list', null=True, blank=True, default=None)
+    
+    Amount = models.CharField('Amount',max_length=31,default = "")
     AmountDiscrepancy = models.IntegerField('Amount between Credit and Debit',default=0)
     
-    PostDay = models.CharField('Post Day',max_length=7)
-    PostMonth = models.CharField('Post Month',max_length=7)
-    PostYear = models.CharField('Post Year',max_length=7)
-    ValueDay = models.CharField('Value Day',max_length=7)
-    ValueMonth = models.CharField('Value Month',max_length=7)
-    ValueYear =  models.CharField('Value Year',max_length=7)
+    PostDay = models.CharField('Post Day',max_length=7,default = "")
+    PostMonth = models.CharField('Post Month',max_length=7,default = "")
+    PostYear = models.CharField('Post Year',max_length=7,default = "")
+    ValueDay = models.CharField('Value Day',max_length=7,default = "")
+    ValueMonth = models.CharField('Value Month',max_length=7,default = "")
+    ValueYear =  models.CharField('Value Year',max_length=7,default = "")
     
-    CompletePostDate = models.CharField('Complete Post Date',max_length=15)
-    CompleteValueDate = models.CharField('Complete Value Date',max_length=15)
+    CompletePostDate = models.CharField('Complete Post Date',max_length=15,default = "")
+    CompleteValueDate = models.CharField('Complete Value Date',max_length=15,default = "")
     
     DateDiscrepancy = models.IntegerField('Days between Post Date and Value Date',default=0)
 
-    Libdesc = models.CharField('Lib Description',max_length=63)
-    Reftran = models.CharField('Reference Transaction',max_length=31)
+    Libdesc = models.CharField('Lib Description',max_length=63,default = "")
+    Reftran = models.CharField('Reference Transaction',max_length=31,default = "")
     
-    BankAccount = models.CharField('Bank Account',max_length=31)
-    BankName = models.CharField('Bank Name',max_length=63)
-    BankCurrency = models.CharField('Bank Currency',max_length=31)
+    BankAccount = models.CharField('Bank Account',max_length=31,default = "")
+    BankName = models.CharField('Bank Name',max_length=63,default = "")
+    BankCurrency = models.CharField('Bank Currency',max_length=31,default = "")
+    
+    GLMemo = models.CharField('GL Memo',max_length=63,default = "")
+    GLCompany = models.CharField('GL Company',max_length=63,default = "")
     
     AffidavitDate = models.CharField('AffidavitDate',max_length=31,default="")
     AffidavitAmount = models.CharField('AffidavitAmount',max_length=31,default="")
@@ -175,7 +276,7 @@ class Record(models.Model):
     status = models.CharField(max_length=100, default="unlinked")
     linked_style_class = models.CharField(max_length=255, default="nolink")
     error_style_class = models.CharField(max_length=255, default="noerror")
-    internalrecord_link = models.ForeignKey(InternalRecord)
+    internalrecord_link = models.ForeignKey(InternalRecord,null=True,blank=True)
     
     def __unicode__(self):
         return self.status
@@ -417,53 +518,7 @@ class SourcePdf(models.Model):
     related_checked.short_description = 'Data Entry Completed/Checked?'
 
     
-
-class OcrRecord(models.Model):
-
-    OcrRecordIndex = models.IntegerField('OcrRecordIndex_Reference')
-
-    Document_Type = models.CharField('Document Type',max_length=255)
-    Amount = models.CharField('Amount',max_length=255)
-    Currency = models.CharField('Currency',max_length=255)
-    Company = models.CharField('Company',max_length=255)
-    Address = models.CharField('Address',max_length=255)
-    Telephone = models.CharField('Telephone',max_length=255)
-    City = models.CharField('City',max_length=255)
-    Country = models.CharField('City',max_length=255)
-    IssueDate = models.CharField('IssueDate',max_length=255)
-    Day = models.CharField('Issue Day',max_length=255)
-    Month = models.CharField('Issue Month',max_length=255)
-    Year = models.CharField('Issue Year',max_length=255)
-    Document_Number = models.CharField('Document Number',max_length=255)
-    PurchaseOrder_Number = models.CharField('Purchase Order Number',max_length=255)
-    Piece_Number = models.CharField('Piece Number',max_length=255)
-    ContainsArabic = models.CharField('ContainsArabic',max_length=255)
-    Page_Number = models.CharField('Page Number',max_length=255)
-    Notes = models.CharField('Notes',max_length=255)
-    Translation_Notes = models.CharField(max_length=255, default="NoTranslationField")
-    Source_Bank_Account = models.CharField('Source Bank Account',max_length=255)
-    Cheque_Number = models.CharField('Cheque Number for Remise de Cheques',max_length=255, default="NoChequeNumberField")
-    Sender = models.CharField('Sender Email/Fax/Letter',max_length=255, default="NoSenderField")
-    Receiver = models.CharField('Receiver Email/Fax/Letter',max_length=255, default="NoReceiverField")
-    Blank = models.CharField('Blank',max_length=255)
-    Unreadable = models.CharField('Unreadable',max_length=255)
     
-    OldCompanyLine = models.CharField('OldCompanyLine',max_length=255,default = "MISSING NAME")
-    SecondVersionCompanyLine = models.CharField('SecondVersionCompanyLine',max_length=255,default = "MISSING NAME")
-    OldCompanyLineIndexInteger = models.IntegerField('OldCompanyLineIndexInteger',default = 0)
-    SecondVersionCompanyLineIndexInteger = models.IntegerField('SecondVersionCompanyLineIndexInteger',default = 0)
-    
-    OcrByCompany = models.ForeignKey(Group)
-    OcrAuthor = models.ForeignKey(User)
-    OcrCreationDate = models.CharField('OcrCreationDate',max_length=255)
-    
-    actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
-    affidavit_watermark_string = models.CharField(max_length=7,default="None")
-    affidavit_uid_string = models.CharField(max_length=63,default="None")
-    
-    def __unicode__(self):
-        return self.Company
-
 class CompanyOriginal(models.Model):
     ledgeryear_original = models.CharField(max_length=255, default="None")
     accountnumber_original = models.CharField(max_length=255, default="None")
@@ -521,7 +576,7 @@ class PdfRecord(models.Model):
     linked_style_class = models.CharField(max_length=255, default="nolink")
     error_style_class = models.CharField(max_length=255, default="noerror")
     skip_counter = models.CharField(max_length=10, default='0')
-    record_link = models.ForeignKey(Record)
+    record_link = models.ForeignKey(Record,null=True,blank=True)
     sourcedoc_link = models.ForeignKey(SourcePdf)
     ocrrecord_link = models.ForeignKey(OcrRecord)
     companytemplate_link = models.ForeignKey(CompanyTemplate)

@@ -134,7 +134,7 @@
                             
                                 for(var k = 0; k < all_search_tags.length; k++)
                                 {
-                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number" && all_search_tags[k] != "PDF Views")
+                                    if(all_search_tags[k] != "Amount" && all_search_tags[k] != "Complete Date" && all_search_tags[k] != "Piece Number" && all_search_tags[k] != "Company" && all_search_tags[k] != "Movement Number" && all_search_tags[k] != "GRLV PDF Views" && all_search_tags[k] != "ICR PDF Views")
                                     {
                                         row.cells.push({ text: evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]) });
                                         //row.cells.push(evaluateAddToRow(all_search_tags[k],all_candidates_data[i].transactions_list[j]));
@@ -144,7 +144,8 @@
                             
                             }
                             
-                            row.cells.push({ text: evaluateAddToRow("PDF Views",all_candidates_data[i].transactions_list[j]) });
+                            row.cells.push({ text: evaluateAddToRow("GRLV PDF Views",all_candidates_data[i].transactions_list[j]) });
+                            row.cells.push({ text: evaluateAddToRow("ICR PDF Views",all_candidates_data[i].transactions_list[j]) });
                             
                             rows_list.push(row);
                         }
@@ -181,7 +182,8 @@
             
             }
             
-            headers_row.push({text: "PDF Views", class: 'theader' });
+            headers_row.push({text: "GRLV PDF Views", class: 'theader' });
+            headers_row.push({text: "ICR PDF Views", class: 'theader' });
             
             headers_list.push(headers_row);
             
@@ -452,18 +454,47 @@
                 
                 }
             }
-            if(tag_name == "PDF Views")
+            if(tag_name == "GRLV PDF Views")
             {
+                final_value = ""
+                
                 if(complete_item.internal_records.length == 1)
                 {
-                    final_value = complete_item.internal_records[0].Filename;
+                    final_value = "grandelivreglobale/"+complete_item.internal_records[0].Filename;
                     
                 }
                 else if(complete_item.internal_records.length > 1)
                 {
                     for(record in complete_item.internal_records)
                     {
-                        temp_value = complete_item.internal_records[record].Filename;
+                        temp_value = "grandelivreglobale/"+complete_item.internal_records[record].Filename;
+                        
+                        if(!temp_value) temp_value = "-";
+                        
+                        final_value += temp_value+"|"
+                    }
+                
+                }
+            }
+            if(tag_name == "ICR PDF Views")
+            {
+                console.log(complete_item.ocr_records)
+                final_value = ""
+                
+                if(complete_item.ocr_records.length == 1)
+                {
+                    final_value = complete_item.ocr_records[0].pdfrecord__sourcedoc_link__job_directory;
+                    final_value += "/"
+                    final_value += complete_item.ocr_records[0].pdfrecord__sourcedoc_link__filename;
+                    
+                }
+                else if(complete_item.ocr_records.length > 1)
+                {
+                    for(record in complete_item.ocr_records)
+                    {
+                        temp_value = complete_item.ocr_records[record].pdfrecord__sourcedoc_link__job_directory;
+                        temp_value += "/"
+                        temp_value += complete_item.ocr_records[record].pdfrecord__sourcedoc_link__filename;
                         
                         if(!temp_value) temp_value = "-";
                         
@@ -493,12 +524,13 @@
                     
                     path = different_pathnames[i]
                     
-                    s += '<div path_filename="'+path+'" class="pdf_button ui-icon ui-icon-document"><div>';
-                    if(i!=different_pathnames.length-1)
+                    if(path != "" && path != "-")
                     {
-                        xanto = i
+                        s += '<div path_filename="'+path+'" class="pdf_button ui-icon ui-icon-document"></div>';
                     }
+                    
                 }
+                console.log($(this))
                 $(this).text("");
                 $(this).append(s);
             });
@@ -526,7 +558,7 @@
                     
                     var path_filename = $(this).attr("path_filename");
                     
-                    var frame = '<iframe id="transaction_graph" src="http://54.200.180.182/sourcepdfs/grandelivreglobale/'+path_filename+'" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
+                    var frame = '<iframe id="transaction_graph" src="http://54.200.180.182/sourcepdfs/'+path_filename+'" width='+frame_width+' height='+frame_height+' frameBorder="0"></iframe>'
                     
                     $("#iframe_test").append(frame);
                   //alert("The span element was clicked.");

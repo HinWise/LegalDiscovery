@@ -85,6 +85,41 @@ def show_transaction(request,transaction_index):
         ]}
         internal_records_list.append(helper_dict)
 
+    item_icr_records = transaction_item.ocr_records_list.all()
+    
+    icr_records_list = []
+
+    for icr in item_icr_records:
+        print "<-----------------"
+        print "-----------------"
+        print icr.pk
+        print "-----------------"
+        print "----------------->"
+        helper_dict = {"name":"Icr Record "+ str(icr.OcrRecordIndex),"children":[
+            {"name":"Amount = "+str(icr.Amount) +" "+ str(icr.Currency)},
+            {"name":"Company = "+str(icr.Company)},
+            {"name":"Complete Date = "+icr.Day+"/"+icr.Month+"/"+icr.Year},
+            {"name":"Document Type = "+icr.Document_Type},
+            {"name":"Piece Number = "+icr.Piece_Number},
+            {"name":"Document Number = "+icr.Document_Number},
+            {"name":"Purchase Order Number = "+icr.PurchaseOrder_Number},
+            {"name":"Account Number = "+icr.Source_Bank_Account},
+            {"name":"Cheque Number = "+str(icr.Cheque_Number)},
+            {"name":"Address = "+str(icr.Address)},
+            {"name":"Telephone = "+str(icr.Telephone)},
+            {"name":"City = "+str(icr.City)},
+            {"name":"Country = "+str(icr.Country)},
+            {"name":"Page_Number = "+str(icr.Page_Number)},
+            {"name":"Memo = "+str(icr.Notes)},
+            {"name":"Sender = "+str(icr.Sender)},
+            {"name":"Receiver = "+str(icr.Receiver)},
+            {"name":"Contains Arabic? = "+str(icr.ContainsArabic)},
+            {"name":"Is Blank? = "+str(icr.Blank)},
+            {"name":"Is Unreadable? = "+str(icr.Unreadable)},
+            
+        ]}
+        icr_records_list.append(helper_dict)
+        
     if len(internal_records_list) > 0:
         internal_records_dict = {"name":"Associated Internal Records","children":internal_records_list}
     else:
@@ -94,7 +129,13 @@ def show_transaction(request,transaction_index):
         bank_records_dict = {"name":"Associated Bank Records","children":bank_records_list}
     else:
         bank_records_dict = {"name":"Associated Bank Records"}
-        
+
+    
+    if len(icr_records_list) > 0:
+        icr_records_dict = {"name":"Associated ICR Records","children":icr_records_list}
+    else:
+        icr_records_dict = {"name":"Associated ICR Records"}
+
     main_content_list = [{"name":"Amount = "+transaction_item.Amount},{"name":"Amount Discrepancy= "+str(transaction_item.AmountDiscrepancy)},
         {"name":"PostDate = "+transaction_item.PostDay+"/"+transaction_item.PostMonth+"/"+transaction_item.PostYear},
         {"name":"ValueDate = "+transaction_item.ValueDay+"/"+transaction_item.ValueMonth+"/"+transaction_item.ValueYear},
@@ -107,7 +148,9 @@ def show_transaction(request,transaction_index):
         {"name":"NumberBankRecordIndexes = "+str(transaction_item.NumberBankRecordIndexes)},
         bank_records_dict,
         {"name":"NumberInternalRecordIndexes = "+str(transaction_item.NumberInternalRecordIndexes)},
-        internal_records_dict
+        internal_records_dict,
+        {"name":"NumberOcrRecordIndexes = "+str(transaction_item.NumberOcrRecordIndexes)},
+        icr_records_dict
     ]
     
     transaction_dict = { "name":"Transaction "+str(transaction_item.TransactionIndex),"children":main_content_list}
