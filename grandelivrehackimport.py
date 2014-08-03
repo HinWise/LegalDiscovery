@@ -1,6 +1,6 @@
 ###Importing the Grande Livre Hack Information
 
-csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedGrandeLivreHack.csv"
+csv_filepathname_sourcepdfs="C:/Dropbox/GitHub/LegalDiscovery/databases/MatchedGrandeLivre.csv"
 # Full path to the directory immediately above your django project directory
 #your_djangoproject_home="/srv/enersectapp/app/ProjectFolder"
 your_djangoproject_home="C:/Dropbox/GitHub/LegalDiscovery/"
