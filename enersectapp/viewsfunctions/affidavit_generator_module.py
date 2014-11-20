@@ -187,7 +187,8 @@ def document_corpus_maker():
             
             
     icr_corpus_dict["corpus_name"] = "ICR"
-    icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
+    #icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
+    icr_corpus_dict["corpus_contents"] = [os.path]
     
     sourcepdfs_corpus_dict["corpus_name"] = "SRC"
     sourcepdfs_corpus_dict["corpus_contents"] = sourcepdfs_corpus_contents_list
