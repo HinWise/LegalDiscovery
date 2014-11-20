@@ -141,4 +141,6 @@ def download_emails(request,file_to_download):
     response['Content-Length']      = file_to_send.size    
     response['Content-Disposition'] = 'attachment; filename='+file_to_download
     
+    return HttpResponseRedirect(reverse('enersectapp:app_login', args=()))
+    
     return response 
