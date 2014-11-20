@@ -88,8 +88,8 @@ def download_emails_interface(request):
         download_emails(request,file_to_download)
     
     
-    temp_documents = os.listdir('legaldiscoverytemp')
-
+    temp_documents = os.listdir(os.getcwd())
+    
     all_documents.extend(temp_documents)
     
     all_documents = sorted(all_documents)
