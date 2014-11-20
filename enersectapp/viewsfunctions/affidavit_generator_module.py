@@ -105,7 +105,7 @@ def affidavit_generator(request):
         document_corpus_list = []
          
     context = {'user_type':user_type,'the_user':the_user,
-                'document_corpus_list':document_corpus_list,'watermark_name':watermark_name}
+                'document_corpus_list':document_corpus_list,'watermark_name':os.path}
     
     return render(request,'enersectapp/affidavit_generator.html',context)
 
@@ -187,8 +187,7 @@ def document_corpus_maker():
             
             
     icr_corpus_dict["corpus_name"] = "ICR"
-    #icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
-    icr_corpus_dict["corpus_contents"] = [os.path]
+    icr_corpus_dict["corpus_contents"] = icr_corpus_contents_list
     
     sourcepdfs_corpus_dict["corpus_name"] = "SRC"
     sourcepdfs_corpus_dict["corpus_contents"] = sourcepdfs_corpus_contents_list
