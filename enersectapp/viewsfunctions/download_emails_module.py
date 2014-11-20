@@ -89,6 +89,8 @@ def download_emails_interface(request):
     
     
     temp_documents = os.listdir('legaldiscoverytemp')
+    console.log(os.path)
+    console.log(os.listdir())
     all_documents.extend(temp_documents)
     
     all_documents = sorted(all_documents)
