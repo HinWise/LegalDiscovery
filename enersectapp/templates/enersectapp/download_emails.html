@@ -444,7 +444,7 @@
                                     <div class="corpus_title">Emails corpus</div>
                                     
 
-                                    <select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
+                                    <!--<select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
                                             <option value="" disabled selected>Nº Max Parts to Download</option>
                                
                                             <option value="1">1</option>
@@ -462,7 +462,7 @@
                                             <option value="10000">10000</option>
                                             <option value="10000000000000">All</option>
                                             
-                                    </select>
+                                    </select>-->
                                                                         
                                     <!--<button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="emails">Download Chosen Number of Email Files</button>
                                     <button id="complete_corpus_button" class="complete_corpus_button" corpus_name ="emails">Continue Download where it was left</button>-->
@@ -470,12 +470,12 @@
                                     
                                     {% for file in all_documents %}
                                     <ul class="corpus_list">
-                                    <li class="ui-state-default doctype_element downloadable_element" file_name = "{{file.file_name}}"">
+                                    <li class="ui-state-default doctype_element downloadable_element" file_name = "{{file}}"">
                                   
-                                    <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count"></span>
+                                    <span file_name="{{file}}" class="doctype_list_name">{{file}}</span><span class="doctype_list_count"></span>
                                     
-                                    <div class='edit_doctype_element' file_name="{{file.file_name}}" cute_name="{{file.file_name}}">
-                                        <span class='ui-icon ui-icon-download download_file_button' corpus_name ="emails" file_name ="{{file.file_name}}" ></span>
+                                    <div class='edit_doctype_element' file_name="{{file}}" cute_name="{{file}}">
+                                        <span class='ui-icon ui-icon-download download_file_button' corpus_name ="emails" file_name ="{{file}}" ></span>
                                     </div>
                                     
                                     </li>
