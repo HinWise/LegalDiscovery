@@ -143,6 +143,6 @@ def download_emails(request,file_to_download):
     
     response = HttpResponse(file_to_send,content_type='application/x-gzip')
     #response['Content-Length']      = file_to_send.size os.path.getsize(filename)    
-    response['Content-Disposition'] = 'attachment; filename='+file_to_download
+    response['Content-Disposition'] = 'attachment; filename=test.gz'
         
     return response 
