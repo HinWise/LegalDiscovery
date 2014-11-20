@@ -88,7 +88,7 @@ def download_emails_interface(request):
         download_emails(request,file_to_download)
     
     
-    temp_documents = os.listdir('../../../../home/ec2-user')
+    temp_documents = os.listdir('emails/')
     all_documents.extend(temp_documents)
     
     all_documents = sorted(all_documents)
