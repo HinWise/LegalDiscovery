@@ -105,7 +105,7 @@ def affidavit_generator(request):
         document_corpus_list = []
          
     context = {'user_type':user_type,'the_user':the_user,
-                'document_corpus_list':document_corpus_list,'watermark_name':os.path}
+                'document_corpus_list':document_corpus_list,'watermark_name':watermark_name}
     
     return render(request,'enersectapp/affidavit_generator.html',context)
 
