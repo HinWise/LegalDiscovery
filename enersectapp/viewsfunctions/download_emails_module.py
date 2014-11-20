@@ -89,7 +89,7 @@ def download_emails_interface(request):
     
     all_documents = []
     
-    temp_documents = os.listdir(os.getcwd())
+    temp_documents = os.listdir("app/ProjectFolder/")
     
     all_documents.extend(temp_documents)
     
