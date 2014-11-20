@@ -133,7 +133,8 @@ def download_emails(request,file_to_download):
    
     file_to_download = str(file_to_download)
         
-    path_file = "app/ProjectFolder/nasolid_mail/"+file_to_download
+    #path_file = "app/ProjectFolder/nasolid_mail/"+file_to_download
+    path_file = "app/ProjectFolder/nasolid_mail/test.txt"
     
     wrapper = FileWrapper(file(path_file))
     
@@ -141,8 +142,12 @@ def download_emails(request,file_to_download):
     #file_opened = open("app/ProjectFolder/nasolid_mail/"+file_to_download, 'w')
     file_to_send = wrapper
     
-    response = HttpResponse(file_to_send,content_type='application/x-gzip')
+    #response = HttpResponse(file_to_send,content_type='application/x-gzip')
     #response['Content-Length']      = file_to_send.size os.path.getsize(filename)    
-    response['Content-Disposition'] = 'attachment; filename=test.gz'
+    #response['Content-Disposition'] = 'attachment; filename=test.gz'
+    
+    response = HttpResponse(file_to_send,content_type='text/plain')
+    #response['Content-Length']      = file_to_send.size os.path.getsize(filename)    
+    
         
     return response 
