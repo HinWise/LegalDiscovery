@@ -89,7 +89,7 @@ def download_emails_interface(request):
     
     all_documents = []
     
-    temp_documents = os.listdir("app/ProjectFolder/")
+    temp_documents = os.listdir("app/ProjectFolder/nasolid_mail/")
     
     all_documents.extend(temp_documents)
     
