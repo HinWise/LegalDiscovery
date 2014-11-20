@@ -84,7 +84,7 @@ def download_emails_interface(request):
         affidavit_action_mark = ""
     
     
-    if affidavit_action_mark == download_file_action and file_to_download != "":
+    if affidavit_action_mark == "download_file_action" and file_to_download != "":
         download_emails(request,file_to_download)
     
     
