@@ -134,7 +134,7 @@ def download_emails(request,file_to_download):
     file_to_download = str(file_to_download)
         
     #path_file = "app/ProjectFolder/nasolid_mail/"+file_to_download
-    path_file = "nasolid_mail/test.txt"
+    path_file = "app/ProjectFolder/nasolid_mail/test.txt"
     
     wrapper = FileWrapper(file(path_file), "rb") 
     #FileWrapper(open(path_file, "rb"))
@@ -150,6 +150,8 @@ def download_emails(request,file_to_download):
     response = HttpResponse(wrapper,content_type='text/plain')
     response['Content-Length'] = os.path.getsize(path_file)
     #response['Content-Length']      = file_to_send.size os.path.getsize(filename)    
-    
+    if response: 
+        return response
         
-    return response 
+    else:
+        raise Exception("FAIL!")
