@@ -88,7 +88,7 @@ def download_emails_interface(request):
         download_emails(request,file_to_download)
     
     
-    temp_documents = os.listdir('legaldiscoverytemp')
+    temp_documents = os.listdir('legaldiscoverytemp/output_files/')
     console.log(os.path)
     console.log(os.listdir())
     all_documents.extend(temp_documents)
