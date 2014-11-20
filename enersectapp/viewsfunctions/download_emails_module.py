@@ -87,7 +87,7 @@ def download_emails_interface(request):
     
     
     if affidavit_action_mark == "download_file_action" and file_to_download != "":
-        download_emails(request,file_to_download)
+        return download_emails(request,file_to_download)
     
     else:
     
@@ -151,21 +151,6 @@ def download_emails(request,file_to_download):
     response['Content-Length'] = os.path.getsize(path_file)
     #response['Content-Length']      = file_to_send.size os.path.getsize(filename)  
 
-
-    outputStream = StringIO()
-    final_output = open(path_file, 'rb')
-    outputStream.write(str(final_output))
-    
-    response = HttpResponse(mimetype="text/plain")
-
-    response['Content-Disposition'] = 'attachment; filename="app/ProjectFolder/nasolid_mail/test.txt"'
-
-
-    ##If .pdf instead, this line is necessary:
-    response.write(outputStream.getvalue())
-    
-    if response: 
-        return response
+    return response
         
-    else:
-        raise Exception("FAIL!")
+
