@@ -32,7 +32,7 @@ num_jump = 1
 
 #00.AlbarakaSourceIndex	01.Page(s)	02.FirstPage	03.Doc_Type	04.Doc_ID_Num_Cheque 05.Doc_ID_Num_Invoice	
 #06.Beneficiary	07.Day	08.Month	09.Year	10.FullDate	11.StringAmount	12.Currency	13.Description	
-#14.Page_Marking	15.Signed_By	16.File	17.Flagged	18.Entered_By	19.Uniform_File	20.NetAmount
+#14.Page_Marking	15.Signed_By	16.File	17.Flagged	18.Entered_By	19.Uniform_File	20.NetAmount 21.ServerFilenames
 
 row_dictionary = {}
 
@@ -60,7 +60,7 @@ with transaction.commit_on_success():
             if counter % 100 == 0:
                 print counter
             if counter <= num_files and counter > num_jump:
-                new_item = AlbarakaSource(AlbarakaSourceIndex=0)
+                new_item = AlbarakaSource.objects.get(AlbarakaSourceIndex=int(row[0]))
                 new_item.save()
                 for column in range(len(row)):
                     
@@ -113,6 +113,8 @@ with transaction.commit_on_success():
                             new_item.Filename = str(row[column])
                         if row_value == "NetAmount": 
                             new_item.Amount = str(row[column])
+                        if row_value == "ServerFilenames": 
+                            new_item.ServerFilenames = str(row[column])
                     except:
                         print "<------"
                         print "BAD ROW -->"+str(row[0])+ "<---"

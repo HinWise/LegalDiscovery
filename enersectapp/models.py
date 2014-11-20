@@ -181,6 +181,7 @@ class AlbarakaSource(models.Model):
     
     Filename = models.CharField('Filename',max_length=63,default = "")
     FilenameUnclean = models.CharField('FilenameUnclean',max_length=63,default = "")
+    ServerFilenames = models.CharField('ServerFilenames',max_length=127,default = "")
     
     Flagged = models.CharField('Flagged',max_length=63,default = "no")
    
@@ -471,9 +472,16 @@ class Packet(models.Model):
 
 
 class SourcePdf(models.Model):
+
+    SourcePdfIndex = models.IntegerField('SourcePdfIndex_Reference',null=True,blank=True)
+    SourcePdfReference = models.CharField('SourcePdfReference',max_length=63,default="")
+    
+    corpus_type = models.CharField('CorpusType_Source',max_length=31,default="")
+
     job_directory = models.CharField('Job directory',max_length=255)
     filename = models.CharField('Pdf filename',max_length=255)
     document_type = models.CharField(max_length=255, default="uncategorized")
+    document_typeBeforeManifest = models.CharField(max_length=63, default="")
     original_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='source_original_document_type')
     original_document_type_string = models.CharField('DocType before using Category Changer Tool',max_length=255,default='No change')
     modified_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='source_modified_document_type')
@@ -485,11 +493,26 @@ class SourcePdf(models.Model):
     multipart_filename = models.CharField('Multipart Filename',max_length=255,default="none")
     corrupt = models.CharField('Corrupt',max_length=255,default="no")
     visitedonce = models.CharField(max_length=255,default="none")
+    
     Day = models.CharField('Day',max_length=31,default="")
     Month = models.CharField('Month',max_length=31,default="")
     Year = models.CharField('Year',max_length=31,default="")
-    FullDate = models.CharField('Year',max_length=31,default="")
+    FullDate = models.CharField('FullDate',max_length=31,default="")
     Currency = models.CharField('Currency',max_length=63,default="")
+    Document_Number = models.CharField('Document_Number',max_length=63,default="")
+    Beneficiary = models.CharField(max_length=63, default="")
+    Amount = models.CharField(max_length=63, default="")
+    Piece_Number = models.CharField(max_length=63, default="")
+    
+    DayBeforeManifest = models.CharField('DayBeforeManifest',max_length=31,default="")
+    MonthBeforeManifest = models.CharField('MonthBeforeManifest',max_length=31,default="")
+    YearBeforeManifest = models.CharField('YearBeforeManifest',max_length=31,default="")
+    FullDateBeforeManifest = models.CharField('FullDateBeforeManifest',max_length=31,default="")
+    CurrencyBeforeManifest = models.CharField('CurrencyBeforeManifest',max_length=63,default="")
+    Document_NumberBeforeManifest = models.CharField('Document_NumberBeforeManifest',max_length=63,default="")
+    BeneficiaryBeforeManifest = models.CharField(max_length=63, default="")
+    AmountBeforeManifest = models.CharField(max_length=63, default="")
+    Piece_NumberBeforeManifest = models.CharField(max_length=63, default="")
     
     actual_affidavit_watermark = models.ForeignKey(AffidavitInstance,null=True,blank=True)
     affidavit_watermark_string = models.CharField(max_length=7,default="None")
@@ -633,7 +656,39 @@ class TransactionsReportTemplate(models.Model):
     def __unicode__(self):
         return self.name
 
-        
+class AffidavitManifest(models.Model):   
+
+    AffidavitManifestIndex = models.IntegerField('AffidavitManifestIndex_Reference',null=True,blank=True)
+    AffidavitManifestReference = models.CharField('AffidavitManifestReference',max_length=63,default="")
+    
+    corpus_type = models.CharField('CorpusType',max_length=31,default="")
+    
+    directory = models.CharField('Directory',max_length=127,default="")
+    filename = models.CharField('Pdf filename',max_length=127,default="")
+    
+    modified_document_type = models.ForeignKey(SourceDocType,null=True,blank=True,related_name='manifest_modified_document_type')
+    size = models.CharField('Pdf size',max_length=31,default="none")
+    
+    multipart = models.CharField('Multipart document',max_length=31,default="none")
+    multipart_num_total = models.CharField('Multipart Parts',max_length=31,default="none")
+    multipart_filename = models.CharField('Multipart Filename',max_length=31,default="none")
+    
+    corrupt = models.CharField('Corrupt',max_length=31,default="no")
+    
+    Day = models.CharField('Day',max_length=31,default="")
+    Month = models.CharField('Month',max_length=31,default="")
+    Year = models.CharField('Year',max_length=31,default="")
+    Full_Date = models.CharField('FullDate',max_length=31,default="")
+    Currency = models.CharField('Currency',max_length=63,default="")
+    Document_Number = models.CharField('Document_Number',max_length=63,default="")
+    Document_Type = models.CharField(max_length=63, default="")
+    Beneficiary = models.CharField(max_length=63, default="")
+    
+    SourcePdfLink = models.ForeignKey(SourcePdf,null=True,blank=True,related_name='source_pdf_link')
+    OcrRecordLink = models.ForeignKey(OcrRecord,null=True,blank=True,related_name='ocr_record_link')
+    InternalRecordLink = models.ForeignKey(InternalRecord,null=True,blank=True,related_name='internal_record_link')
+    BankRecordLink = models.ForeignKey(BankRecord,null=True,blank=True,related_name='bank_record_link')
+    AlbarakaSourceLink = models.ForeignKey(AlbarakaSource,null=True,blank=True,related_name='albarakasource_record_link')
 
 class UserProfile(models.Model):  
     user = models.OneToOneField(User)

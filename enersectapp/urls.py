@@ -296,5 +296,9 @@ urlpatterns = patterns('',
     
     
     
+    # Email file parts downloading tool
+    # Allows you to download email parts, for the Marios project
+    # ex: enersectapp/emails_ui/download_emails/
+    url(r'^emails_ui/download_emails/$', views.download_emails, name='download_emails'),
    
 )

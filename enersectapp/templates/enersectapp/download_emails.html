@@ -1,0 +1,529 @@
+{% load i18n %}
+{% load staticfiles %}
+
+
+
+{% block page_title %}
+<head>
+<title>Search Tool</title>
+</head>
+{% endblock page_title %}
+
+{% block config_libs %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/jquery-ui-1.10.3.custom/css/eggplant/jquery-ui-1.10.3.custom.css' %}" />
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js' %}" ></script>
+<script type="text/javascript" src="{% static 'enersectapp/dragtablejs/jquery.dragtable.js' %}"></script>
+<script type="text/javascript" src="{% static 'enersectapp/jquery-panelsnap/jquery.panelSnap.js' %}"></script>
+
+
+
+{% endblock config_libs %}
+
+{% block special_libs %}
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/user_panel_module.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/site_basic_style_template.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/loadingscreen.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/aristo/css/Aristo/Aristo.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enersectapp/affidavit_generator.css' %}" />
+
+{% endblock special_libs %}
+
+{% block jqueryui_setups %}
+
+
+<script type="text/javascript">
+
+    
+
+    $(document).ready(function () {
+
+
+        
+        configLoadingScreen();
+        
+        createUserPanel();
+        
+
+        //Cute tooltips, configures fade-ins and outs for the Tooltips.
+
+        $(function() {
+            $( ".show-option" ).tooltip({
+
+              show: {
+                effect: "slideDown",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+            $( ".hide-option" ).tooltip({
+              hide: {
+                effect: "slideUp",
+                delay: 250
+              },tooltipClass: "custom-tooltip"
+            });
+        });
+
+        
+        //Panel for the Affidavit of Records
+        
+        if($( "#affidavit_panel" ))
+        
+        {
+        
+            $( "#affidavit_panel" ).dialog({
+              autoOpen: true,
+              height: $("#affidavit_panel_container").height(),
+              width: $("#affidavit_panel_container").width(),
+              modal: true,
+              closeOnEscape: false,
+              resizable: false,
+              draggable:false,
+              position: {
+                        my: "left top", at: "left top", of: $('#affidavit_panel_container')
+              }
+            });
+        }
+        
+        
+        //Create New Affidavit Instance Panel
+        
+        if($( "#affidavit_create_watermark_panel" ))
+        {
+            $( "#affidavit_create_watermark_panel" ).dialog({
+              autoOpen: true,
+              height: $("#affidavit_create_watermark_panel_container").height(),
+              width: $("#affidavit_create_watermark_panel_container").width(),
+              modal: true,
+              closeOnEscape: false,
+              resizable: false,
+              position: {
+                        my: "left top", at: "left top", of: $('#affidavit_create_watermark_panel_container')
+              }
+            });
+        }
+
+        //Affidavit of Records Mode Button
+        
+        $("#affidavit_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            
+            //Toggle
+            
+            if($('#report_type').attr("value") != "affidavit")
+            {
+
+                $('#report_type').attr("value","affidavit");
+            }
+            else
+            {
+
+                $('#report_type').attr("value","legal_discovery");
+            }
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Create Affidavit Watermark Instance
+        
+        $("#create_new_instance_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","create_instance_watermark");
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+
+        });
+        
+
+        //Generate Corpus of Files from Corpus
+        
+        $(".generate_corpus_files_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","generate_corpus_files_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            //Tells what corpus is selected
+            $('#selected_corpus_mark').attr("value",corpus_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+            
+            //Choose between Preview Output or Complete Output, which will translate into a
+            //maximum number of records to show and the way they are divided in different .pdfs
+
+            
+            var select_max_documents = $('#select_max_documents'+corpus_name).val();
+            $('#select_max_documents').attr("value",select_max_documents);
+            
+            var select_docs_per_pdf = $('#select_docs_per_pdf'+corpus_name).val();
+            $('#select_docs_per_pdf').attr("value",select_docs_per_pdf);
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Merge Files from Corpus Button
+        
+        $(".merge_files_button").button().click(function(){
+        
+            //toggleLoadingScreen();
+            //$('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","merge_corpus_files_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            $('#selected_corpus_mark').attr("value",corpus_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //COmplete Corpus Files Button (same as Generate Corpus, but with an extra mark)
+        
+        $(".complete_corpus_button").button().click(function(){
+        
+            toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","generate_corpus_files_action");
+            
+            $('#complete_corpus_mark').attr("value","complete");
+            
+            corpus_name = $(this).attr("corpus_name");
+            
+            //Tells what corpus is selected
+            $('#selected_corpus_mark').attr("value",corpus_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+            
+            //Choose between Preview Output or Complete Output, which will translate into a
+            //maximum number of records to show and the way they are divided in different .pdfs
+
+            
+            var select_max_documents = $('#select_max_documents'+corpus_name).val();
+            $('#select_max_documents').attr("value",select_max_documents);
+            
+            var select_docs_per_pdf = $('#select_docs_per_pdf'+corpus_name).val();
+            $('#select_docs_per_pdf').attr("value",select_docs_per_pdf);
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        //Download  File from Corpus Button
+        
+        $(".download_file_button").button().click(function(){
+        
+            //toggleLoadingScreen();
+            $('button').attr("disabled", true).addClass("ui-state-disabled");
+            $('#affidavit_action_mark').attr("value","download_file_action");
+            
+            corpus_name = $(this).attr("corpus_name");
+            file_name = $(this).attr("file_name");
+            
+            $('#selected_corpus_mark').attr("value",corpus_name);
+            $('#selected_file_mark').attr("value",file_name);
+
+            $('#legal_template').attr("value",$('#select_template_menu').val());
+          
+            $('#discovery_form').submit();
+        
+        });
+        
+        
+        //Make DocType_List sortable && dragable! 
+        
+        /*$( "#doctype_list" ).sortable({
+          placeholder: "ui-state-highlight-line",
+          items: "li:not(.unavailable_element)",
+          handle: ".handle",
+          distance: 10
+        })
+        .selectable({ 
+            filter:".available_element", cancel:".handle",
+            
+            create: function(event,ui) {
+            
+                var container = $( "#doctype_list" );
+                
+                var checked_elements = $('.doctype_element:not(.unavailable_element)[is_checked="checked"]');
+                
+                $(".ui-selected", container).not(checked_elements).removeClass("ui-selected").addClass("ui-unselecting");
+                
+                checked_elements.not(".ui-selected").addClass("ui-selecting");
+              
+                container.data("ui-selectable")._mouseStop(null);
+              
+                
+            },
+            
+            selected: function( event, ui ) {
+            
+                var clicked_element = $(ui.selected);
+                var clean_name = clicked_element.attr("clean_name");
+                
+                var selected_elem = $('.doctype_item_checkbox[real_field_name="'+clean_name+'"]');
+                
+                selected_elem.prop('checked', true); 
+                selected_elem.attr("is_checked","checked");
+                clicked_element.attr("is_checked","checked");
+                
+                
+            },
+            
+            unselected: function( event, ui ) {
+            
+                var clicked_element = $(ui.unselected);
+                
+                var clean_name = clicked_element.attr("clean_name");
+                
+                var selected_elem = $('.doctype_item_checkbox[real_field_name="'+clean_name+'"]');
+               
+                selected_elem.prop('checked', false); 
+                selected_elem.attr("is_checked","unchecked");
+                clicked_element.attr("is_checked","unchecked");
+                
+            }
+            
+            })
+        .find( ".available_element" )
+        .addClass( "selected_list_element")
+        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );*/
+        
+        
+        //Makes Corpus_list sortable and selectable
+        
+        
+        /*$( ".corpus_list" ).sortable({
+          placeholder: "ui-state-highlight-line",
+          items: ".downloadable_element",
+          handle: ".handle",
+          draggable: false,
+          distance: 10
+        })
+        .selectable({ 
+            filter:".downloadable_element", cancel:".handle",
+            
+            })
+        .find( ".downloadable_element" )
+        .addClass( "selected_doctype_element")
+        .prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );*/
+        
+
+        function configLoadingScreen(){
+
+            image_width = $('#LoadingSpinner').width();
+            image_height = $('#LoadingSpinner').height();
+
+            $('#LoadingSpinner').css("margin-left",-image_width/2);
+            $('#LoadingSpinner').css("margin-top",-image_height/2);
+
+            //text_width = $('#LoadingDescription').width();
+            //text_height = $('#LoadingDescription').height();
+
+            //$('#LoadingDescription').css("margin-left",-text_width/2);
+            //$('#LoadingDescription').css("margin-top",-text_height/2);
+
+        }
+
+        function toggleLoadingScreen(){
+
+            $('#LoadingScreen').toggleClass("invisible");
+            $('#export_mark').attr("value", "none");
+
+        }
+
+        function createUserPanel(){
+
+            $( "#user-panel" ).dialog({
+
+                  autoOpen:false,
+                  height: $('#userpanel_container').height(),
+                  width: $('#userpanel_container').width(),
+                  modal: false,
+                  closeOnEscape: false,
+                  resizable:true,
+                  show: {
+                    effect: "drop",
+                    duration: 500
+                  },
+                  hide: {
+                    effect: "drop",
+                    duration: 500
+                  },
+                  position: {
+                    my: "left bottom", at: "left bottom", of: $('#userpanel_container')
+                    }
+
+                });
+
+                $( "#userpanelmenu" ).menu({ position: { my: "right bottom", at: "right bottom" },
+                    select: function( event, ui ) {
+
+                    }
+                });
+            }
+
+    });
+
+</script>
+
+{% endblock jqueryui_setups %}
+ <body>
+{% if not is_popup %}
+
+<div id = "LoadingScreen" class="invisible">
+        <img id ="LoadingSpinner"  src = "{% static 'enersectapp/images/ajax-loader.gif' %}"/>
+        <h4 id="LoadingDescription"></h4>
+</div>
+
+{% block container_all %}
+
+<div id="container_all">
+
+{% block container_headers %}
+
+<div id="container_headers">
+
+</div>
+
+{% endblock container_headers %}
+
+{% block container_body %}
+
+<div id="container_body">
+
+{% block content%}
+
+    <div id="right_container">
+
+        <div id="userpanel_container">
+            <div id="user-panel" class="invisible" title="{{the_user}}">
+                <ul class="menuclass" id="userpanelmenu">
+                    <li><a id="logout_link" href="{% url 'enersectapp:app_login' %}">Change User</a></li>
+                    <li>--</li>
+                    <li><a id="toolsmenu_link" href="{% url 'enersectapp:main' %}">Return to Tools Menu</a></li>
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div id="panels_container">
+        
+            <form id="discovery_form" action="{% url 'enersectapp:download_emails' %}" method="post">
+            {% csrf_token %}
+                <fieldset id="fieldset_fields">
+                
+                    
+                    <div id="affidavit_panel_container">
+                    
+                        <div id="affidavit_panel" title="Affidavit Generator Control Panel">
+                    
+                            <div id="document_lists_container">
+                   
+                            
+                                <div class="document_list" corpus_type = "emails">
+                                    
+                                    <div class="corpus_title">Emails corpus</div>
+                                    
+
+                                    <select class="select_max_documents" name="select_max_documents{{document_corpus.corpus_name}}" id="select_max_documents{{document_corpus.corpus_name}}" corpus_type = "{{document_corpus.corpus_name}}">
+                                            <option value="" disabled selected>Nº Max Parts to Download</option>
+                               
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="250">250</option>
+                                            <option value="500">500</option>
+                                            <option value="1000">1000</option>
+                                            <option value="2500">2500</option>
+                                            <option value="5000">5000</option>
+                                            <option value="10000">10000</option>
+                                            <option value="10000000000000">All</option>
+                                            
+                                    </select>
+                                                                        
+                                    <!--<button id="generate_corpus_files_button" class="generate_corpus_files_button" corpus_name ="emails">Download Chosen Number of Email Files</button>
+                                    <button id="complete_corpus_button" class="complete_corpus_button" corpus_name ="emails">Continue Download where it was left</button>-->
+                                    
+                                    
+                                    {% for file in all_documents %}
+                                    <ul class="corpus_list">
+                                    <li class="ui-state-default doctype_element downloadable_element" file_name = "{{file.file_name}}"">
+                                  
+                                    <span file_name="{{file.file_name}}" class="doctype_list_name">{{file.file_name}}</span><span class="doctype_list_count"></span>
+                                    
+                                    <div class='edit_doctype_element' file_name="{{file.file_name}}" cute_name="{{file.file_name}}">
+                                        <span class='ui-icon ui-icon-download download_file_button' corpus_name ="emails" file_name ="{{file.file_name}}" ></span>
+                                    </div>
+                                    
+                                    </li>
+                                    </ul>
+                                    {% endfor %}
+                                    
+                                </div>
+                                
+                                
+                            {% endfor %}
+                    
+                            </div>
+                            
+                        </div>
+                    
+                    </div>
+                    
+                     
+   
+                    <input type="input" class="invisible" id="affidavit_action_mark" name="affidavit_action_mark" value=""/>
+                    <input type="input" class="invisible" id="selected_corpus_mark" name="selected_corpus_mark" value=""/>
+                    <input type="input" class="invisible" id="selected_file_mark" name="selected_file_mark" value=""/>
+                    <input type="input" class="invisible" id="select_max_documents" name="select_max_documents" value=""/>
+                    <input type="input" class="invisible" id="select_docs_per_pdf" name="select_docs_per_pdf" value=""/>
+                    <input type="input" class="invisible" id="complete_corpus_mark" name="complete_corpus_mark" value=""/>
+                    
+                </fieldset>
+
+            </form>
+        
+        
+    </div>
+
+
+
+{% endblock content%}
+
+
+</div>
+
+{% endblock container_body %}
+
+</div>
+
+{% endblock container_all %}
+
+{% endif %}
+</body>
+
+
+{% block sidebar %}{% endblock %}

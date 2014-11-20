@@ -1041,7 +1041,6 @@ def transactions_report(request):
     
         non_repeated_searchtags.append(str(tag))
     
-    print non_repeated_searchtags
 
     context = {"the_user":the_user,'number_of_searchtags': number_of_searchtags,
                 'searchtags_string':searchtags_string,'final_list_ordered_score':final_list_ordered_score,"tag_types":tag_types,"searchtags":searchtags,

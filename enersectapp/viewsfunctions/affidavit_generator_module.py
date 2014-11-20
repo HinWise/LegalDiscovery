@@ -603,7 +603,7 @@ def generate_icr_output(request,watermark_name):
                       
 
                     pdf_string = ""
-                    pdf_string += "                                                                                                                                 "+"ICR__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
+                    pdf_string += "                                                                                                                    "+"ICR__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                     pdf_string +="\n\n\n"
                     page_count +=1    
                 
@@ -1476,7 +1476,6 @@ def generate_albaraka_output(request,watermark_name):
 
 def generate_transactions_output(request,watermark_name):
     
-    
     try:
         max_documents = request.POST['select_max_documents']
     except:
@@ -1625,7 +1624,7 @@ def generate_transactions_output(request,watermark_name):
             print "----- " +str(selected_entry_item.pk)+ " ---- " + str(exhibit_count)
         
             if (doc_iterator % docs_per_pdf == 0 or doc_iterator == 0) and did_page_jump == False:
-            
+                
                 pdf_string += "                                                                                                                  "+"TRN__"+str(watermark_name)+"__page__"+str(page_count).zfill(10)
                 pdf_string +="\n\n\n"
                 page_count +=1
@@ -1644,20 +1643,22 @@ def generate_transactions_output(request,watermark_name):
             for record in corpus_final:
                 
                 record_uid = record.affidavit_uid_string
-                
+
                 pdf_content = add_transactions_entry_content(exhibit_count,record)
                 
-                if len(pdf_content) > 0:
+                if len(pdf_content) > 0 :
          
                     pdf_string += pdf_content
      
-                    pdf_string += add_transactions_entry_content_icr(record)
- 
-                    pdf_string += add_transactions_entry_content_internal(record)
-     
-                    pdf_string += add_transactions_entry_content_albaraka(record)
+                    if "No Valuable Information" not in pdf_content:
                     
-                    pdf_string += add_transactions_entry_content_albarakasource(record)
+                        pdf_string += add_transactions_entry_content_icr(record)
+     
+                        pdf_string += add_transactions_entry_content_internal(record)
+         
+                        pdf_string += add_transactions_entry_content_albaraka(record)
+                        
+                        pdf_string += add_transactions_entry_content_albarakasource(record)
                   
                     pdf_string += "\n\n     -Transaction Reference UID: ["+record_uid+"]"
 
@@ -1684,7 +1685,8 @@ def generate_transactions_output(request,watermark_name):
         
                     # temp file in memory of no more than 1048576 bytes (or it gets written to disk)
                     tmpfile.rollover()
-                  
+                    
+
                     the_canvas = canvas.Canvas(tmpfile,pagesize=A4)
                     string_to_pdf(the_canvas,pdf_string)
                            
@@ -4101,10 +4103,19 @@ def prepareAffidavitString(transaction_item,count):
 
     if len(all_dates)>0:
         all_dates.sort(reverse=True)
-        affi_date = all_dates[0]
-  
+        divided_chosen_date = all_dates[0].split("/")
+        day_string = divided_chosen_date[0]
+        month_string = Month_Dictionary[divided_chosen_date[1]]
+        year_string = divided_chosen_date[2]
+        affi_date = month_string + " " + day_string + ", " + year_string
+        
+
     affi_amount = transaction_item.Amount + " " + transaction_item.BankCurrency
 
+    for albarakasource in transaction_item.albarakasource_records_list.all():
+        if albarakasource.Beneficiary != "":
+            affi_company = albarakasource.Beneficiary
+    
     #print "----> "+transaction_item.Libdesc+" <-----"
 
     legend = TransactionLegend.objects.get(ReferenceType = transaction_item.Libdesc)
@@ -4113,7 +4124,7 @@ def prepareAffidavitString(transaction_item,count):
     
     if legend.ConditionalRule == "No":
         
-        affi_final = ""
+        affi_final = "Transaction #"+str(count)+": No Valuable Information."
         
     elif legend.ConditionalRule == "Yes":
     
