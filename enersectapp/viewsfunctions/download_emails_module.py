@@ -48,7 +48,7 @@ import random
 
 from django.core.files.base import ContentFile
 import tempfile
-from django.core.servers.basehttp import FileWrapper,FileWrapperFixed
+from django.core.servers.basehttp import FileWrapper,FixedFileWrapper
     
 def download_emails_interface(request):
 
