@@ -87,18 +87,20 @@ def download_emails_interface(request):
     if affidavit_action_mark == "download_file_action" and file_to_download != "":
         download_emails(request,file_to_download)
     
-    all_documents = []
+    else:
     
-    temp_documents = os.listdir("app/ProjectFolder/nasolid_mail/")
-    
-    all_documents.extend(temp_documents)
-    
-    all_documents = sorted(all_documents)
-    
-    context = {'user_type':user_type,'the_user':the_user,
-                'all_documents':all_documents}
-    
-    return render(request,'enersectapp/download_emails.html',context)
+        all_documents = []
+        
+        temp_documents = os.listdir("app/ProjectFolder/nasolid_mail/")
+        
+        all_documents.extend(temp_documents)
+        
+        all_documents = sorted(all_documents)
+        
+        context = {'user_type':user_type,'the_user':the_user,
+                    'all_documents':all_documents}
+        
+        return render(request,'enersectapp/download_emails.html',context)
     
     
 def download_emails(request,file_to_download):
@@ -133,9 +135,10 @@ def download_emails(request,file_to_download):
     
     string_to_return = file_to_download
     file_opened = open("app/ProjectFolder/nasolid_mail/"+file_to_download, 'w')
-    file_to_send = ContentFile(file_opened)
+    file_to_send = File(file_opened)
     
     response = HttpResponse(file_to_send,content_type='application/x-gzip')
     response['Content-Length']      = file_to_send.size    
     response['Content-Disposition'] = 'attachment; filename='+file_to_download
+    
     return response 
