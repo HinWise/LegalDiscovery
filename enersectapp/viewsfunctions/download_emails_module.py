@@ -48,7 +48,7 @@ import random
 
 from django.core.files.base import ContentFile
 import tempfile
-from django.core.servers.basehttp import FileWrapper,FixedFileWrapper
+from django.core.servers.basehttp import FileWrapper
     
 def download_emails_interface(request):
 
@@ -153,7 +153,7 @@ def download_emails(request,file_to_download):
 
 
     outputStream = StringIO()
-    final_output = (FileWrapperFixed(file(path_file, 'rb')))
+    final_output = (FileWrapper(file(path_file, 'rb')))
     final_output.write(outputStream)
     
     response = HttpResponse(mimetype="text/plain")
