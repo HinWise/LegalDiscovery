@@ -48,7 +48,7 @@ import random
 
 from django.core.files.base import ContentFile
 import tempfile
-from django.core.servers.basehttp import FileWrapper
+from django.core.servers.basehttp import FileWrapper,FileWrapperFixed
     
 def download_emails_interface(request):
 
@@ -149,7 +149,21 @@ def download_emails(request,file_to_download):
     
     response = HttpResponse(wrapper,content_type='text/plain')
     response['Content-Length'] = os.path.getsize(path_file)
-    #response['Content-Length']      = file_to_send.size os.path.getsize(filename)    
+    #response['Content-Length']      = file_to_send.size os.path.getsize(filename)  
+
+
+    outputStream = StringIO()
+    final_output = (FileWrapperFixed(file(path_file, 'rb')))
+    final_output.write(outputStream)
+    
+    response = HttpResponse(mimetype="text/plain")
+
+    response['Content-Disposition'] = 'attachment; filename="app/ProjectFolder/nasolid_mail/test.txt"'
+
+
+    ##If .pdf instead, this line is necessary:
+    response.write(outputStream.getvalue())
+    
     if response: 
         return response
         
