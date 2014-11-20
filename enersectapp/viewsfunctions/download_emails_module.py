@@ -136,7 +136,8 @@ def download_emails(request,file_to_download):
     #path_file = "app/ProjectFolder/nasolid_mail/"+file_to_download
     path_file = "app/ProjectFolder/nasolid_mail/test.txt"
     
-    wrapper = FileWrapper(open(path_file, "rb"))
+    wrapper = FileWrapper(file(path_file), "rb") 
+    #FileWrapper(open(path_file, "rb"))
     
     string_to_return = file_to_download
     #file_opened = open("app/ProjectFolder/nasolid_mail/"+file_to_download, 'w')
