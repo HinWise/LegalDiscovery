@@ -87,6 +87,7 @@ def download_emails_interface(request):
     if affidavit_action_mark == "download_file_action" and file_to_download != "":
         download_emails(request,file_to_download)
     
+    all_documents = []
     
     temp_documents = os.listdir(os.getcwd())
     
