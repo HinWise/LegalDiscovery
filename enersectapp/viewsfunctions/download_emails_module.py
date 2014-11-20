@@ -153,8 +153,8 @@ def download_emails(request,file_to_download):
 
 
     outputStream = StringIO()
-    final_output = open(path_file, 'w')
-    final_output.write(outputStream)
+    final_output = open(path_file, 'rb')
+    outputStream.write(str(final_output))
     
     response = HttpResponse(mimetype="text/plain")
 
