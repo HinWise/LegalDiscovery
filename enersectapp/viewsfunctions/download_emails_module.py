@@ -88,7 +88,7 @@ def download_emails_interface(request):
         download_emails(request,file_to_download)
     
     
-    temp_documents = os.listdir('nasolid_mail/')
+    temp_documents = os.listdir('legaldiscoverytemp/')
     all_documents.extend(temp_documents)
     
     all_documents = sorted(all_documents)
