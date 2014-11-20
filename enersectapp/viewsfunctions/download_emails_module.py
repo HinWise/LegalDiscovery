@@ -60,7 +60,7 @@ def download_emails_interface(request):
         
     if len(the_user.groups.filter(name="Clients")) >0:
     
-        user_type = "TeamLeader"
+        user_type = "Client"
         
     elif the_user.is_superuser == True :
     
@@ -115,7 +115,7 @@ def download_emails(request,file_to_download):
         
     if len(the_user.groups.filter(name="Clients")) >0:
     
-        user_type = "TeamLeader"
+        user_type = "Client"
         
     elif the_user.is_superuser == True :
     
